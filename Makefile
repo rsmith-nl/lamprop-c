@@ -1,8 +1,8 @@
 # Package name and version: BASENAME-VMAJOR.VMINOR.VPATCH.tar.gz
-BASENAME = foo  ## Name for the project
-VMAJOR   = 0
-VMINOR   = 1
-VPATCH   = 0
+BASENAME = lamprop  ## Name for the project
+VMAJOR   = 2025
+VMINOR   = 08
+VPATCH   = 03
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
@@ -15,27 +15,19 @@ LFLAGS = -s -flto -fmerge-constants  ## Linker flags
 # For a static executable, add the following LFLAGS.
 #LFLAGS += --static
 
-# for GTK+ 3.x or other pkg-config libraries
-#CFLAGS += `pkg-config --cflags gtk+-3.0` -DGTK_DISABLE_DEPRECATED
-#LIBS += `pkg-config --libs gtk+-3.0`
-
 # Other libraries to link against
-#LIBS += -lm
+LIBS += -lm
 
 PREFIX = ${HOME}/.local  ## Root for the installation dicrectory tree.
-
 BINDIR = $(PREFIX)/bin  ## Location where the binary will be installed.
-
 MANDIR = $(PREFIX)/man/man1 ## Location for the manual-page.
-
-# Location where the documentatiion will be installed.
 DOCSDIR= $(PREFIX)/share/doc/$(BASENAME)  ## Location for the documentation
 
 ##### Maintainer stuff goes here:
 DISTFILES = Makefile  ## Files that need to be included in the distribution.
 
 # Source files.
-SRCS = statusline-i3.c  ## source code files.
+SRCS = lamprop.c  ## source code files.
 
 ##### No editing necessary beyond this point
 # Object files.
@@ -60,8 +52,9 @@ install: $(BASENAME)  ## Install the program.
 .PHONY: uninstall
 uninstall:  ## Uninstall the program.
 	rm -f $(BINDIR)/$(BASENAME)
+	rm -f $(MANDIR)/$(BASENAME).1*
 
-statusline-i3.o: statusline-i3.c version.h
+lamprop.o: lamprop.c version.h
 
 version.h:
 	echo '#define VERSION "'${VMAJOR}"."${VMINOR}"."${VPATCH}'"' >version.h
