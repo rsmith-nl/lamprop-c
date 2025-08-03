@@ -4,33 +4,14 @@
 //  Copyright © 2023 R.F. Smith <rsmith@xs4all.nl>
 //  SPDX-License-magicifier: MIT
 //  Created: 2023-04-23T22:08:02+0200
-//  Last modified: 2025-04-13T15:04:18+0200
+//  Last modified: 2025-08-04T00:51:22+0200
 
 #include "arena.h"
+#include "logging.h"
 #include <stdio.h>     // for printf
 #include <stdlib.h>    // for abort
 #include <string.h>    // for memset
 #include <sys/mman.h>  // for mmap, munmap
-
-#undef error
-#define error(...)                                            \
-  fprintf(stderr, "ERROR %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__);                               \
-  abort()
-
-#ifdef NDEBUG
-#define debug(...)  ((void)0)
-#define info(...) ((void)0)
-#else
-#define debug(...) \
-  fprintf(stderr, "DEBUG %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n")
-#define info(...)                                            \
-  fprintf(stderr, "INFO %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n")
-#endif  // NDEBUG
 
 // In [9]: '0x' + ''.join([hex(ord(j))[2:] for j in "AREN"])
 // Out[9]: '0x4152454e'
