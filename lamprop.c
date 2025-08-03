@@ -4,9 +4,11 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-03T19:31:01+0200
+// Last modified: 2025-08-04T01:31:50+0200
 
+#include "arena.h"
 #include "logging.h"
+#include "stringview.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -16,16 +18,61 @@
 
 #undef fatal
 #define fatal(...)                                                  \
-  fprintf(stderr, "FATAL ERROR %s, line %i: ", __FILE__, __LINE__); \
+  fprintf(stderr, "ERROR %s, line %i: ", __FILE__, __LINE__); \
   fprintf(stderr, __VA_ARGS__);                                     \
   abort()
 
+// From parser.c
+extern Sv8 read_file(char *path, Arena *permanent);
 
 int main(int argc, char *argv[])
 {
-  UNUSED(argc);
-  UNUSED(argv);
   debug("starting lamprop...\n");
+  Arena perm = arena_create(16777216);
+  if (argc > 1) {
+    Sv8 contents = read_file(argv[argc-1], &perm);
+    info("contents of “%s” is %td bytes long.", argv[argc-1], contents.len);
+    ptrdiff_t nlines = sv8count(contents, '\n');
+    info("file “%s” contains %td lines.", argv[argc-1], nlines);
+    Sv8Cut ccut = sv8cut(contents, '\n');
+    int32_t fcnt = 0, rcnt = 0, tcnt = 0, mcnt = 0, lcnt = 0, scnt = 0;
+    while (ccut.ok == true) {
+      if (ccut.head.data[1] == ':') {
+        // info("found %c-line", ccut.head.data[0]);
+        switch (ccut.head.data[0]) {
+          case 'f':
+            fcnt++;
+            break;
+          case 'r':
+            rcnt++;
+            break;
+          case 't':
+            tcnt++;
+            break;
+          case 'm':
+            mcnt++;
+            break;
+          case 'l':
+            lcnt++;
+            break;
+          case 's':
+            scnt++;
+            break;
+          default:
+            break;
+        }
+      }
+      ccut = sv8cut(ccut.tail, '\n');
+    }
+    info("found %d fibers", fcnt);
+    info("found %d resins", rcnt);
+    info("found %d laminates", tcnt);
+    info("found %d laminate matrix", mcnt);
+    info("found %d lamina", lcnt);
+    info("found %d symmetries", scnt);
+  } else {
+    fprintf(stderr, "ERROR: no laminate file name supplied.\n");
+  }
   debug("ending lamprop...\n");
   return 0;
 }
