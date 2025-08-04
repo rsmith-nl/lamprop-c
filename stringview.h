@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-04T22:44:22+0200
+// Last modified: 2025-08-05T00:15:04+0200
 
 #pragma once
 #include <stddef.h>  // ptrdiff_t
@@ -59,6 +59,8 @@ extern Sv8Cut sv8cut(Sv8 s, char c);
 // Cut the string at the first whitespace from the left.
 extern Sv8Cut sv8lsplit(Sv8 s);
 
+// Convert a string to an integer.
+extern bool sv8toi(Sv8 s, int32_t *res);
 
 
 #ifdef __cplusplus

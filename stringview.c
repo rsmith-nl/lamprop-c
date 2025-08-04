@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-04T23:56:25+0200
+// Last modified: 2025-08-05T00:52:58+0200
 
 #include <assert.h>
 #include <stdbool.h>
@@ -132,3 +132,45 @@ Sv8Cut sv8lsplit(Sv8 s)
   return r;
 }
 
+bool sv8toi(Sv8 s, int32_t *res)
+{
+  s = sv8lstrip(s);
+  char *beg = s.data;
+  char *end = s.data + s.len;
+  int32_t number = 0;
+  bool negative = false;
+  // Handle leading sign
+  if (*beg=='-') {
+    negative = true;
+    beg++;
+    s.data++;
+  } else if (*beg=='+') {
+    beg++;
+    s.data++;
+  }
+  // Skip leading zeroes, if any
+  while (beg<end && *beg == '0') {
+    beg++;
+  }
+  // Initialize on first digit.
+  if (beg<end && *beg > '0' && *beg <= '9') {
+    number = (*beg - '0');
+    beg++;
+  }
+  while (beg<end && *beg >= '0' && *beg <= '9') {
+    number *= 10;
+    if (*beg > '0') {
+      number += (*beg - '0');
+    }
+    beg++;
+  }
+  if (beg > s.data) {
+    if (negative) {
+      *res = -number;
+    } else {
+      *res = number;
+    }
+    return true;
+  }
+  return false;
+}
