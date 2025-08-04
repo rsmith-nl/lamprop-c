@@ -11,7 +11,7 @@ VPATCH   = 03
 CFLAGS = -Os ## Compiler flags for C
 CFLAGS += -std=c11 -march=native -pipe -ffast-math
 CFLAGS += -Wall -Wshadow -Wpointer-arith -Wstrict-prototypes
-LFLAGS = -s -flto -fmerge-constants  ## Linker flags
+LFLAGS = -s -flto ## Linker flags
 # For a static executable, add the following LFLAGS.
 #LFLAGS += --static
 
