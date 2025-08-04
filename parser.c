@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-04T22:19:54+0200
+// Last modified: 2025-08-04T23:48:54+0200
 
 #include "arena.h"
 #include "stringview.h"
@@ -37,9 +37,13 @@ Sv8 read_file(char *path, Arena *permanent)
 
 Resin parse_resin(Sv8 line)
 {
-  // This function is only called when *line* starts with 'r:'.
-  // So we don't have to check that.
   Resin rv = {0};
+  Sv8Cut cut = sv8lsplit(line);
+  // This function is only called when *line* starts with 'r:'.
+  // So discard that.
+  cut = sv8lsplit(cut.tail);
+  //cut.head contains the Young's modulus.
+
   return rv;
 }
 
