@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-04T22:16:02+0200
+// Last modified: 2025-08-04T23:47:34+0200
 
 #include "arena.h"
 #include "logging.h"
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     info("found %d fibers", fcnt);
     info("found %d resins", rcnt);
     // Scan for laminates
-    int32_t tcnt = 0, mcnt = 0, lcnt = 0, scnt = 0;
+    int32_t tcnt = 0, scnt = 0;
     char current = ' ';
     ccut = sv8cut(contents, '\n');
     while (ccut.ok == true) {
@@ -68,7 +68,6 @@ int main(int argc, char *argv[])
             if (current != 't') {
               fprintf(stderr, "WARNING: unexpected m:-line; will be ignored");
             } else {
-              mcnt++;
               current = 'm';
               info("found m-line");
             }
@@ -77,7 +76,6 @@ int main(int argc, char *argv[])
             if (current != 'm' && current != 'l') {
               fprintf(stderr, "WARNING: unexpected l:-line; will be ignored");
             } else {
-              lcnt++;
               current = 'l';
               info("found l-line");
             }
@@ -98,9 +96,7 @@ int main(int argc, char *argv[])
       ccut = sv8cut(ccut.tail, '\n');
     }
     info("found %d laminates", tcnt);
-    info("found %d laminate matrix", mcnt);
-    info("found %d lamina", lcnt);
-    info("found %d symmetries", scnt);
+    info("found %d symmetric laminates", scnt);
   } else {
     fprintf(stderr, "ERROR: no laminate file name supplied.\n");
   }
