@@ -4,7 +4,7 @@
 //  Copyright © 2023 R.F. Smith <rsmith@xs4all.nl>
 //  SPDX-License-magicifier: MIT
 //  Created: 2023-04-23T22:08:02+0200
-//  Last modified: 2025-08-04T00:51:22+0200
+//  Last modified: 2025-08-04T20:21:09+0200
 
 #include "arena.h"
 #include "logging.h"
@@ -72,10 +72,12 @@ void *arena_alloc(Arena *arena, ptrdiff_t size, ptrdiff_t count, ptrdiff_t align
 void arena_destroy(Arena *arena)
 {
   if (arena == 0) {
-    error("null pointer used for arena\n");
+    error("null pointer used for arena ignored\n");
+    return;
   }
   if (arena->magic != ARENA_MAGIC) {
-    error("invalid arena %p; magic %d\n", (void *)arena, arena->magic);
+    error("invalid arena %p; magic %d ignored\n", (void *)arena, arena->magic);
+    return;
   }
   int rv = munmap(arena->begin, arena->guard - arena->begin);
   if (rv == -1) {
@@ -83,4 +85,15 @@ void arena_destroy(Arena *arena)
   }
   Arena empty = {0};
   *arena = empty;
+}
+
+void arena_empty(Arena *arena)
+{
+  if (arena == 0) {
+    error("null pointer used for arena ignored\n");
+  }
+  if (arena->magic != ARENA_MAGIC) {
+    error("invalid arena %p; magic %d ignored\n", (void *)arena, arena->magic);
+  }
+  arena->cur = arena->begin;
 }

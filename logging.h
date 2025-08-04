@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:49:24 +0200
-// Last modified: 2025-08-04T00:50:32+0200
+// Last modified: 2025-08-04T20:10:19+0200
 
 #pragma once
 
@@ -26,13 +26,15 @@
 
 #ifndef NDEBUG
 #undef warn
-#define warn(a, ...)                                              \
-  fprintf(stderr, "WARNING %s, line %i: ", __FILE__, __LINE__, ); \
-  fprintf(stderr, __VA_ARGS__)
+#define warn(...)                                            \
+  fprintf(stderr, "WARNING %s, line %i: ", __FILE__, __LINE__); \
+  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, "\n")
 #else
 #undef warn
 #define warn(...) (void)0
 #endif  // NDEBUG
+
 
 #ifndef NDEBUG
 #undef info
