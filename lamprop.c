@@ -4,11 +4,12 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-04T22:07:28+0200
+// Last modified: 2025-08-04T22:16:02+0200
 
 #include "arena.h"
 #include "logging.h"
 #include "stringview.h"
+#include "types.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -21,9 +22,6 @@
   fprintf(stderr, "ERROR %s, line %i: ", __FILE__, __LINE__); \
   fprintf(stderr, __VA_ARGS__);                                     \
   abort()
-
-// From parser.c
-extern Sv8 read_file(char *path, Arena *permanent);
 
 int main(int argc, char *argv[])
 {
