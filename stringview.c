@@ -4,13 +4,23 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-04T23:01:33+0200
+// Last modified: 2025-08-04T23:56:25+0200
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
 #include "stringview.h"
+
+
+static bool _isspace(char c)
+{
+  if (c==' '||c=='\t'|c=='\r'|c=='\n'||c=='\v'||c=='\f') {
+    return true;
+  }
+  return false;
+}
 
 bool sv8equals(Sv8 a, Sv8 b)
 {
@@ -19,7 +29,7 @@ bool sv8equals(Sv8 a, Sv8 b)
 
 Sv8 sv8lstrip(Sv8 s)
 {
-  while (s.len && *s.data<=' ') {
+  while (s.len && _isspace(*s.data)) {
     s.data++, s.len--;
   }
   return s;
@@ -27,7 +37,7 @@ Sv8 sv8lstrip(Sv8 s)
 
 Sv8 sv8rstrip(Sv8 s)
 {
-  while (s.len && s.data[s.len-1]<=' ') {
+  while (s.len && _isspace(s.data[s.len-1])) {
     s.len--;
   }
   return s;
@@ -102,16 +112,23 @@ Sv8Cut sv8lsplit(Sv8 s)
   char *beg = s.data;
   char *end = s.data + s.len;
   char *cut = beg;
+  char *startws = 0, *endws = 0;
   while (cut<end) {
-    char c = *cut;
-    if (c==' '||c=='\t'|c=='\r'|c=='\n'||c=='\v'||c=='\f') {
-      break;
+    if (_isspace(*cut)) { // whitespace
+      if (startws==0) {
+        startws = cut;
+      }
+    } else { // not whitespace
+      if (startws!=0) {
+        endws = cut;
+        break;
+      }
     }
     cut++;
   }
   r.ok   = cut < end;
-  r.head = sv8span(beg, cut);
-  r.tail = sv8span(cut+r.ok, end);
+  r.head = sv8span(beg, startws);
+  r.tail = sv8span(endws, end);
   return r;
 }
 
