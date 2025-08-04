@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-03T21:44:24+0200
+// Last modified: 2025-08-04T22:44:22+0200
 
 #pragma once
 #include <stddef.h>  // ptrdiff_t
@@ -55,6 +55,10 @@ extern Sv8 sv8span(char *beg, char *end);
 
 // Cut the string s at the character c.
 extern Sv8Cut sv8cut(Sv8 s, char c);
+
+// Cut the string at the first whitespace from the left.
+extern Sv8Cut sv8lsplit(Sv8 s);
+
 
 
 #ifdef __cplusplus
