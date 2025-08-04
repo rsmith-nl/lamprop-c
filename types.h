@@ -4,11 +4,11 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:31:50+0200
-// Last modified: 2025-08-03T20:12:19+0200
+// Last modified: 2025-08-04T22:23:27+0200
 
 #pragma once
 
-#include "sv.h"
+#include "stringview.h"
 
 typedef struct {
   float E;
@@ -38,7 +38,7 @@ typedef struct {
   float G12, G13, G23;
   float ν12, ν13, ν23;
   float αx, αy, αxy;
-  float Q̅11, Q̅12, Q̅16, Q̅22, Q̅26, Q̅66, Q̅s44, Q̅s55 Q̅s45;
+  float Q̅11, Q̅12, Q̅16, Q̅22, Q̅26, Q̅66, Q̅s44, Q̅s55, Q̅s45;
   float ρ;
   float C[6][6];
 } Lamina;
@@ -52,7 +52,7 @@ typedef struct {
   float ρ;
   float vf, wf;
   float ABD[6][6], abd[6][6];
-  float H[2][2], h[2][2]
+  float H[2][2], h[2][2];
   float Ex, Ey, Ez;
   float Gxy, Gyz, Gxz;
   float νxy, νyx;
@@ -67,6 +67,10 @@ typedef struct {
 extern "C" {
 #endif
 
+extern Sv8 read_file(char *path, Arena *permanent);
+
+extern Resin parse_resin(Sv8 line);
+extern Fiber parse_fiber(Sv8 line);
 
 #ifdef __cplusplus
 }
