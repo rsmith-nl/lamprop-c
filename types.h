@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:31:50+0200
-// Last modified: 2025-08-04T22:23:27+0200
+// Last modified: 2025-08-04T22:25:00+0200
 
 #pragma once
 
@@ -60,7 +60,7 @@ typedef struct {
   float C[6][6], S[6][6];
   float tEx, tEy, tEz;
   float tGxy, tGyz, tGxz;
-  float νxy, νyx, νyz;
+  float tνxy, tνyx, tνyz;
 } Laminate;
 
 #ifdef __cplusplus
