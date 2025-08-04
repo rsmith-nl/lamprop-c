@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
           case 'r':
             rcnt++;
             break;
-         default:
+          default:
             break;
         }
       }
@@ -97,7 +97,6 @@ int main(int argc, char *argv[])
       }
       ccut = sv8cut(ccut.tail, '\n');
     }
-
     info("found %d laminates", tcnt);
     info("found %d laminate matrix", mcnt);
     info("found %d lamina", lcnt);

@@ -29,20 +29,22 @@ Sv8 read_file(char *path, Arena *permanent)
   ptrdiff_t rv = fread(contents.data, sizeof(char), size, inputfile);
   if (rv != size) {
     fprintf(stderr,
-        "WARNING: file “%s” has size %td bytes, but only %td bytes read.\n",
-        path, size, rv);
+            "WARNING: file “%s” has size %td bytes, but only %td bytes read.\n",
+            path, size, rv);
   }
   return contents;
 }
 
-Resin parse_resin(Sv8 line) {
+Resin parse_resin(Sv8 line)
+{
   // This function is only called when *line* starts with 'r:'.
   // So we don't have to check that.
   Resin rv = {0};
   return rv;
 }
 
-Fiber parse_fiber(Sv8 line) {
+Fiber parse_fiber(Sv8 line)
+{
   // This function is only called when *line* starts with 'f:'.
   // So we don't have to check that.
   Fiber rv = {0};
