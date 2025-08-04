@@ -4,11 +4,12 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-04T00:33:02+0200
+// Last modified: 2025-08-04T22:19:54+0200
 
 #include "arena.h"
 #include "stringview.h"
 #include "logging.h"
+#include "types.h"
 
 //#include <stdint.h>
 //#include <stdbool.h>
@@ -33,3 +34,18 @@ Sv8 read_file(char *path, Arena *permanent)
   }
   return contents;
 }
+
+Resin parse_resin(Sv8 line) {
+  // This function is only called when *line* starts with 'r:'.
+  // So we don't have to check that.
+  Resin rv = {0};
+  return rv;
+}
+
+Fiber parse_fiber(Sv8 line) {
+  // This function is only called when *line* starts with 'f:'.
+  // So we don't have to check that.
+  Fiber rv = {0};
+  return rv;
+}
+
