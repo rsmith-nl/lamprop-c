@@ -33,6 +33,7 @@ SRCS = lamprop.c stringview.c parser.c arena.c  ## source code files.
 
 all: $(BASENAME)  ## Compile the program. (default)
 
+# This makefile uses a unit build.
 $(BASENAME): $(SRCS) version.h
 	$(CC) $(CFLAGS) $(LFLAGS) $(LDIRS) -o $(BASENAME) $(SRCS) $(LIBS)
 
