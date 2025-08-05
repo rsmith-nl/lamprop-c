@@ -4,11 +4,12 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-05T22:01:51+0200
+// Last modified: 2025-08-05T22:32:33+0200
 
 #pragma once
 #include <stddef.h>  // ptrdiff_t
 #include <stdbool.h>  // bool
+#include <stdint.h>  // int32_t
 
 #define SV8(s)    (Sv8){s, sizeof(s)-1}
 
