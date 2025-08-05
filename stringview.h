@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-05T00:15:04+0200
+// Last modified: 2025-08-05T22:01:51+0200
 
 #pragma once
 #include <stddef.h>  // ptrdiff_t
@@ -26,6 +26,17 @@ typedef struct {
   bool ok;
 } Sv8Cut;
 
+typedef struct {
+  double result;
+  Sv8 tail;
+  bool ok;
+} Sv8Double;
+
+typedef struct {
+  int32_t result;
+  Sv8 tail;
+  bool ok;
+} Sv8Int;
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,8 +71,9 @@ extern Sv8Cut sv8cut(Sv8 s, char c);
 extern Sv8Cut sv8lsplit(Sv8 s);
 
 // Convert a string to an integer.
-extern bool sv8toi(Sv8 s, int32_t *res);
+extern Sv8Int sv8toi(Sv8 s);
 
+Sv8Double sv8tod(Sv8 s);
 
 #ifdef __cplusplus
 }

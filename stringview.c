@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-05T00:52:58+0200
+// Last modified: 2025-08-05T22:23:50+0200
 
 #include <assert.h>
 #include <stdbool.h>
@@ -132,45 +132,182 @@ Sv8Cut sv8lsplit(Sv8 s)
   return r;
 }
 
-bool sv8toi(Sv8 s, int32_t *res)
+Sv8Int sv8toi(Sv8 s)
 {
+  Sv8Int rv = {0};
   s = sv8lstrip(s);
   char *beg = s.data;
   char *end = s.data + s.len;
-  int32_t number = 0;
+  int32_t state = 0, number = 0;
   bool negative = false;
-  // Handle leading sign
-  if (*beg=='-') {
-    negative = true;
-    beg++;
-    s.data++;
-  } else if (*beg=='+') {
-    beg++;
-    s.data++;
+  bool stop = false;
+  while (beg<end && !stop) {
+    char c = *beg++;
+    switch (state) {
+      case 0:
+        if (c=='+') {
+          state = 1;
+        } else if (c=='-') {
+          negative = true;
+          state = 1;
+        } else if (c=='0') {
+          state = 2;
+        } else if (c>='1' && c <='9') {
+          state = 3;
+          number = c - '0';
+        } else {
+          goto fail2;
+        }
+        break;
+      case 1:
+        if (c=='0') {
+          state = 2;
+        } else if (c>='1' && c <='9') {
+          state = 3;
+          number = c - '0';
+        } else {
+          goto fail2;
+        }
+        break;
+      case 2:
+        if (c=='0') {
+          state = 2;
+        } else if (c>='1' && c <='9') {
+          state = 3;
+          number = c - '0';
+        } else {
+          stop = true;
+          beg--;
+        }
+        break;
+      case 3:
+        if (c>='0' && c <='9') {
+          state = 3;
+          number = number*10 + c - '0';
+        } else {
+          stop = true; // non-numeric character
+          if (beg < end) {
+            beg--;
+          }
+        }
+        break;
+    } // switch
+  } // while
+  rv.result = number;
+  if (negative) {
+    rv.result *= -1;
   }
-  // Skip leading zeroes, if any
-  while (beg<end && *beg == '0') {
-    beg++;
-  }
-  // Initialize on first digit.
-  if (beg<end && *beg > '0' && *beg <= '9') {
-    number = (*beg - '0');
-    beg++;
-  }
-  while (beg<end && *beg >= '0' && *beg <= '9') {
-    number *= 10;
-    if (*beg > '0') {
-      number += (*beg - '0');
-    }
-    beg++;
-  }
-  if (beg > s.data) {
-    if (negative) {
-      *res = -number;
-    } else {
-      *res = number;
-    }
-    return true;
-  }
-  return false;
+  rv.tail = sv8span(beg, end);
+  rv.ok = true;
+  return rv;
+fail2:
+  rv.ok = false;
+  rv.result = 0;
+  rv.tail = s;
+  return rv;
+}
+
+
+
+Sv8Double sv8tod(Sv8 s)
+{
+  // See e.g. https://www.codeproject.com/Articles/5291098/\
+  // Fun-With-State-Machines-Incrementally-Parsing-Numb
+  // See also sv8tod.pdf for the diagram of this state machine.
+  Sv8Double rv = {0};
+  int32_t state = 0;
+  bool stop = false;
+  s = sv8lstrip(s);
+  char *beg = s.data;
+  char *end = s.data + s.len;
+  while (beg<end && !stop) {
+    char c = *beg++;
+    switch (state) {
+      case 0:
+        if (c=='-') {
+          state = 1;
+        } else if (c=='0') {
+          state = 2;
+        } else if (c>='1' && c<='9') {
+          state = 8;
+        } else {
+          goto fail1; // invalid start token
+        }
+        break;
+      case 1:
+        if (c=='0') {
+          state = 2;
+        } else if (c>='1' && c<='9') {
+          state = 8;
+        } else {
+          goto fail1; // non-number after starting '-'.
+        }
+        break;
+      case 2:
+        if (c=='.') {
+          state = 3;
+        } else if (c=='e' || c=='E') {
+          state = 5;
+        } else {
+          goto fail1; // invalid token after starting (-)0.
+        }
+        break;
+      case 3:
+        if (c>='0' && c<='9') {
+          state = 4;
+        } else {
+          stop = true;
+        }
+        break;
+      case 4:
+        if (c>='0' && c<='9') {
+          state = 4;
+        } else if (c=='e' || c=='E') {
+          state = 5;
+        } else {
+          stop = true;
+        }
+        break;
+      case 5:
+        if (c>='0' && c<='9') {
+          state = 7;
+        } else if (c=='+' || c=='-') {
+          state = 6;
+        } else {
+          goto fail1; // e or E without number.
+        }
+        break;
+      case 6:
+        if (c>='0' && c<='9') {
+          state = 7;
+        } else {
+          goto fail1; // not a number after [eE][+-]
+        }
+        break;
+      case 7:
+        if (c>='0' && c<='9') {
+          state = 7;
+        }
+        break;
+      case 8:
+        if (c=='.') {
+          state = 3;
+        } else if (c>='0' && c<='9') {
+          state = 8;
+        } else if (c=='e' || c=='E') {
+          state = 5;
+        } else {
+          stop = true;
+        }
+        break;
+    } // switch
+  } // while
+  rv.ok = true;
+  // TODO: set rv.result and rv.tail.
+  return rv;
+fail1:
+  rv.ok = false;
+  rv.result = 0.0;
+  rv.tail = s;
+  return rv;
 }
