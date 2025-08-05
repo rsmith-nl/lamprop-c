@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-04T23:48:54+0200
+// Last modified: 2025-08-05T22:37:16+0200
 
 #include "arena.h"
 #include "stringview.h"
@@ -21,12 +21,16 @@ Sv8 read_file(char *path, Arena *permanent)
 {
   Sv8 contents = {0};
   FILE *inputfile = fopen(path, "r");
+  if (inputfile==0) {
+    return contents;
+  }
   fseek(inputfile, 0L, SEEK_END);
   ptrdiff_t size = ftell(inputfile);
   rewind(inputfile);
   contents.data = arena_new(permanent, char, size);
   contents.len = size;
   ptrdiff_t rv = fread(contents.data, sizeof(char), size, inputfile);
+  fclose(inputfile);
   if (rv != size) {
     fprintf(stderr,
             "WARNING: file “%s” has size %td bytes, but only %td bytes read.\n",
@@ -43,7 +47,6 @@ Resin parse_resin(Sv8 line)
   // So discard that.
   cut = sv8lsplit(cut.tail);
   //cut.head contains the Young's modulus.
-
   return rv;
 }
 
