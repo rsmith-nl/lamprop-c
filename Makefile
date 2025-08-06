@@ -7,13 +7,11 @@ VPATCH   = 03
 # Define the C compiler to be used, if not cc.
 #CC = gcc
 
-# Add appropriate CFLAGS and LFLAGS
-CFLAGS = -Os ## Compiler flags for C
-CFLAGS += -std=c11 -march=native -pipe -ffast-math
-CFLAGS += -Wall -Wshadow -Wpointer-arith -Wstrict-prototypes
-LFLAGS = -s -flto ## Linker flags
-# For a static executable, add the following LFLAGS.
-#LFLAGS += --static
+# The next line is for building debugging libraries.
+CFLAGS = -pipe -std=c11 -fPIC -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
+                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
+                -fsanitize=address,undefined
+LFLAGS += -s -pipe -fsanitize=address,undefined
 
 # Other libraries to link against
 LIBS += -lm
