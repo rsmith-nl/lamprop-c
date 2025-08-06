@@ -65,6 +65,10 @@ tidy:  ## Run static code checker clang-tidy.
 man:  ## Show the rendered manual page
 	mandoc -Tutf8 $(BASENAME).1 | less
 
+.PHONY: tags
+tags:  ## Update tags file
+	uctags --languages=C --kinds-c=deft *.c *.h
+
 .PHONY: help
 help:  ## List available commands
 	@echo "make variables:"
