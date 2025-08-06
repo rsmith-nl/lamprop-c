@@ -67,7 +67,7 @@ man:  ## Show the rendered manual page
 
 .PHONY: tags
 tags:  ## Update tags file
-	uctags --languages=C --kinds-c=deft *.c *.h
+	uctags --languages=C *.[ch]
 
 .PHONY: help
 help:  ## List available commands
