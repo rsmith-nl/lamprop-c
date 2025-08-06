@@ -65,9 +65,8 @@ tidy:  ## Run static code checker clang-tidy.
 man:  ## Show the rendered manual page
 	mandoc -Tutf8 $(BASENAME).1 | less
 
-.PHONY: tags
 tags:  ## Update tags file
-	uctags --language-force=C *.h *.c
+	uctags --language-force=C --kinds-C=+p-f *.h *.c
 
 .PHONY: help
 help:  ## List available commands
