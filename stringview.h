@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-05T22:32:33+0200
+// Last modified: 2025-08-06T01:58:35+0200
 
 #pragma once
 #include <stddef.h>  // ptrdiff_t
@@ -71,9 +71,17 @@ extern Sv8Cut sv8cut(Sv8 s, char c);
 // Cut the string at the first whitespace from the left.
 extern Sv8Cut sv8lsplit(Sv8 s);
 
-// Convert a string to an integer.
+// Tries to read an int32_t from the beginning of a stringview.
+// Leading whitespace is skipped.
+// If an integer was found, Sv8Int.ok equals true, otherwise false.
+// A view of the remaining string is returned in Sv8Int.tail.
 extern Sv8Int sv8toi(Sv8 s);
 
+// Tries to read a double from the beginning of a stringview.
+// Leading whitespace is skipped.
+// If an floating point number was found, Sv8Double.ok equals true, otherwise false.
+// A view of the remaining string is returned in Sv8Double.tail.
+// Does not handle NaN and Inf!
 Sv8Double sv8tod(Sv8 s);
 
 #ifdef __cplusplus
