@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-04T23:47:34+0200
+// Last modified: 2025-08-06T21:50:40+0200
 
 #include "arena.h"
 #include "logging.h"
@@ -40,9 +40,27 @@ int main(int argc, char *argv[])
         switch (ccut.head.data[0]) {
           case 'f':
             fcnt++;
+            Fiber f = parse_fiber(ccut.head);
+            if (f.ok) {
+              char tmps[f.name.len+1];
+              memcpy(tmps, f.name.data, f.name.len);
+              tmps[f.name.len] = 0;
+              info("Found fiber '%s'", tmps);
+            } else {
+              warn("Error reading fiber...");
+            }
             break;
           case 'r':
             rcnt++;
+            Resin r = parse_resin(ccut.head);
+            if (r.ok) {
+              char tmps[r.name.len+1];
+              memcpy(tmps, r.name.data, r.name.len);
+              tmps[r.name.len] = 0;
+              info("Found resin '%s'", tmps);
+            } else {
+              warn("Error reading resin...");
+            }
             break;
           default:
             break;
