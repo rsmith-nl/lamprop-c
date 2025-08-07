@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-06T23:17:28+0200
+// Last modified: 2025-08-07T18:29:41+0200
 
 #include "arena.h"
 #include "logging.h"
@@ -23,15 +23,18 @@
   fprintf(stderr, __VA_ARGS__);                                     \
   abort()
 
+#define NRESINS 100
+#define NLAMINA 1000
+
 int main(int argc, char *argv[])
 {
   debug("starting lamprop...\n");
-  Arena perm = arena_create(16777216);
-  Arena resina = arena_create(1048576);
-  Arena fibera = arena_create(1048576);
-  // Arena lamina = arena_create(10485760);
+  Arena permanent = arena_create(33554432);
+  Arena resina = arena_create(NRESINS*sizeof(Resin));
+  Arena fibera = arena_create(NRESINS*sizeof(Fiber));
+  //Arena lamina = arena_create(NLAMINA*sizeof(Lamina));
   if (argc > 1) {
-    Sv8 contents = read_file(argv[argc-1], &perm);
+    Sv8 contents = read_file(argv[argc-1], &permanent);
     info("contents of “%s” is %td bytes long.", argv[argc-1], contents.len);
     ptrdiff_t nlines = sv8count(contents, '\n');
     info("file “%s” contains %td lines.", argv[argc-1], nlines);
