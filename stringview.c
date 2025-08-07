@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-06T18:32:14+0200
+// Last modified: 2025-08-07T20:34:16+0200
 
 #include <assert.h>
 #include <math.h>
@@ -349,4 +349,17 @@ fail1:
   rv.result = 0.0;
   rv.tail = s;
   return rv;
+}
+
+// FNV-1a hash. With thanks to Chris Wellons
+// Source: https://nullprogram.com/blog/2025/01/19/
+// Also: https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+uint64_t hash64(Sv8 s)
+{
+  uint64_t h = 0x100;
+  for (ptrdiff_t i = 0; i < s.len; i++) {
+    h ^= s.data[i] & 255;
+    h *= 1111111111111111111;
+  }
+  return h;
 }

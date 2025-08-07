@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-06T01:58:35+0200
+// Last modified: 2025-08-07T20:34:36+0200
 
 #pragma once
 #include <stddef.h>  // ptrdiff_t
@@ -16,6 +16,7 @@
 // Note that these structures do not allocate memory.
 // So they are *views* of a existing string in memory somewhere.
 
+// String view
 typedef struct {
   char *data;
   ptrdiff_t len;
@@ -83,6 +84,9 @@ extern Sv8Int sv8toi(Sv8 s);
 // A view of the remaining string is returned in Sv8Double.tail.
 // Does not handle NaN and Inf!
 Sv8Double sv8tod(Sv8 s);
+
+// Hash a string view with FNV-1a hash function.
+uint64_t hash64(Sv8 s);
 
 #ifdef __cplusplus
 }
