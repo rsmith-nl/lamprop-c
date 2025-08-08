@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-08T23:57:39+0200
+// Last modified: 2025-08-09T00:19:40+0200
 
 #include "arena.h"
 #include "stringview.h"
@@ -291,7 +291,7 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                 char tmpnm[lm.name.len+1];
                 memset(tmpnm, 0, lm.name.len+1);
                 memcpy(tmpnm, lm.name.data, lm.name.len);
-                fprintf(stderr, "found t-line named “%s” on line %d\n", tmpnm, lineno);
+                fprintf(stderr, "found laminate named “%s” on line %d\n", tmpnm, lineno);
               }
             }
           } else {
@@ -312,10 +312,10 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                   break;
                 }
               }
+              char buf[ml.resin_name.len+1];
+              memset(buf, 0, ml.resin_name.len+1);
+              memcpy(buf, ml.resin_name.data, ml.resin_name.len);
               if (unknown_resin) {
-                char buf[ml.resin_name.len+1];
-                memset(buf, 0, ml.resin_name.len+1);
-                memcpy(buf, ml.resin_name.data, ml.resin_name.len);
                 Laminate *curlam = rv.laminates + (rv.nlaminates-1);
                 char buf2[curlam->name.len+1];
                 memset(buf2, 0, curlam->name.len+1);
@@ -328,7 +328,7 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                 state=' ';
               } else {
                 if (info) {
-                  fprintf(stderr, "found m-line on line %d\n", lineno);
+                  fprintf(stderr, "using resin “%s” on line %d\n", buf, lineno);
                 }
               }
             } else {
