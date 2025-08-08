@@ -72,7 +72,7 @@ tidy:  ## Run static code checker clang-tidy.
 man:  ## Show the rendered manual page
 	mandoc -Tutf8 $(BASENAME).1 | less
 
-tags:  ## Update tags file
+tags: $(SRCS) *.h  ## Update tags file
 	uctags --language-force=C --kinds-C=+p-f *.h *.c
 
 .PHONY: help
