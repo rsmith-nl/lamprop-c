@@ -4,48 +4,51 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:49:24 +0200
-// Last modified: 2025-08-04T20:10:19+0200
+// Last modified: 2025-08-08T09:20:34+0200
 
 #pragma once
 
-#ifndef NDEBUG
-#undef debug
-#define debug(...)                                            \
-  fprintf(stderr, "DEBUG %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__)
-#else
-#undef debug
-#define debug(...) (void)0
-#endif  // NDEBUG
-
 #undef error
+#ifndef NDEBUG
 #define error(...)                                            \
   fprintf(stderr, "ERROR %s, line %i: ", __FILE__, __LINE__); \
   fprintf(stderr, __VA_ARGS__);                               \
+  fprintf(stderr, "\n");                                      \
   abort()
+#else
+#define error(...)                \
+  fprintf(stderr, "ERROR: ");     \
+  fprintf(stderr, __VA_ARGS__);   \
+  fprintf(stderr, "\n");          \
+  abort()
+#endif  // NDEBUG
 
+#undef debug
 #ifndef NDEBUG
+#define debug(...)                                            \
+  fprintf(stderr, "DEBUG %s, line %i: ", __FILE__, __LINE__); \
+  fprintf(stderr, __VA_ARGS__);                               \
+  fprintf(stderr, "\n")
+#else
+#define debug(...) (void)0
+#endif  // NDEBUG
+
 #undef warn
+#ifndef NDEBUG
 #define warn(...)                                            \
   fprintf(stderr, "WARNING %s, line %i: ", __FILE__, __LINE__); \
   fprintf(stderr, __VA_ARGS__); \
   fprintf(stderr, "\n")
 #else
-#undef warn
 #define warn(...) (void)0
 #endif  // NDEBUG
 
-
-#ifndef NDEBUG
 #undef info
+#ifndef NDEBUG
 #define info(...)                                            \
   fprintf(stderr, "INFO %s, line %i: ", __FILE__, __LINE__); \
   fprintf(stderr, __VA_ARGS__); \
   fprintf(stderr, "\n")
 #else
-#undef info
 #define info(...) (void)0
 #endif  // NDEBUG
-
-#undef UNUSED
-#define UNUSED(x)(void)(x)
