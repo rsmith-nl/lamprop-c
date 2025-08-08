@@ -4,17 +4,14 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-06T21:50:05+0200
+// Last modified: 2025-08-08T16:16:35+0200
 
 #include "arena.h"
 #include "stringview.h"
 #include "logging.h"
 #include "types.h"
 
-//#include <stdint.h>
-//#include <stdbool.h>
 #include <stdio.h>  // for fopen
-//#include <stdlib.h>
 #include <sys/mman.h> // for mmap
 
 Sv8 read_file(char *path, Arena *permanent)
@@ -42,9 +39,9 @@ Sv8 read_file(char *path, Arena *permanent)
 Resin parse_resin(Sv8 line)
 {
   Resin rv = {0};
-  Sv8Cut cut = sv8lsplit(line);
   // This function is only called when *line* starts with 'f:'.
   // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
   // cut.tail now starts with the Young's modulus after whitespace.
   Sv8Double E = sv8tod(cut.tail);
   if (E.ok) {
@@ -94,9 +91,9 @@ Resin parse_resin(Sv8 line)
 Fiber parse_fiber(Sv8 line)
 {
   Fiber rv = {0};
-  Sv8Cut cut = sv8lsplit(line);
   // This function is only called when *line* starts with 'f:'.
   // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
   // cut.tail now starts with the Young's modulus after whitespace.
   Sv8Double E1 = sv8tod(cut.tail);
   if (E1.ok) {
@@ -142,3 +139,18 @@ Fiber parse_fiber(Sv8 line)
   return rv;
 }
 
+Laminate parse_laminate(Sv8 line)
+{
+  Laminate rv = {0};
+  rv.ok = true;
+  // This function is only called when *line* starts with 'f:'.
+  // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
+  // cut.tail now starts with the name after whitespace.
+  rv.name = sv8strip(cut.tail);
+  if (rv.name.len==0) {
+    warn("laminate without a name found");
+    rv.ok = false;
+  }
+  return rv;
+}

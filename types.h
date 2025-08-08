@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:31:50+0200
-// Last modified: 2025-08-06T19:45:51+0200
+// Last modified: 2025-08-08T15:29:09+0200
 
 #pragma once
 
@@ -78,6 +78,7 @@ extern Sv8 read_file(char *path, Arena *permanent);
 
 extern Resin parse_resin(Sv8 line);
 extern Fiber parse_fiber(Sv8 line);
+extern Laminate parse_laminate(Sv8 line);
 
 #ifdef __cplusplus
 }
