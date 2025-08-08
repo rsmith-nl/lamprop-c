@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-08T20:29:58+0200
+// Last modified: 2025-08-08T23:47:16+0200
 
 #include "arena.h"
 #include "stringview.h"
@@ -197,16 +197,14 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
           if (f.ok) {
             bool skip_fiber = false;
             if (info) fprintf(stderr, "found fiber on line %d\n", lineno);
-            if (rv.nfibers) {
-              // check for doubles.
-              for (int32_t k = 0; k < rv.nfibers; k++) {
-                if (sv8equals(rv.fibers[k].name, f.name)) {
-                  skip_fiber = true;
-                  char buf[f.name.len+1];
-                  memset(buf, 0, f.name.len+1);
-                  memcpy(buf, f.name.data, f.name.len);
-                  warn("a fiber named “%s” already exists; will be skipped", buf);
-                }
+            // check for doubles.
+            for (int32_t k = 0; k < rv.nfibers; k++) {
+              if (sv8equals(rv.fibers[k].name, f.name)) {
+                skip_fiber = true;
+                char buf[f.name.len+1];
+                memset(buf, 0, f.name.len+1);
+                memcpy(buf, f.name.data, f.name.len);
+                warn("a fiber named “%s” already exists; will be skipped", buf);
               }
             }
             if (!skip_fiber) {
@@ -223,16 +221,14 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
           if (r.ok) {
             bool skip_resin = false;
             if (info) fprintf(stderr, "found resin on line %d\n", lineno);
-            if (rv.nfibers) {
-              // check for doubles
-              for (int32_t k = 0; k < rv.nresins; k++) {
-                if (sv8equals(rv.resins[k].name, f.name)) {
-                  skip_resin = true;
-                  char buf[f.name.len+1];
-                  memset(buf, 0, f.name.len+1);
-                  memcpy(buf, f.name.data, f.name.len);
-                  warn("a resin named “%s” already exists; will be skipped", buf);
-                }
+            // check for doubles
+            for (int32_t k = 0; k < rv.nresins; k++) {
+              if (sv8equals(rv.resins[k].name, f.name)) {
+                skip_resin = true;
+                char buf[f.name.len+1];
+                memset(buf, 0, f.name.len+1);
+                memcpy(buf, f.name.data, f.name.len);
+                warn("a resin named “%s” already exists; will be skipped", buf);
               }
             }
             if (!skip_resin) {
@@ -253,3 +249,107 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
   }
   return rv;
 }
+
+Ldata laminates(Sv8 contents, bool info, FRdata fr)
+{
+  Ldata rv = {0};
+  char state = ' ';
+  rv.laminatesa = arena_create(NLAMINATES*sizeof(Laminate));
+  rv.laminates = (void*)rv.laminatesa.begin;
+  rv.laminaa = arena_create(NLAMINA*sizeof(Lamina));
+  rv.laminas = (void*)rv.laminaa.begin;
+  // Restart from the beginning.
+  Sv8Cut ccut = sv8cut(contents, '\n');
+  int32_t lineno = 1;
+  while (ccut.ok == true) {
+    if (ccut.head.data[1] == ':') {
+      switch (ccut.head.data[0]) {
+        case 't':
+          state = 't';
+          Laminate lm = parse_laminate(ccut.head);
+          if (lm.ok) {
+            if (info) {
+              char tmpnm[lm.name.len+1];
+              memset(tmpnm, 0, lm.name.len+1);
+              memcpy(tmpnm, lm.name.data, lm.name.len);
+              fprintf(stderr, "found t-line named “%s” on line %d\n", tmpnm, lineno);
+            }
+            // check for doubles
+            bool skip_lm = false;
+            for (int32_t k = 0; k < rv.nlaminates; k++) {
+              if (sv8equals(rv.laminates[k].name, lm.name)) {
+                skip_lm = true;
+                char buf[lm.name.len+1];
+                memset(buf, 0, lm.name.len+1);
+                memcpy(buf, lm.name.data, lm.name.len);
+                warn("a laminate named “%s” already exists; will be skipped", buf);
+              }
+            }
+            if (!skip_lm) {
+              // Store laminate in the laminate arena.
+              *arena_new(&rv.laminatesa, Laminate, 1) = lm;
+              rv.nlaminates++;
+            }
+          } else {
+            warn("error reading laminate on line %d...", lineno);
+          }
+          break;
+        case 'm':
+          if (state != 't') {
+            warn("unexpected m:-line; will be ignored");
+          } else {
+            state = 'm';
+            Mline ml = parse_m(ccut.head);
+            if (ml.ok) {
+              if (info) fprintf(stderr, "found m-line on line %d\n", lineno);
+              bool found_resin = false;
+              for (int32_t k = 0; k < fr.nresins; k++) {
+                if (sv8equals(fr.resins[k].name, ml.resin_name)) {
+                  found_resin = true;
+                  break;
+                }
+              }
+              if (!found_resin) {
+                char buf[ml.resin_name.len+1];
+                memset(buf, 0, ml.resin_name.len+1);
+                memcpy(buf, ml.resin_name.data, ml.resin_name.len);
+                Laminate *curlam = rv.laminates + (rv.nlaminates-1);
+                char buf2[curlam->name.len+1];
+                memset(buf2, 0, curlam->name.len+1);
+                memcpy(buf2, curlam->name.data, curlam->name.len);
+                warn("resin “%s” does not exist; skipping laminate “%s”", buf, buf2);
+                // delete laminate
+                rv.nlaminates--;
+                rv.laminatesa.cur -= sizeof(Laminate);
+                memset(rv.laminatesa.cur, 0, sizeof(Laminate));
+                state=' ';
+              }
+            }
+          }
+          break;
+        case 'l':
+          if (state != 'm' && state != 'l') {
+            warn("unexpected l:-line; will be ignored");
+          } else {
+            state = 'l';
+            if (info) fprintf(stderr, "found l-line on line %d\n", lineno);
+          }
+          break;
+        case 's':
+          if (state != 'l') {
+            warn("unexpected s:-line; will be ignored");
+          } else {
+            state = ' ';
+            if (info) fprintf(stderr, "found s-line on line %d\n", lineno);
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    ccut = sv8cut(ccut.tail, '\n');
+    lineno++;
+  }
+  return rv;
+}
+

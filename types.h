@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:31:50+0200
-// Last modified: 2025-08-08T20:29:20+0200
+// Last modified: 2025-08-08T23:39:13+0200
 
 #pragma once
 
@@ -14,6 +14,9 @@
 #include <stdbool.h>
 
 #define NRESINS 1000
+#define NLAMINATES 100
+// Largest laminate I've ever used was 250 layers.
+#define NLAMINA 25000
 
 typedef struct {
   double E;
@@ -86,6 +89,15 @@ typedef struct {
   int32_t nresins, nfibers;
 } FRdata;
 
+typedef struct {
+  Arena laminaa;
+  Arena laminatesa;
+  Lamina *laminas;
+  Laminate *laminates;
+  int32_t nlamina, nlaminates;
+} Ldata;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -96,6 +108,7 @@ extern Fiber parse_fiber(Sv8 line);
 extern Laminate parse_laminate(Sv8 line);
 extern Mline parse_m(Sv8 line);
 extern FRdata fibers_and_resins(Sv8 contents, bool info);
+extern Ldata laminates(Sv8 contents, bool info, FRdata fr);
 
 #ifdef __cplusplus
 }
