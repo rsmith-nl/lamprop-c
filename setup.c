@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:37 +0200
-// Last modified: 2025-08-08T11:37:00+0200
+// Last modified: 2025-08-08T14:19:37+0200
 
 #include "setup.h"
 #include "logging.h"
@@ -62,10 +62,12 @@ const char help[] =
 
 Options setup(int argc, char *argv[])
 {
+#ifndef NDEBUG
   info("argc = %d", argc);
   for (int32_t j = 0; j < argc; j++) {
     info("argv[%d] = “%s”", j, argv[j]);
   }
+#endif
   Options rv = {0};
   int32_t choice;
   while (1) {

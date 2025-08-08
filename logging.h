@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:49:24 +0200
-// Last modified: 2025-08-08T09:20:34+0200
+// Last modified: 2025-08-08T14:22:13+0200
 
 #pragma once
 
@@ -40,7 +40,10 @@
   fprintf(stderr, __VA_ARGS__); \
   fprintf(stderr, "\n")
 #else
-#define warn(...) (void)0
+#define warn(...) \
+  fprintf(stderr, "WARNING: "); \
+  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, "\n")
 #endif  // NDEBUG
 
 #undef info
