@@ -27,9 +27,13 @@ int main(int argc, char *argv[])
   Arena permanent = arena_create(33554432);
   if (opt.argv != 0) {
     Sv8 contents = read_file(opt.argv, &permanent);
-    if (opt.info) fprintf(stderr, "file “%s” is %td bytes.\n", opt.argv, contents.len);
+    if (opt.info) {
+      fprintf(stderr, "file “%s” is %td bytes.\n", opt.argv, contents.len);
+    }
     ptrdiff_t nlines = sv8count(contents, '\n');
-    if (opt.info) fprintf(stderr, "file “%s” contains %td lines.\n", opt.argv, nlines);
+    if (opt.info) {
+      fprintf(stderr, "file “%s” contains %td lines.\n", opt.argv, nlines);
+    }
     // Scan for fibers and resins
     FRdata fr = fibers_and_resins(contents, opt.info);
     if (opt.info) {

@@ -196,7 +196,9 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
           f = parse_fiber(ccut.head);
           if (f.ok) {
             bool skip_fiber = false;
-            if (info) fprintf(stderr, "found fiber on line %d\n", lineno);
+            if (info) {
+              fprintf(stderr, "found fiber on line %d\n", lineno);
+            }
             // check for doubles.
             for (int32_t k = 0; k < rv.nfibers; k++) {
               if (sv8equals(rv.fibers[k].name, f.name)) {
@@ -220,7 +222,9 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
           r = parse_resin(ccut.head);
           if (r.ok) {
             bool skip_resin = false;
-            if (info) fprintf(stderr, "found resin on line %d\n", lineno);
+            if (info) {
+              fprintf(stderr, "found resin on line %d\n", lineno);
+            }
             // check for doubles
             for (int32_t k = 0; k < rv.nresins; k++) {
               if (sv8equals(rv.resins[k].name, f.name)) {
@@ -323,7 +327,9 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                 memset(rv.laminatesa.cur, 0, sizeof(Laminate));
                 state=' ';
               } else {
-                if (info) fprintf(stderr, "found m-line on line %d\n", lineno);
+                if (info) {
+                  fprintf(stderr, "found m-line on line %d\n", lineno);
+                }
               }
             } else {
               warn("could not parse m-line on line %d", lineno);
@@ -335,7 +341,9 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
             warn("unexpected l:-line on line %d; will be ignored", lineno);
           } else {
             state = 'l';
-            if (info) fprintf(stderr, "found l-line on line %d\n", lineno);
+            if (info) {
+              fprintf(stderr, "found l-line on line %d\n", lineno);
+            }
           }
           break;
         case 's':
@@ -343,7 +351,9 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
             warn("unexpected s:-line on line %d; will be ignored", lineno);
           } else {
             state = ' ';
-            if (info) fprintf(stderr, "found s-line on line %d\n", lineno);
+            if (info) {
+              fprintf(stderr, "found s-line on line %d\n", lineno);
+            }
           }
           break;
         default:
