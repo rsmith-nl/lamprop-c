@@ -13,6 +13,11 @@ CFLAGS = -pipe -std=c11 -fPIC -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
                 -fsanitize=address,undefined
 LFLAGS += -s -pipe -fsanitize=address,undefined
 
+.ifdef NDEBUG
+CFLAGS += -DNDEBUG=1
+.endif
+
+
 # Other libraries to link against
 LIBS += -lm
 
