@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-08T16:16:35+0200
+// Last modified: 2025-08-08T18:19:44+0200
 
 #include "arena.h"
 #include "stringview.h"
@@ -143,7 +143,8 @@ Laminate parse_laminate(Sv8 line)
 {
   Laminate rv = {0};
   rv.ok = true;
-  // This function is only called when *line* starts with 'f:'.
+  rv.finished = false;
+  // This function is only called when *line* starts with 't:'.
   // So discard that.
   Sv8Cut cut = sv8lsplit(line);
   // cut.tail now starts with the name after whitespace.
@@ -154,3 +155,27 @@ Laminate parse_laminate(Sv8 line)
   }
   return rv;
 }
+
+Mline parse_m(Sv8 line)
+{
+  Mline rv = {0};
+  // This function is only called when *line* starts with 'm:'.
+  // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
+  // cut.tail now starts with the fiber volume fraction after whitespace.
+  Sv8Double vf = sv8tod(cut.tail);
+  if (vf.ok) {
+    rv.vf = vf.result;
+  } else {
+    return rv;
+  }
+  // vf.tail should now contain the name of the resin.
+  Sv8 resin_name = sv8strip(vf.tail);
+  if (resin_name.len != 0) {
+    rv.resin_name = resin_name;
+    rv.ok = true;
+  }
+  return rv;
+}
+
+

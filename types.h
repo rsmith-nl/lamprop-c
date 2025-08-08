@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:31:50+0200
-// Last modified: 2025-08-08T15:29:09+0200
+// Last modified: 2025-08-08T18:16:59+0200
 
 #pragma once
 
@@ -33,7 +33,6 @@ typedef struct {
 
 typedef struct {
   Fiber f;
-  Resin r;
   double fiber_weight;
   double angle;
   double vf;
@@ -53,6 +52,7 @@ typedef struct {
   Sv8 name;
   int32_t nlayers;
   Lamina *layers;
+  Resin r;
   double thickness;
   double fiber_weight, resin_weight;
   double ρ;
@@ -67,8 +67,15 @@ typedef struct {
   double tEx, tEy, tEz;
   double tGxy, tGyz, tGxz;
   double tνxy, tνyx, tνyz;
-  bool ok;
+  bool ok, finished;
 } Laminate;
+
+typedef struct {
+  double vf;
+  Sv8 resin_name;
+  bool ok;
+} Mline;
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,6 +86,7 @@ extern Sv8 read_file(char *path, Arena *permanent);
 extern Resin parse_resin(Sv8 line);
 extern Fiber parse_fiber(Sv8 line);
 extern Laminate parse_laminate(Sv8 line);
+extern Mline parse_m(Sv8 line);
 
 #ifdef __cplusplus
 }
