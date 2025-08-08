@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:37 +0200
-// Last modified: 2025-08-08T11:05:54+0200
+// Last modified: 2025-08-08T11:37:00+0200
 
 #include "setup.h"
 #include "logging.h"
@@ -82,7 +82,7 @@ Options setup(int argc, char *argv[])
       {0,0,0,0}
     };
     int32_t option_index = 0;
-    choice = getopt_long( argc, argv, "hilHemfLv", long_options, &option_index);
+    choice = getopt_long(argc, argv, "hilHemfLv", long_options, &option_index);
     if (choice == -1) {
       break;
     }
@@ -126,5 +126,8 @@ Options setup(int argc, char *argv[])
         break;
     }
   }
+  // Save updated values, skipping the executable name.
+  rv.argc = argc - optind;
+  rv.argv = argv[optind];
   return rv;
 }
