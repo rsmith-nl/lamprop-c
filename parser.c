@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-08T23:47:16+0200
+// Last modified: 2025-08-08T23:57:39+0200
 
 #include "arena.h"
 #include "stringview.h"
@@ -265,15 +265,9 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
     if (ccut.head.data[1] == ':') {
       switch (ccut.head.data[0]) {
         case 't':
-          state = 't';
+          state = 't'; // This resets the state.
           Laminate lm = parse_laminate(ccut.head);
           if (lm.ok) {
-            if (info) {
-              char tmpnm[lm.name.len+1];
-              memset(tmpnm, 0, lm.name.len+1);
-              memcpy(tmpnm, lm.name.data, lm.name.len);
-              fprintf(stderr, "found t-line named “%s” on line %d\n", tmpnm, lineno);
-            }
             // check for doubles
             bool skip_lm = false;
             for (int32_t k = 0; k < rv.nlaminates; k++) {
@@ -289,6 +283,12 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
               // Store laminate in the laminate arena.
               *arena_new(&rv.laminatesa, Laminate, 1) = lm;
               rv.nlaminates++;
+              if (info) {
+                char tmpnm[lm.name.len+1];
+                memset(tmpnm, 0, lm.name.len+1);
+                memcpy(tmpnm, lm.name.data, lm.name.len);
+                fprintf(stderr, "found t-line named “%s” on line %d\n", tmpnm, lineno);
+              }
             }
           } else {
             warn("error reading laminate on line %d...", lineno);
@@ -301,15 +301,14 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
             state = 'm';
             Mline ml = parse_m(ccut.head);
             if (ml.ok) {
-              if (info) fprintf(stderr, "found m-line on line %d\n", lineno);
-              bool found_resin = false;
+              bool unknown_resin = true;
               for (int32_t k = 0; k < fr.nresins; k++) {
                 if (sv8equals(fr.resins[k].name, ml.resin_name)) {
-                  found_resin = true;
+                  unknown_resin = false;
                   break;
                 }
               }
-              if (!found_resin) {
+              if (unknown_resin) {
                 char buf[ml.resin_name.len+1];
                 memset(buf, 0, ml.resin_name.len+1);
                 memcpy(buf, ml.resin_name.data, ml.resin_name.len);
@@ -318,18 +317,22 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                 memset(buf2, 0, curlam->name.len+1);
                 memcpy(buf2, curlam->name.data, curlam->name.len);
                 warn("resin “%s” does not exist; skipping laminate “%s”", buf, buf2);
-                // delete laminate
+                // Delete laminate from arena.
                 rv.nlaminates--;
                 rv.laminatesa.cur -= sizeof(Laminate);
                 memset(rv.laminatesa.cur, 0, sizeof(Laminate));
                 state=' ';
+              } else {
+                if (info) fprintf(stderr, "found m-line on line %d\n", lineno);
               }
+            } else {
+              warn("could not parse m-line on line %d", lineno);
             }
           }
           break;
         case 'l':
           if (state != 'm' && state != 'l') {
-            warn("unexpected l:-line; will be ignored");
+            warn("unexpected l:-line on line %d; will be ignored", lineno);
           } else {
             state = 'l';
             if (info) fprintf(stderr, "found l-line on line %d\n", lineno);
@@ -337,7 +340,7 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
           break;
         case 's':
           if (state != 'l') {
-            warn("unexpected s:-line; will be ignored");
+            warn("unexpected s:-line on line %d; will be ignored", lineno);
           } else {
             state = ' ';
             if (info) fprintf(stderr, "found s-line on line %d\n", lineno);
