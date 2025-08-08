@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-08T04:02:56+0200
+// Last modified: 2025-08-08T11:35:22+0200
 
 #include "arena.h"
 #include "logging.h"
@@ -18,27 +18,25 @@
 #include <stdlib.h> // for abort(3)
 #include <string.h>
 
-#undef fatal
-#define fatal(...)                                                  \
-  fprintf(stderr, "ERROR %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__);                                     \
-  abort()
-
 #define NRESINS 100
 #define NLAMINA 1000
 
 int main(int argc, char *argv[])
 {
-  debug("starting lamprop...\n");
-  Arena permanent = arena_create(33554432);
-  Arena resina = arena_create(NRESINS*sizeof(Resin));
-  Arena fibera = arena_create(NRESINS*sizeof(Fiber));
-  //Arena lamina = arena_create(NLAMINA*sizeof(Lamina));
-  if (argc > 1) {
-    Sv8 contents = read_file(argv[argc-1], &permanent);
-    info("contents of “%s” is %td bytes long.", argv[argc-1], contents.len);
+  debug("starting lamprop...");
+  Options opt = setup(argc, argv);
+  info("opt.output = %d", opt.output);
+  fprintf(stderr, "DEBUG: opt.argc = %d\n", opt.argc);
+  fprintf(stderr, "DEBUG: opt.argv = %s\n", opt.argv);
+  if (opt.argv != 0) {
+    Arena permanent = arena_create(33554432);
+    Arena resina = arena_create(NRESINS*sizeof(Resin));
+    Arena fibera = arena_create(NRESINS*sizeof(Fiber));
+    //Arena lamina = arena_create(NLAMINA*sizeof(Lamina));
+    Sv8 contents = read_file(opt.argv, &permanent);
+    info("contents of “%s” is %td bytes long.", opt.argv, contents.len);
     ptrdiff_t nlines = sv8count(contents, '\n');
-    info("file “%s” contains %td lines.", argv[argc-1], nlines);
+    info("file “%s” contains %td lines.", opt.argv, nlines);
     int32_t fcnt = 0, rcnt = 0;
     Sv8Cut ccut = sv8cut(contents, '\n');
     // Scan for fibers and resins
@@ -121,9 +119,9 @@ int main(int argc, char *argv[])
     info("found %d laminates", tcnt);
     info("found %d symmetric laminates", scnt);
   } else {
-    fprintf(stderr, "ERROR: no laminate file name supplied.\n");
+    fprintf(stderr, "WARNING: no laminate file name supplied.\n");
   }
-  debug("ending lamprop...\n");
+  debug("ending lamprop...");
   return 0;
 }
 
