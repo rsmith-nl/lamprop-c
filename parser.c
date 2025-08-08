@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-09T00:19:40+0200
+// Last modified: 2025-08-09T01:35:29+0200
 
 #include "arena.h"
 #include "stringview.h"
@@ -178,6 +178,34 @@ Mline parse_m(Sv8 line)
   return rv;
 }
 
+Lline parse_l(Sv8 line)
+{
+  Lline rv = {0};
+  // This function is only called when *line* starts with 'l:'.
+  // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
+  // cut.tail now starts with the fiber area weight after whitespace.
+  Sv8Double area_weight = sv8tod(cut.tail);
+  if (area_weight.ok) {
+    rv.area_weight = area_weight.result;
+  } else {
+    return rv;
+  }
+  Sv8Double angle = sv8tod(area_weight.tail);
+  if (angle.ok) {
+    rv.angle = angle.result;
+  } else {
+    return rv;
+  }
+  // angle.tail should now contain the name of the fiber.
+  Sv8 fiber_name = sv8strip(angle.tail);
+  if (fiber_name.len != 0) {
+    rv.fiber_name = fiber_name;
+    rv.ok = true;
+  }
+  return rv;
+}
+
 FRdata fibers_and_resins(Sv8 contents, bool info)
 {
   FRdata rv = {0};
@@ -341,8 +369,29 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
             warn("unexpected l:-line on line %d; will be ignored", lineno);
           } else {
             state = 'l';
-            if (info) {
-              fprintf(stderr, "found l-line on line %d\n", lineno);
+            Lline lmn = parse_l(ccut.head);
+            if (lmn.ok) {
+              bool unknown_fiber = true;
+              for (int32_t k = 0; k < fr.nfibers; k++) {
+                if (sv8equals(fr.fibers[k].name, lmn.fiber_name)) {
+                  unknown_fiber = false;
+                  break;
+                }
+              }
+              char buf[lmn.fiber_name.len+1];
+              memset(buf, 0, lmn.fiber_name.len+1);
+              memcpy(buf, lmn.fiber_name.data, lmn.fiber_name.len);
+              if (unknown_fiber) {
+                warn("fiber “%s” does not exist; skipping lamina", buf);
+                state='l';
+              } else {
+                // TODO: store lamina in arena.
+                if (info) {
+                  fprintf(stderr, "using fiber “%s” on line %d\n", buf, lineno);
+                }
+              }
+            } else {
+              warn("could not parse m-line on line %d", lineno);
             }
           }
           break;

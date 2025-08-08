@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:31:50+0200
-// Last modified: 2025-08-08T23:39:13+0200
+// Last modified: 2025-08-09T01:19:38+0200
 
 #pragma once
 
@@ -82,6 +82,12 @@ typedef struct {
 } Mline;
 
 typedef struct {
+  double area_weight, angle;
+  Sv8 fiber_name;
+  bool ok;
+} Lline;
+
+typedef struct {
   Arena resina;
   Arena fibera;
   Resin *resins;
@@ -107,6 +113,7 @@ extern Resin parse_resin(Sv8 line);
 extern Fiber parse_fiber(Sv8 line);
 extern Laminate parse_laminate(Sv8 line);
 extern Mline parse_m(Sv8 line);
+extern Lline parse_l(Sv8 line);
 extern FRdata fibers_and_resins(Sv8 contents, bool info);
 extern Ldata laminates(Sv8 contents, bool info, FRdata fr);
 
