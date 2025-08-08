@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-08T11:35:22+0200
+// Last modified: 2025-08-08T11:44:13+0200
 
 #include "arena.h"
 #include "logging.h"
@@ -12,11 +12,8 @@
 #include "types.h"
 #include "setup.h"
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <stdio.h>  // for fprintf(3)
 #include <stdlib.h> // for abort(3)
-#include <string.h>
 
 #define NRESINS 100
 #define NLAMINA 1000
