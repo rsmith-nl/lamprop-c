@@ -95,3 +95,10 @@ dist: clean  # Build a tar distribution file
 	cp $(DISTFILES) $(XTRA_DIST) *.c *.h $(PKGDIR)
 	tar -czf $(TARFILE) $(PKGDIR)
 	rm -rf $(PKGDIR)
+
+# Register dependencies on local headers.
+depend:
+	echo -n 'lamprop: ' >depend
+	awk '/#include "/ {print $$2}' $(SRCS)|tr -d '"'|tr '\n' ' ' >>depend
+
+.include "depend"
