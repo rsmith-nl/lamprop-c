@@ -11,10 +11,12 @@ VPATCH   = 08
 CFLAGS = -pipe -std=c11 -fPIC -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
                 -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
                 -fsanitize=address,undefined
-LFLAGS += -s -pipe -fsanitize=address,undefined
+LFLAGS = -s -pipe -fsanitize=address,undefined
 
 .ifdef NDEBUG
+CFLAGS = -Os -pipe -std=c11 -fPIC -ffast-math
 CFLAGS += -DNDEBUG=1
+LFLAGS = -s -pipe
 .endif
 
 
