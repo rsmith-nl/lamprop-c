@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:31:50+0200
-// Last modified: 2025-08-08T18:16:59+0200
+// Last modified: 2025-08-08T20:29:20+0200
 
 #pragma once
 
@@ -12,6 +12,8 @@
 #include "stringview.h"
 
 #include <stdbool.h>
+
+#define NRESINS 1000
 
 typedef struct {
   double E;
@@ -76,17 +78,24 @@ typedef struct {
   bool ok;
 } Mline;
 
+typedef struct {
+  Arena resina;
+  Arena fibera;
+  Resin *resins;
+  Fiber *fibers;
+  int32_t nresins, nfibers;
+} FRdata;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern Sv8 read_file(char *path, Arena *permanent);
-
 extern Resin parse_resin(Sv8 line);
 extern Fiber parse_fiber(Sv8 line);
 extern Laminate parse_laminate(Sv8 line);
 extern Mline parse_m(Sv8 line);
+extern FRdata fibers_and_resins(Sv8 contents, bool info);
 
 #ifdef __cplusplus
 }

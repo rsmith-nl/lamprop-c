@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-08T18:19:44+0200
+// Last modified: 2025-08-08T20:29:58+0200
 
 #include "arena.h"
 #include "stringview.h"
@@ -12,7 +12,7 @@
 #include "types.h"
 
 #include <stdio.h>  // for fopen
-#include <sys/mman.h> // for mmap
+#include <string.h> // for memset(3), memcpy(3)
 
 Sv8 read_file(char *path, Arena *permanent)
 {
@@ -178,4 +178,78 @@ Mline parse_m(Sv8 line)
   return rv;
 }
 
-
+FRdata fibers_and_resins(Sv8 contents, bool info)
+{
+  FRdata rv = {0};
+  rv.resina = arena_create(NRESINS*sizeof(Resin));
+  rv.resins = (void*)rv.resina.begin;
+  rv.fibera = arena_create(NRESINS*sizeof(Fiber));
+  rv.fibers = (void*)rv.fibera.begin;
+  int32_t lineno = 1;
+  Sv8Cut ccut = sv8cut(contents, '\n');
+  Fiber f = {0};
+  Resin r = {0};
+  while (ccut.ok == true) {
+    if (ccut.head.data[1] == ':') {
+      switch (ccut.head.data[0]) {
+        case 'f':
+          f = parse_fiber(ccut.head);
+          if (f.ok) {
+            bool skip_fiber = false;
+            if (info) fprintf(stderr, "found fiber on line %d\n", lineno);
+            if (rv.nfibers) {
+              // check for doubles.
+              for (int32_t k = 0; k < rv.nfibers; k++) {
+                if (sv8equals(rv.fibers[k].name, f.name)) {
+                  skip_fiber = true;
+                  char buf[f.name.len+1];
+                  memset(buf, 0, f.name.len+1);
+                  memcpy(buf, f.name.data, f.name.len);
+                  warn("a fiber named “%s” already exists; will be skipped", buf);
+                }
+              }
+            }
+            if (!skip_fiber) {
+              // Store fiber in the fiber arena.
+              *arena_new(&rv.fibera, Fiber, 1) = f;
+              rv.nfibers++;
+            }
+          } else {
+            warn("error reading fiber on line %d...", lineno);
+          }
+          break;
+        case 'r':
+          r = parse_resin(ccut.head);
+          if (r.ok) {
+            bool skip_resin = false;
+            if (info) fprintf(stderr, "found resin on line %d\n", lineno);
+            if (rv.nfibers) {
+              // check for doubles
+              for (int32_t k = 0; k < rv.nresins; k++) {
+                if (sv8equals(rv.resins[k].name, f.name)) {
+                  skip_resin = true;
+                  char buf[f.name.len+1];
+                  memset(buf, 0, f.name.len+1);
+                  memcpy(buf, f.name.data, f.name.len);
+                  warn("a resin named “%s” already exists; will be skipped", buf);
+                }
+              }
+            }
+            if (!skip_resin) {
+              // Store fiber in the fiber arena.
+              *arena_new(&rv.resina, Resin, 1) = r;
+              rv.nresins++;
+            }
+          } else {
+            warn("error reading resin on line %d...", lineno);
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    ccut = sv8cut(ccut.tail, '\n');
+    lineno++;
+  }
+  return rv;
+}
