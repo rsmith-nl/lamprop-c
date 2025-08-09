@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-09T22:45:48+0200
+// Last modified: 2025-08-09T23:16:54+0200
 
 #include "logging.h"
 #include "core.h"
@@ -231,7 +231,7 @@ Lline parse_l(Sv8 line, Laminate *pcurlam)
     //debug("rv.fiber_name = %s", sv8cstring(rv.fiber_name));
     rv.ok = true;
   } //else {
-    //debug("fiber name empty");
+  //debug("fiber name empty");
   //}
   // Increase the layer count in the laminate.
   pcurlam->nlayers++;
@@ -395,8 +395,8 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                 pcurlam->r = *pcurresin;
                 pcurlam->vf = ml.vf;
                 if (info) {
-                  fprintf(stderr, "using resin “%s” on line %d\n", 
-                      sv8cstring(ml.resin_name), lineno);
+                  fprintf(stderr, "using resin “%s” on line %d\n",
+                          sv8cstring(ml.resin_name), lineno);
                 }
               }
             } else {
@@ -426,7 +426,7 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
               }
               if (unknown_fiber) {
                 warn("fiber “%s” on line %d does not exist; skipping lamina",
-                    sv8cstring(lmn.fiber_name), lineno);
+                     sv8cstring(lmn.fiber_name), lineno);
                 state='l';
               } else {
                 // Fill lamina properties
