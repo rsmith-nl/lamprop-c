@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-09T11:10:59+0200
+// Last modified: 2025-08-09T11:32:23+0200
 
 #include "stringview.h"
 
@@ -180,6 +180,7 @@ Sv8Int sv8toi(Sv8 s)
           state = 3;
           number = c - '0';
         } else {
+          // return 0.
           stop = true;
         }
         break;
@@ -262,7 +263,11 @@ Sv8Double sv8tod(Sv8 s)
         } else if (c=='e' || c=='E') {
           state = 5;
         } else {
-          goto fail1; // invalid token after starting (-)0.
+          // return 0.
+          rv.result = neg_num?-0.0:0.0;
+          rv.ok = true;
+          rv.tail = sv8span(beg-1, end);
+          return rv;
         }
         break;
       case 3:
