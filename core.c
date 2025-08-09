@@ -4,12 +4,11 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-09T19:50:56+0200
+// Last modified: 2025-08-09T20:16:10+0200
 
 #include "matrix6.h"
 #include "core.h"
 
-#include <assert.h>
 #include <string.h>
 #include <math.h>
 
@@ -125,6 +124,8 @@ void tbar(double out[6][6], double angle)
 
 bool finish_laminate(Laminate *pl)
 {
-  assert(pl->magic==LMNT);
+  if (pl->magic!=LMNT) {
+    return false;
+  }
   return true;
 }
