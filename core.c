@@ -4,11 +4,12 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-09T15:46:09+0200
+// Last modified: 2025-08-09T19:50:56+0200
 
 #include "matrix6.h"
 #include "core.h"
 
+#include <assert.h>
 #include <string.h>
 #include <math.h>
 
@@ -17,6 +18,7 @@ static void tbar(double out[6][6], double angle);
 Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf)
 {
   Lamina rv = {0};
+  rv.magic = LAYR;
   rv.f = f;
   rv.fiber_weight = area_weight;
   angle = M_PI * angle / 180.0;  // convert to radians.
@@ -118,4 +120,11 @@ void tbar(double out[6][6], double angle)
     {-2 * c * s, 2 * c * s, 0, 0, 0, c * c - s * s}
   };
   memcpy(out, Tbar, 6*6*sizeof(double));
+}
+
+
+bool finish_laminate(Laminate *pl)
+{
+  assert(pl->magic==LMNT);
+  return true;
 }

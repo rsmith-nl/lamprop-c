@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 15:41:55 +0200
-// Last modified: 2025-08-09T15:56:25+0200
+// Last modified: 2025-08-09T19:50:12+0200
 
 #pragma once
 
@@ -18,7 +18,14 @@
 // Largest laminate I've ever used was 250 layers.
 #define NLAMINA 25000
 
+// Magic values;
+#define FIBR 0x46494252
+#define RESN 0x5245534e
+#define LAYR 0x4c415952
+#define LMNT 0x4c4d4e54
+
 typedef struct {
+  uint32_t magic;
   double E;
   double ν;
   double α;
@@ -28,6 +35,7 @@ typedef struct {
 } Resin;
 
 typedef struct {
+  uint32_t magic;
   double E1;
   double ν12;
   double α1;
@@ -37,6 +45,7 @@ typedef struct {
 } Fiber;
 
 typedef struct {
+  uint32_t magic;
   Fiber f;
   double fiber_weight;
   double angle;
@@ -54,6 +63,7 @@ typedef struct {
 } Lamina;
 
 typedef struct {
+  uint32_t magic;
   Sv8 name;
   int32_t nlayers;
   Lamina *layers;
@@ -82,6 +92,7 @@ extern "C" {
 
 // Initialze and return a Lamina structure.
 extern Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf);
+extern bool finish_laminate(Laminate *pl);
 
 #ifdef __cplusplus
 }

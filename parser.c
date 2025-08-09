@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-09T16:02:19+0200
+// Last modified: 2025-08-09T19:54:18+0200
 
 #include "logging.h"
 #include "core.h"
@@ -28,8 +28,8 @@ typedef struct {
 static Resin parse_resin(Sv8 line);
 static Fiber parse_fiber(Sv8 line);
 static Laminate parse_laminate(Sv8 line);
-static Mline parse_m(Sv8 line);
-static Lline parse_l(Sv8 line);
+static Mline parse_m(Sv8 line, Laminate *pcurlam);
+static Lline parse_l(Sv8 line, Laminate *pcurlam);
 
 Sv8 read_file(char *path, Arena *permanent)
 {
@@ -56,6 +56,7 @@ Sv8 read_file(char *path, Arena *permanent)
 Resin parse_resin(Sv8 line)
 {
   Resin rv = {0};
+  rv.magic = RESN;
   // This function is only called when *line* starts with 'f:'.
   // So discard that.
   Sv8Cut cut = sv8lsplit(line);
@@ -108,6 +109,7 @@ Resin parse_resin(Sv8 line)
 Fiber parse_fiber(Sv8 line)
 {
   Fiber rv = {0};
+  rv.magic = FIBR;
   // This function is only called when *line* starts with 'f:'.
   // So discard that.
   Sv8Cut cut = sv8lsplit(line);
@@ -159,6 +161,7 @@ Fiber parse_fiber(Sv8 line)
 Laminate parse_laminate(Sv8 line)
 {
   Laminate rv = {0};
+  rv.magic = LMNT;
   // This function is only called when *line* starts with 't:'.
   // So discard that.
   Sv8Cut cut = sv8lsplit(line);
@@ -173,7 +176,7 @@ Laminate parse_laminate(Sv8 line)
   return rv;
 }
 
-Mline parse_m(Sv8 line)
+Mline parse_m(Sv8 line, Laminate *pcurlam)
 {
   Mline rv = {0};
   // This function is only called when *line* starts with 'm:'.
@@ -182,7 +185,10 @@ Mline parse_m(Sv8 line)
   // cut.tail now starts with the fiber volume fraction after whitespace.
   Sv8Double vf = sv8tod(cut.tail);
   if (vf.ok) {
-    rv.vf = vf.result;
+    // Convert from percentage to fraction.
+    rv.vf = vf.result/100.0;
+    // Also set cf in the laminate.
+    pcurlam->vf = rv.vf;
   } else {
     return rv;
   }
@@ -196,7 +202,7 @@ Mline parse_m(Sv8 line)
   return rv;
 }
 
-Lline parse_l(Sv8 line)
+Lline parse_l(Sv8 line, Laminate *pcurlam)
 {
   Lline rv = {0};
   // This function is only called when *line* starts with 'l:'.
@@ -228,6 +234,8 @@ Lline parse_l(Sv8 line)
   } //else {
     //debug("fiber name empty");
   //}
+  // Increase the layer count in the laminate.
+  pcurlam->nlayers++;
   return rv;
 }
 
@@ -318,11 +326,15 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
   // Restart from the beginning.
   Sv8Cut ccut = sv8cut(contents, '\n');
   int32_t lineno = 1;
+  Resin *pcurresin = 0;
+  Laminate *pcurlam = 0;
   while (ccut.ok == true) {
     if (ccut.head.data[1] == ':') {
       switch (ccut.head.data[0]) {
         case 't':
-          state = 't'; // This resets the state machine.
+          // This resets the state machine.
+          state = 't';
+          // This laminate structure is empty exept for the name.
           Laminate lm = parse_laminate(ccut.head);
           if (lm.ok) {
             // Check for existing laminate with the same name.
@@ -336,14 +348,16 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
               }
             }
             if (!skip_lm) {
+              // Store the current pointer to the lamina arena in the
+              // laminate. This is where the lamina will go.
+              lm.layers = (void*)rv.laminaa.cur;
               // Store laminate in the laminate arena.
-              *arena_new(&rv.laminatesa, Laminate, 1) = lm;
+              pcurlam = arena_new(&rv.laminatesa, Laminate, 1);
+              *pcurlam = lm;
               rv.nlaminates++;
               if (info) {
-                char tmpnm[lm.name.len+1];
-                memset(tmpnm, 0, lm.name.len+1);
-                memcpy(tmpnm, lm.name.data, lm.name.len);
-                fprintf(stderr, "found laminate named “%s” on line %d\n", tmpnm, lineno);
+                fprintf(stderr, "found laminate named “%s” on line %d\n",
+                        sv8cstring(lm.name), lineno);
               }
             }
           } else {
@@ -356,33 +370,34 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
           } else if (state != 't') {
             warn("unexpected m:-line; will be ignored");
           } else {
+            pcurlam = rv.laminates + (rv.nlaminates-1);
             state = 'm';
-            Mline ml = parse_m(ccut.head);
+            Mline ml = parse_m(ccut.head, pcurlam);
             if (ml.ok) {
               bool unknown_resin = true;
               for (int32_t k = 0; k < fr.nresins; k++) {
                 if (sv8equals(fr.resins[k].name, ml.resin_name)) {
                   unknown_resin = false;
+                  pcurresin = fr.resins + k;
                   break;
                 }
               }
-              char buf[ml.resin_name.len+1];
-              memset(buf, 0, ml.resin_name.len+1);
-              memcpy(buf, ml.resin_name.data, ml.resin_name.len);
               if (unknown_resin) {
-                Laminate *curlam = rv.laminates + (rv.nlaminates-1);
-                char buf2[curlam->name.len+1];
-                memset(buf2, 0, curlam->name.len+1);
-                memcpy(buf2, curlam->name.data, curlam->name.len);
-                warn("resin “%s” does not exist; skipping laminate “%s”", buf, buf2);
+                warn("resin “%s” does not exist; skipping laminate “%s”",
+                     sv8cstring(ml.resin_name), sv8cstring(pcurlam->name));
                 // Delete laminate from arena.
                 rv.nlaminates--;
                 rv.laminatesa.cur -= sizeof(Laminate);
                 memset(rv.laminatesa.cur, 0, sizeof(Laminate));
                 state=' ';
               } else {
+                // Now that we know the resin, store it and the vf in the
+                // laminate.
+                pcurlam->r = *pcurresin;
+                pcurlam->vf = ml.vf;
                 if (info) {
-                  fprintf(stderr, "using resin “%s” on line %d\n", buf, lineno);
+                  fprintf(stderr, "using resin “%s” on line %d\n", 
+                      sv8cstring(ml.resin_name), lineno);
                 }
               }
             } else {
@@ -397,7 +412,7 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
             warn("unexpected l:-line on line %d; will be ignored", lineno);
           } else {
             state = 'l';
-            Lline lmn = parse_l(ccut.head);
+            Lline lmn = parse_l(ccut.head, pcurlam);
             if (lmn.ok) {
               bool unknown_fiber = true;
               Fiber *pf = 0;
@@ -413,9 +428,9 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                     sv8cstring(lmn.fiber_name));
                 state='l';
               } else {
-                Lamina la = {0};
-                memcpy(&la.f, pf, sizeof(Fiber));
                 // TODO: fill lamina properties before storing it.
+                Lamina la = init_lamina(*pf, *pcurresin, lmn.area_weight,
+                                        lmn.angle, pcurlam->vf);
                 *arena_new(&rv.laminaa, Lamina, 1) = la;
                 rv.nlamina++;
                 if (info) {
