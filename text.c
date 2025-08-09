@@ -4,13 +4,17 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2025-08-09T22:56:37+0200
+// Last modified: 2025-08-09T23:00:19+0200
 
 #include "core.h"
 #include "version.h"
 
 #include <stdio.h>
 #include <math.h>
+
+static void engprop(Laminate *pl);
+static void matrices(Laminate *pl);
+static void _fea(Laminate *pl);
 
 void text_out(Laminate *pl, bool eng, bool mat, bool fea)
 {
@@ -29,4 +33,25 @@ void text_out(Laminate *pl, bool eng, bool mat, bool fea)
     printf("%3d %6g %5g %4.3g ", k+1, la->fiber_weight, 180*la->angle/M_PI, 100*la->vf);
     printf("%s\n", sv8cstring(la->f.name));
   }
+  if (eng) {
+    engprop(pl);
+  }
+  if (mat) {
+    matrices(pl);
+  }
+  if (fea) {
+    _fea(pl);
+  }
+}
+
+void engprop(Laminate *pl)
+{
+}
+
+void matrices(Laminate *pl)
+{
+}
+
+void _fea(Laminate *pl)
+{
 }
