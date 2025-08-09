@@ -1008,5 +1008,3 @@ void mat_xpose6(double a[6][6])
   res[5][5] = a[5][5];
   memcpy(a, res, 6*6*sizeof(double));
 }
-
-// EOF matrix6.c

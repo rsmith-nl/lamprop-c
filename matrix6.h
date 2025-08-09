@@ -38,5 +38,3 @@ extern void mat_xpose6(double a[6][6]);
 #ifdef __cplusplus
 }
 #endif
-
-/* EOF matrix6.h */
