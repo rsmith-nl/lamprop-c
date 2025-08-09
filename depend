@@ -1,1 +1,1 @@
-lamprop: arena.h logging.h stringview.h types.h setup.h stringview.h arena.h stringview.h logging.h types.h arena.h logging.h setup.h logging.h version.h 
+lamprop: core.h logging.h parser.h setup.h stringview.h logging.h core.h parser.h arena.h logging.h setup.h logging.h version.h matrix6.h core.h matrix6.h 

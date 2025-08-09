@@ -4,12 +4,11 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-08T23:41:32+0200
+// Last modified: 2025-08-09T15:58:43+0200
 
-#include "arena.h"
+#include "core.h"
 #include "logging.h"
-#include "stringview.h"
-#include "types.h"
+#include "parser.h"
 #include "setup.h"
 
 #include <stdio.h>  // for fprintf(3)

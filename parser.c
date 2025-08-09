@@ -4,15 +4,32 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-09T11:31:05+0200
+// Last modified: 2025-08-09T16:02:19+0200
 
-#include "arena.h"
-#include "stringview.h"
 #include "logging.h"
-#include "types.h"
+#include "core.h"
+#include "parser.h"
 
 #include <stdio.h>  // for fopen
 #include <string.h> // for memset(3), memcpy(3)
+
+typedef struct {
+  double vf;
+  Sv8 resin_name;
+  bool ok;
+} Mline;
+
+typedef struct {
+  double area_weight, angle;
+  Sv8 fiber_name;
+  bool ok;
+} Lline;
+
+static Resin parse_resin(Sv8 line);
+static Fiber parse_fiber(Sv8 line);
+static Laminate parse_laminate(Sv8 line);
+static Mline parse_m(Sv8 line);
+static Lline parse_l(Sv8 line);
 
 Sv8 read_file(char *path, Arena *permanent)
 {
@@ -142,14 +159,13 @@ Fiber parse_fiber(Sv8 line)
 Laminate parse_laminate(Sv8 line)
 {
   Laminate rv = {0};
-  rv.ok = true;
-  rv.finished = false;
   // This function is only called when *line* starts with 't:'.
   // So discard that.
   Sv8Cut cut = sv8lsplit(line);
   // cut.tail now starts with the name after whitespace.
   rv.name = sv8strip(cut.tail);
   //debug("rv.name = %s\n", sv8ctring(rv.name));
+  rv.ok = true;
   if (rv.name.len==0) {
     warn("laminate without a name found");
     rv.ok = false;
@@ -306,18 +322,17 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
     if (ccut.head.data[1] == ':') {
       switch (ccut.head.data[0]) {
         case 't':
-          state = 't'; // This resets the state.
+          state = 't'; // This resets the state machine.
           Laminate lm = parse_laminate(ccut.head);
           if (lm.ok) {
-            // check for doubles
+            // Check for existing laminate with the same name.
             bool skip_lm = false;
             for (int32_t k = 0; k < rv.nlaminates; k++) {
               if (sv8equals(rv.laminates[k].name, lm.name)) {
                 skip_lm = true;
-                char buf[lm.name.len+1];
-                memset(buf, 0, lm.name.len+1);
-                memcpy(buf, lm.name.data, lm.name.len);
-                warn("a laminate named “%s” already exists; will be skipped", buf);
+                state = 'k'; // sKip m, l and s-lines.
+                warn("a laminate named “%s” already exists; will be skipped",
+                     sv8cstring(lm.name));
               }
             }
             if (!skip_lm) {
@@ -336,7 +351,9 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
           }
           break;
         case 'm':
-          if (state != 't') {
+          if (state == 'k') {
+            warn("skipping m-line");
+          } else if (state != 't') {
             warn("unexpected m:-line; will be ignored");
           } else {
             state = 'm';
@@ -374,29 +391,36 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
           }
           break;
         case 'l':
-          if (state != 'm' && state != 'l') {
+          if (state == 'k') {
+            warn("skipping l-lines");
+          } else if (state != 'm' && state != 'l') {
             warn("unexpected l:-line on line %d; will be ignored", lineno);
           } else {
             state = 'l';
             Lline lmn = parse_l(ccut.head);
             if (lmn.ok) {
               bool unknown_fiber = true;
+              Fiber *pf = 0;
               for (int32_t k = 0; k < fr.nfibers; k++) {
                 if (sv8equals(fr.fibers[k].name, lmn.fiber_name)) {
                   unknown_fiber = false;
+                  pf = fr.fibers + k;
                   break;
                 }
               }
-              char buf[lmn.fiber_name.len+1];
-              memset(buf, 0, lmn.fiber_name.len+1);
-              memcpy(buf, lmn.fiber_name.data, lmn.fiber_name.len);
               if (unknown_fiber) {
-                warn("fiber “%s” does not exist; skipping lamina", buf);
+                warn("fiber “%s” does not exist; skipping lamina",
+                    sv8cstring(lmn.fiber_name));
                 state='l';
               } else {
-                // TODO: store lamina in arena.
+                Lamina la = {0};
+                memcpy(&la.f, pf, sizeof(Fiber));
+                // TODO: fill lamina properties before storing it.
+                *arena_new(&rv.laminaa, Lamina, 1) = la;
+                rv.nlamina++;
                 if (info) {
-                  fprintf(stderr, "using fiber “%s” on line %d\n", buf, lineno);
+                  fprintf(stderr, "using fiber “%s” on line %d\n",
+                          sv8cstring(lmn.fiber_name), lineno);
                 }
               }
             } else {
@@ -405,10 +429,13 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
           }
           break;
         case 's':
-          if (state != 'l') {
+          if (state == 'k') {
+            warn("skipping s-line");
+          } else if (state != 'l') {
             warn("unexpected s:-line on line %d; will be ignored", lineno);
           } else {
             state = ' ';
+            // TODO: symmetrically expand laminate.
             if (info) {
               fprintf(stderr, "found s-line on line %d\n", lineno);
             }
