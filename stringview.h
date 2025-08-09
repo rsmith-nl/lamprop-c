@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-08T05:00:15+0200
+// Last modified: 2025-08-09T11:11:17+0200
 
 #pragma once
 #include <stddef.h>  // ptrdiff_t
@@ -87,7 +87,11 @@ extern Sv8Int sv8toi(Sv8 s);
 Sv8Double sv8tod(Sv8 s);
 
 // Hash a string view with FNV-1a hash function.
-uint64_t hash64(Sv8 s);
+extern uint64_t sv8hash64(Sv8 s);
+
+// Return up to 255 bytes of the Sv8 as a C string.
+// This returns a pointer to a static buffer.
+extern char *sv8cstring(Sv8 s);
 
 #ifdef __cplusplus
 }
