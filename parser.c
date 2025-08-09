@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-09T01:35:29+0200
+// Last modified: 2025-08-09T11:31:05+0200
 
 #include "arena.h"
 #include "stringview.h"
@@ -149,6 +149,7 @@ Laminate parse_laminate(Sv8 line)
   Sv8Cut cut = sv8lsplit(line);
   // cut.tail now starts with the name after whitespace.
   rv.name = sv8strip(cut.tail);
+  //debug("rv.name = %s\n", sv8ctring(rv.name));
   if (rv.name.len==0) {
     warn("laminate without a name found");
     rv.ok = false;
@@ -173,6 +174,7 @@ Mline parse_m(Sv8 line)
   Sv8 resin_name = sv8strip(vf.tail);
   if (resin_name.len != 0) {
     rv.resin_name = resin_name;
+    //debug("rv.resin_name = %s\n", sv8cstring(rv.resin_name));
     rv.ok = true;
   }
   return rv;
@@ -188,21 +190,28 @@ Lline parse_l(Sv8 line)
   Sv8Double area_weight = sv8tod(cut.tail);
   if (area_weight.ok) {
     rv.area_weight = area_weight.result;
+    //debug("rv.area_weight = %g", rv.area_weight);
   } else {
+    //debug("reading area weight failed");
     return rv;
   }
   Sv8Double angle = sv8tod(area_weight.tail);
   if (angle.ok) {
     rv.angle = angle.result;
+    //debug("rv.angle = %g", rv.angle);
   } else {
+    //debug("reading angle failed");
     return rv;
   }
   // angle.tail should now contain the name of the fiber.
   Sv8 fiber_name = sv8strip(angle.tail);
   if (fiber_name.len != 0) {
     rv.fiber_name = fiber_name;
+    //debug("rv.fiber_name = %s", sv8cstring(rv.fiber_name));
     rv.ok = true;
-  }
+  } //else {
+    //debug("fiber name empty");
+  //}
   return rv;
 }
 
@@ -391,7 +400,7 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                 }
               }
             } else {
-              warn("could not parse m-line on line %d", lineno);
+              warn("could not parse l-line on line %d", lineno);
             }
           }
           break;
