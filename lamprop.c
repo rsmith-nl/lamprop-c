@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-09T22:17:03+0200
+// Last modified: 2025-08-09T22:39:19+0200
 
 #include "core.h"
 #include "logging.h"
@@ -14,6 +14,9 @@
 #include <stdio.h>  // for fprintf(3)
 #include <stdlib.h> // for abort(3)
 #include <string.h> // for memset(3), memcpy(3)
+
+// text.c
+extern void text_out(Laminate *pl, bool eng, bool mat, bool fea);
 
 int main(int argc, char *argv[])
 {
@@ -50,6 +53,9 @@ int main(int argc, char *argv[])
         pl->magic = 0; // disable the laminate.
       }
       // TODO: print laminates and properties....
+      if (opt.output == TEXT) {
+        text_out(pl, opt.eng, opt.matrix, opt.fea);
+      }
 #ifndef NDEBUG
       if (pl->magic == LMNT) {
         debug("- laminate %d is a valid laminate", j+1);

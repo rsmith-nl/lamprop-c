@@ -32,7 +32,8 @@ DOCSDIR= $(PREFIX)/share/doc/$(BASENAME)  ## Location for the documentation
 DISTFILES = Makefile  ## Files that need to be included in the distribution.
 
 # Source files.
-SRCS = lamprop.c stringview.c parser.c arena.c setup.c core.c matrix6.c ## source code files.
+SRCS = lamprop.c stringview.c parser.c arena.c setup.c core.c ## source code files.
+SRCS += matrix6.c text.c
 
 ##### No editing necessary beyond this point
 
