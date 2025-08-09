@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-09T19:54:18+0200
+// Last modified: 2025-08-09T22:12:07+0200
 
 #include "logging.h"
 #include "core.h"
@@ -407,7 +407,9 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
           break;
         case 'l':
           if (state == 'k') {
-            warn("skipping l-lines");
+            warn("skipping l-line on %d", lineno);
+          } else if (state == 's') {
+            warn("l-line after an s-line on line %d; skipping", lineno);
           } else if (state != 'm' && state != 'l') {
             warn("unexpected l:-line on line %d; will be ignored", lineno);
           } else {
@@ -424,13 +426,14 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                 }
               }
               if (unknown_fiber) {
-                warn("fiber “%s” does not exist; skipping lamina",
-                    sv8cstring(lmn.fiber_name));
+                warn("fiber “%s” on line %d does not exist; skipping lamina",
+                    sv8cstring(lmn.fiber_name), lineno);
                 state='l';
               } else {
-                // TODO: fill lamina properties before storing it.
+                // Fill lamina properties
                 Lamina la = init_lamina(*pf, *pcurresin, lmn.area_weight,
                                         lmn.angle, pcurlam->vf);
+                // Store lamina in the arena.
                 *arena_new(&rv.laminaa, Lamina, 1) = la;
                 rv.nlamina++;
                 if (info) {
@@ -445,12 +448,17 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
           break;
         case 's':
           if (state == 'k') {
-            warn("skipping s-line");
+            warn("skipping s-line on %d", lineno);
           } else if (state != 'l') {
             warn("unexpected s:-line on line %d; will be ignored", lineno);
           } else {
-            state = ' ';
-            // TODO: symmetrically expand laminate.
+            state = 's';
+            Lamina *begin = pcurlam->layers;
+            Lamina *end = begin + (pcurlam->nlayers -1);
+            for (Lamina *p = end; p >= begin; p--) {
+              *arena_new(&rv.laminaa, Lamina, 1) = *p;
+              pcurlam->nlayers++;
+            }
             if (info) {
               fprintf(stderr, "found s-line on line %d\n", lineno);
             }
