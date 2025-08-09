@@ -1,10 +1,10 @@
-// file: types.h
-// vim:fileencoding=utf-8:ft=cpp
+// file: core.h
+// vim:fileencoding=utf-8:ft=cpp:tabstop=2
 //
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
-// Created: 2025-08-03T19:31:50+0200
-// Last modified: 2025-08-09T01:19:38+0200
+// Created: 2025-08-09 15:41:55 +0200
+// Last modified: 2025-08-09T15:56:25+0200
 
 #pragma once
 
@@ -72,50 +72,16 @@ typedef struct {
   double tEx, tEy, tEz;
   double tGxy, tGyz, tGxz;
   double tνxy, tνyx, tνyz;
-  bool ok, finished;
+  bool ok;
 } Laminate;
-
-typedef struct {
-  double vf;
-  Sv8 resin_name;
-  bool ok;
-} Mline;
-
-typedef struct {
-  double area_weight, angle;
-  Sv8 fiber_name;
-  bool ok;
-} Lline;
-
-typedef struct {
-  Arena resina;
-  Arena fibera;
-  Resin *resins;
-  Fiber *fibers;
-  int32_t nresins, nfibers;
-} FRdata;
-
-typedef struct {
-  Arena laminaa;
-  Arena laminatesa;
-  Lamina *laminas;
-  Laminate *laminates;
-  int32_t nlamina, nlaminates;
-} Ldata;
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern Sv8 read_file(char *path, Arena *permanent);
-extern Resin parse_resin(Sv8 line);
-extern Fiber parse_fiber(Sv8 line);
-extern Laminate parse_laminate(Sv8 line);
-extern Mline parse_m(Sv8 line);
-extern Lline parse_l(Sv8 line);
-extern FRdata fibers_and_resins(Sv8 contents, bool info);
-extern Ldata laminates(Sv8 contents, bool info, FRdata fr);
+// Initialze and return a Lamina structure.
+extern Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf);
 
 #ifdef __cplusplus
 }
