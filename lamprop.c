@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-09T20:33:24+0200
+// Last modified: 2025-08-09T20:37:24+0200
 
 #include "core.h"
 #include "logging.h"
@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
       if (!finish_laminate(pl)) {
         pl->magic = 0; // disable the laminate.
       }
+      // TODO: print laminates and properties....
 #ifndef NDEBUG
       if (pl->magic == LMNT) {
         debug("- laminate %d is a valid laminate", j+1);
@@ -63,8 +64,6 @@ int main(int argc, char *argv[])
       }
 #endif
     }
-    // TODO: print laminates and properties....
-
     // Clean up
     arena_destroy(&permanent);
     arena_destroy(&fr.resina);
@@ -78,4 +77,4 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-
+// EOF lamprop.c

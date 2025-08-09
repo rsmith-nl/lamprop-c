@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-09T20:16:10+0200
+// Last modified: 2025-08-09T21:28:15+0200
 
 #include "matrix6.h"
 #include "core.h"
@@ -12,6 +12,7 @@
 #include <string.h>
 #include <math.h>
 
+// Generate rotation angle matrix.
 static void tbar(double out[6][6], double angle);
 
 Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf)
@@ -127,5 +128,6 @@ bool finish_laminate(Laminate *pl)
   if (pl->magic!=LMNT) {
     return false;
   }
+  // TODO: finish calculations.
   return true;
 }
