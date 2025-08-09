@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-09T15:58:43+0200
+// Last modified: 2025-08-09T20:12:12+0200
 
 #include "core.h"
 #include "logging.h"
@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
   debug("opt.argv = %s", opt.argv);
   // General allocation arena. Stores file contents.
   // This is also used as the storage for strings.
-  Arena permanent = arena_create(33554432);
   if (opt.argv != 0) {
+    Arena permanent = arena_create(33554432);
     Sv8 contents = read_file(opt.argv, &permanent);
     if (opt.info) {
       fprintf(stderr, "file “%s” is %td bytes.\n", opt.argv, contents.len);
@@ -44,6 +44,32 @@ int main(int argc, char *argv[])
     if (opt.info) {
       fprintf(stderr, "found %d laminates\n", ld.nlaminates);
     }
+    for (int32_t j = 0; j < ld.nlaminates; j++) {
+      Laminate *pl = ld.laminates + j;
+      // TODO: finish the laminate calculations.
+      finish_laminate(pl);
+#ifndef NDEBUG
+      if (pl->magic == LMNT) {
+        debug("- laminate %d is a valid laminate", j+1);
+        int32_t valid_la = 0;
+        for (int32_t k = 0; k < pl->nlayers; k++) {
+          Lamina *pa = pl->layers + k;
+          if (pa->magic == LAYR) {
+            valid_la++;
+          }
+        }
+        debug("  it has %d/%d valid lamina", valid_la, pl->nlayers);
+      }
+#endif
+    }
+    // TODO: print laminates and properties....
+
+    // Clean up
+    arena_destroy(&permanent);
+    arena_destroy(&fr.resina);
+    arena_destroy(&fr.fibera);
+    arena_destroy(&ld.laminaa);
+    arena_destroy(&ld.laminatesa);
   } else {
     fprintf(stderr, "WARNING: no laminate file name supplied.\n");
   }
