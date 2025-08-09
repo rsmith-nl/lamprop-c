@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-09T23:16:54+0200
+// Last modified: 2025-08-10T00:24:32+0200
 
 #include "logging.h"
 #include "core.h"
@@ -224,6 +224,8 @@ Lline parse_l(Sv8 line, Laminate *pcurlam)
     //debug("reading angle failed");
     return rv;
   }
+  // TODO: implement optional per-layer vf!
+
   // angle.tail should now contain the name of the fiber.
   Sv8 fiber_name = sv8strip(angle.tail);
   if (fiber_name.len != 0) {
