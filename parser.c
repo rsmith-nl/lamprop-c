@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-09T22:17:45+0200
+// Last modified: 2025-08-09T22:45:48+0200
 
 #include "logging.h"
 #include "core.h"
@@ -185,9 +185,8 @@ Mline parse_m(Sv8 line, Laminate *pcurlam)
   // cut.tail now starts with the fiber volume fraction after whitespace.
   Sv8Double vf = sv8tod(cut.tail);
   if (vf.ok) {
-    // Convert from percentage to fraction.
-    rv.vf = vf.result/100.0;
-    // Also set cf in the laminate.
+    rv.vf = vf.result;
+    // Also set vf in the laminate.
     pcurlam->vf = rv.vf;
   } else {
     return rv;
