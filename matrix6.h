@@ -32,6 +32,9 @@ extern int mat_inv6(double m[6][6], double i[6][6]);
 // Print the matrix on stdout
 extern void mat_print6(char *name, double m[6][6]);
 
+// Transpose a matrix
+extern void mat_xpose6(double a[6][6]);
+
 #ifdef __cplusplus
 }
 #endif
