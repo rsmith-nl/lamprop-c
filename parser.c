@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-10T00:24:32+0200
+// Last modified: 2025-08-10T00:33:13+0200
 
 #include "logging.h"
 #include "core.h"
@@ -20,9 +20,9 @@ typedef struct {
 } Mline;
 
 typedef struct {
-  double area_weight, angle;
+  double area_weight, angle, vf;
   Sv8 fiber_name;
-  bool ok;
+  bool ok, optvf;
 } Lline;
 
 static Resin parse_resin(Sv8 line);
@@ -224,10 +224,15 @@ Lline parse_l(Sv8 line, Laminate *pcurlam)
     //debug("reading angle failed");
     return rv;
   }
-  // TODO: implement optional per-layer vf!
-
-  // angle.tail should now contain the name of the fiber.
-  Sv8 fiber_name = sv8strip(angle.tail);
+  Sv8Double vf = sv8tod(angle.tail);
+  Sv8 next = angle.tail;
+  if (vf.ok) {
+    // found optional vf.
+    rv.optvf = true;
+    rv.vf = vf.result;
+    next = vf.tail;
+  }
+  Sv8 fiber_name = sv8strip(next);
   if (fiber_name.len != 0) {
     rv.fiber_name = fiber_name;
     //debug("rv.fiber_name = %s", sv8cstring(rv.fiber_name));
@@ -433,7 +438,7 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
               } else {
                 // Fill lamina properties
                 Lamina la = init_lamina(*pf, *pcurresin, lmn.area_weight,
-                                        lmn.angle, pcurlam->vf);
+                                        lmn.angle, lmn.optvf?lmn.vf:pcurlam->vf);
                 // Store lamina in the arena.
                 *arena_new(&rv.laminaa, Lamina, 1) = la;
                 rv.nlamina++;
