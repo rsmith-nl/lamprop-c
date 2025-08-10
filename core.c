@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-10T19:14:42+0200
+// Last modified: 2025-08-10T22:06:21+0200
 
 // Core functions of lamprop.
 //
@@ -132,6 +132,7 @@ Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf
   double Km = r.E / (3 * (1 - 2 * r.ν));
   double K = 1 / (vf / Kf + vm / Km);
   double ν23 = 1 - ν21 - rv.E2 / (3 * K);
+  rv.ν23 = ν23;
   rv.G23 = rv.E2 / (2 * (1 + ν23));  // Barbero:2008, p. 23, Barbero:2018, p. 504
   double m = cos(angle), n = sin(angle);
   // Calculate the 3D stiffness matrix for this lamina
