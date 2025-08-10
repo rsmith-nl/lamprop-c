@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-10T19:11:33+0200
+// Last modified: 2025-08-10T19:14:42+0200
 
 // Core functions of lamprop.
 //
@@ -345,7 +345,6 @@ bool finish_laminate(Laminate *pl)
   // Calculate the engineering properties.
   // Nettles:1994, p. 34 e.v.
   double dABD = mat_det6(ABD);
-  fprintf(stderr, "DEBUG: dABD = %f\n", dABD);
   double tmp[5][5] = {0};
   double dt1 = 0, dt2 = 0, dt3 = 0, dt4 = 0, dt5 = 0;
   mat_delete(ABD, tmp, 0, 0);
