@@ -33,7 +33,7 @@ DISTFILES = Makefile  ## Files that need to be included in the distribution.
 
 # Source files.
 SRCS = lamprop.c stringview.c parser.c arena.c setup.c core.c ## source code files.
-SRCS += matrix6.c text.c
+SRCS += matrix6.c matrix2.c text.c
 
 ##### No editing necessary beyond this point
 
