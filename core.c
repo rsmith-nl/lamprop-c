@@ -373,11 +373,15 @@ bool finish_laminate(Laminate *pl)
   pl->αx = abd[0][0] * Ntx + abd[0][1] * Nty + abd[0][2] * Ntxy;
   pl->αy = abd[1][0] * Ntx + abd[1][1] * Nty + abd[1][2] * Ntxy;
   // Calculate and store tensor engineering properties
-  pl->tEx = 1 / S[0][0]; pl->tEy = 1 / S[1][1]; pl->tEz = 1 / S[2][2];
-  pl->tGxy  = 1 / S[5][5]; pl->tGxz = 1 / S[4][4]; pl->tGyz = 1 / S[3][3];
-  pl->tνxy = -S[1][0] / S[0][0]; pl->tνxz = -S[2][0] / S[0][0];
+  pl->tEx = 1 / S[0][0];
+  pl->tEy = 1 / S[1][1];
+  pl->tEz = 1 / S[2][2];
+  pl->tGxy  = 1 / S[5][5];
+  pl->tGxz = 1 / S[4][4];
+  pl->tGyz = 1 / S[3][3];
+  pl->tνxy = -S[1][0] / S[0][0];
+  pl->tνxz = -S[2][0] / S[0][0];
   pl->tνyz = -S[2][1] / S[1][1];
-
   return true;
 }
 
