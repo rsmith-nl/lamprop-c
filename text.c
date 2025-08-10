@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2025-08-10T20:31:24+0200
+// Last modified: 2025-08-10T23:21:33+0200
 
 #include "core.h"
 #include "version.h"
@@ -83,4 +83,27 @@ void matrices(Laminate *pl)
 
 void _fea(Laminate *pl)
 {
+  puts("** Material data for CalculiX / Abaqus (SI units):");
+  double D[6][6] = {0};
+  toabaqusi(pl->C, D);
+  printf("*MATERIAL,NAME=%s\n", sv8cstring(pl->name));
+  if (isortho(pl->C)) {
+    puts("*ELASTIC,TYPE=ORTHO");
+    printf("%.4g,%.4g,%.4g,", D[0][0], D[0][1], D[1][1]);
+    printf("%.4g,%.4g,%.4g,", D[0][2], D[1][2], D[2][2]);
+    printf("%.4g,%.4g,\n", D[3][3], D[4][4]);
+    printf("%.4g,293\n", D[5][5]);
+  } else {
+    puts("*ELASTIC,TYPE=ANISO");
+    printf("%.4g,%.4g,%.4g,", D[0][0], D[0][1], D[1][1]);
+    printf("%.4g,%.4g,%.4g,", D[0][2], D[1][2], D[2][2]);
+    printf("%.4g,%.4g,\n", D[0][3], D[1][3]);
+    printf("%.4g,%.4g,%.4g,", D[2][3], D[3][3], D[0][4]);
+    printf("%.4g,%.4g,%.4g,", D[1][4], D[2][4], D[3][4]);
+    printf("%.4g,%.4g,\n", D[4][4], D[0][5]);
+    printf("%.4g,%.4g,%.4g,", D[1][5], D[2][5], D[3][5]);
+    printf("%.4g,%.4g,293\n", D[4][5], D[5][5]);
+  }
+  puts("*DENSITY");
+  printf("%.0f\n", pl->ρ*1000);
 }

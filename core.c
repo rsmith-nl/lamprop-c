@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-10T22:06:21+0200
+// Last modified: 2025-08-11T00:34:42+0200
 
 // Core functions of lamprop.
 //
@@ -101,7 +101,7 @@ static void tbar(double out[6][6], double angle);
 static void mat_delete(double a[6][6], double b[5][5], int r, int k);
 static double mat_det6(double a[6][6]);
 static double mat_det5(double a[5][5]);
-static void inv6(double m[6][6], double i[6][6]);
+//static void inv6(double m[6][6], double i[6][6]);
 
 Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf)
 {
@@ -321,7 +321,8 @@ bool finish_laminate(Laminate *pl)
              pl->layers[j].Q̅26 * pl->layers[j].αy +
              pl->layers[j].Q̅66 * pl->layers[j].αxy) * pl->layers[j].thickness;
     // Calculate H matrix (derived from Barbero:2018, p. 181)
-    double sb = 5 / 4 * (pl->layers[j].thickness - 4 * lz3[j] / (thickness*thickness));
+    // Note: division by 4 moved to end because of accuracy!
+    double sb = 5 * (pl->layers[j].thickness - 4 * lz3[j] / (thickness*thickness)) / 4;
     H[0][0] += pl->layers[j].Q̅s44 * sb;
     H[0][1] += pl->layers[j].Q̅s45 * sb;
     H[1][0] += pl->layers[j].Q̅s45 * sb;
@@ -384,6 +385,41 @@ bool finish_laminate(Laminate *pl)
   pl->tνxz = -S[2][0] / S[0][0];
   pl->tνyz = -S[2][1] / S[1][1];
   return true;
+}
+
+
+bool isortho(double src[6][6])
+{
+  int32_t r[24] = {0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5};
+  int32_t c[24] = {3, 4, 5, 3, 4, 5, 3, 4, 5, 0, 1, 2, 4, 5, 0, 1, 2, 3, 5, 0, 1, 2, 3, 4};
+  int32_t count = 0;
+  for (int32_t x = 0; x < 24; x++) {
+    if (fabs(src[r[x]][c[x]]) < LIMIT) {
+      count++;
+    };
+  }
+  if (count == 24) {
+    return true;
+  }
+  return false;
+}
+
+void toabaqusi(double src[6][6], double dest[6][6])
+{
+  for (int32_t r = 0; r < 6; r++) {
+    for (int32_t c = 0; c < 6; c++) {
+      dest[r][c] = src[r][c] * 1e6;
+    }
+  }
+  // Exceptions
+  dest[0][3] = src[0][5] * 1e6;
+  dest[0][5] = src[0][3] * 1e6;
+  dest[1][3] = src[1][5] * 1e6;
+  dest[1][5] = src[1][3] * 1e6;
+  dest[2][3] = src[2][5] * 1e6;
+  dest[2][5] = src[2][3] * 1e6;
+  dest[3][3] = src[5][5] * 1e6;
+  dest[5][5] = src[3][3] * 1e6;
 }
 
 void mat_delete(double a[6][6], double b[5][5], int r, int k)
@@ -490,33 +526,32 @@ void mat_topright5(double dest[5][5], double src[5][5], double extra[5][5])
 
 // Alternative matrix inversion.
 // Copy from Python version.
-void inv6(double m[6][6], double i[6][6])
-{
-  double copy[6][6] = {0}, rv[6][6] = {0};
-  mat_topright6(copy, m, rv);
-  // Gaussian elimination of top-right triangle
-  for (int32_t k = 5; k >= 0 ; k--) {
-    for (int32_t p = k-1; p >= 0 ; p--) {
-      double fact = copy[p][k] / copy[k][k];
-      for (int32_t j = 0; j < 6; j++) {
-        copy[p][j] -= fact * copy[k][j];
-        if (fabs(copy[p][j]) < LIMIT) {
-          copy[p][j] = 0.0;
-        }
-        rv[p][j] -= fact * rv[k][j];
-      }
-    }
-  }
-  // Divide by diagonals
-  for (int32_t r = 0; r < 6; r++) {
-    for (int32_t k = 0; k < 6; k++) {
-      rv[r][k] /= copy[r][r];
-    }
-  }
-  mat_clean6(rv);
-  mat_cpy6(rv, i);
-}
-
+//void inv6(double m[6][6], double i[6][6])
+//{
+//  double copy[6][6] = {0}, rv[6][6] = {0};
+//  mat_topright6(copy, m, rv);
+//  // Gaussian elimination of top-right triangle
+//  for (int32_t k = 5; k >= 0 ; k--) {
+//    for (int32_t p = k-1; p >= 0 ; p--) {
+//      double fact = copy[p][k] / copy[k][k];
+//      for (int32_t j = 0; j < 6; j++) {
+//        copy[p][j] -= fact * copy[k][j];
+//        if (fabs(copy[p][j]) < LIMIT) {
+//          copy[p][j] = 0.0;
+//        }
+//        rv[p][j] -= fact * rv[k][j];
+//      }
+//    }
+//  }
+//  // Divide by diagonals
+//  for (int32_t r = 0; r < 6; r++) {
+//    for (int32_t k = 0; k < 6; k++) {
+//      rv[r][k] /= copy[r][r];
+//    }
+//  }
+//  mat_clean6(rv);
+//  mat_cpy6(rv, i);
+//}
 
 double mat_det5(double a[5][5])
 {
