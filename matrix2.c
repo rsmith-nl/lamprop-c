@@ -80,17 +80,11 @@ void mat_mul2(double a[2][2], double b[2][2], double ab[2][2])
 
 bool mat_inv2(double m[2][2], double i[2][2])
 {
-  double m2[2][2], inv[2][2], f, diag;
+  double m2[2][2], inv[2][2], f;
   assert(m!=NULL);
   assert(i!=NULL);
   mat_cpy2(m, m2);
   mat_unity2(inv);
-  // If the diagonal is zero, matrix is not invertable
-  diag = m2[0][0];
-  diag *= m2[1][1];
-  if (diag > -LIMIT && diag < LIMIT) {
-    return false;
-  }
   // Empty the lower half of the matrix
   // Row 1
   f = m2[1][0]/m2[0][0];
