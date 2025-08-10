@@ -4,7 +4,88 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-09T21:28:15+0200
+// Last modified: 2025-08-10T09:10:14+0200
+
+// Core functions of lamprop.
+//
+// The following references were used in coding this module:
+//
+// @Book{Barbero:2018,
+//     author = {Ever J. Barbero},
+//     title = {Introduction to composite materials design},
+//     edition   = 3,
+//     publisher = {CRC Press},
+//     year = {2018},
+//     isbn = {9781138196803},
+//     note = {hardcover}
+// }
+//
+// @Book{Barbero:2008,
+//     author = {Ever J. Barbero},
+//     title = {Finite element analysis of composite materials},
+//     publisher = {CRC Press},
+//     year = {2008},
+//     isbn = {9781420054330},
+//     note = {hardcover}
+// }
+//
+// @Book{Bower:2010,
+//     author = {Allan F. Bower},
+//     title = {Applied Mechanics of Solids},
+//     publisher = {CRC Press},
+//     year = {2010},
+//     isbn = {9781439802472a},
+//     note = {hardcover}
+// }
+//
+// @Book{Hyer:1998,
+//   author =       {Micheal W. Hyer},
+//   title =        {Stress analysis of fiber-reinforced composite materials},
+//   publisher =    {McGraw--Hill},
+//   year =         {1998},
+//   isbn =         {0071159835}
+// }
+//
+// @Book{Tsai:1992,
+//   author =       {Stephen W. Tsai},
+//   title =        {Theory of composites design},
+//   publisher =    {Think Composites},
+//   year =         {1992},
+//   isbn =         {0961809035}
+// }
+//
+// @Article{1992WeiEn..52...29H,
+//    author = {Hart-Smith, L.~J.},
+//     title = "{The ten-percent rule for preliminary sizing of fibrous
+//                   composite structures}",
+//   journal = {Weight Engineering},
+//      year = 1992,
+//    volume = 52,
+//     pages = {29-45},
+//   adsnote = {Provided by the Smithsonian/NASA Astrophysics Data System}
+// }
+//
+// @Book{Vinson:1987,
+//   author =       {J.R. Vinson},
+//   title =        {The behavior of structures composed of composite materials},
+//   publisher =    {Martinus Nijhoff Publishers},
+//   year =         {1987},
+//   isbn =         {90247312590}
+//   note =         {hardcover}
+// }
+//
+// @Techreport{Nettles:1994,
+//   author =       {A.T. Nettles},
+//   title =        {Basic Mechanics of Laminated Plates},
+//   institution =  {NASA},
+//   year =         {1994},
+//   number =       {Reference Publication 1351}
+// }
+
+
+
+
+
 
 #include "matrix6.h"
 #include "core.h"
