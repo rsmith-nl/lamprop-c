@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:37 +0200
-// Last modified: 2025-08-09T20:34:07+0200
+// Last modified: 2025-08-10T22:15:21+0200
 
 #include "setup.h"
 #include "logging.h"
@@ -129,5 +129,11 @@ Options setup(int argc, char *argv[])
   // Save updated values, skipping the executable name.
   rv.argc = argc - optind;
   rv.argv = argv[optind];
+  // If none of the output options are given, set all of them
+  if (rv.eng==false && rv.matrix == false && rv.fea == false) {
+    rv.eng = true;
+    rv.matrix = true;
+    rv.fea = true;
+  }
   return rv;
 }
