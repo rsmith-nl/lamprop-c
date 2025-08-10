@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-10T17:37:38+0200
+// Last modified: 2025-08-10T19:11:33+0200
 
 // Core functions of lamprop.
 //
@@ -148,22 +148,16 @@ Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf
     {0, 0, 0, 0, 1 / rv.G13, 0},
     {0, 0, 0, 0, 0, 1 / rv.G12},
   };
-  //mat_print6("Sp", Sp);
   double Cp[6][6] = {0};
   // Invert it to the stiffness matrix in lamina coordinates
   mat_inv6(Sp, Cp);
-  //mat_print6("Cp", Cp);
   // Convert to global coordinates.
   double Tbar[6][6] = {0}, Tbarx[6][6] = {0}, res[6][6] = {0};
   tbar(Tbar, angle);
-  //mat_print6("Tbar", Tbar);
   mat_cpy6(Tbar, Tbarx);
   mat_xpose6(Tbarx);
-  //mat_print6("Tbarx", Tbarx);
   mat_mul6(Tbarx, Cp, res);
-  //mat_print6("res", res);
   mat_mul6(res, Tbar, rv.C);
-  //mat_print6("rv.C", rv.C);
   // The powers of the sine and cosine are often used later.
   double m2 = m * m;
   double m3 = m2 * m, m4 = m2 * m2;
@@ -249,7 +243,6 @@ bool finish_laminate(Laminate *pl)
   double lz2[pl->nlayers], lz3[pl->nlayers];
   double C[6][6] = {0};
   for (int32_t j = 0; j < pl->nlayers; j++) {
-    //mat_print6("pl->layers[j].C", pl->layers[j].C);
     double ze = zs + pl->layers[j].thickness;
     lz2[j] = (ze * ze - zs * zs) / 2;
     lz3[j] = (ze * ze * ze - zs * zs * zs) / 3;
@@ -263,10 +256,8 @@ bool finish_laminate(Laminate *pl)
   }
   // Cleanse C from numbers close to 0.
   mat_clean6(C);
-  mat_print6("laminate C", C);
   double S[6][6] = {0};
   mat_inv6(C, S);
-  mat_print6("laminate S", S);
   // Store matrices.
   memcpy(pl->C, C, 6*6*sizeof(double));
   memcpy(pl->S, S, 6*6*sizeof(double));
@@ -340,26 +331,21 @@ bool finish_laminate(Laminate *pl)
   // Finish the matrices, discarding very small numbers in ABD and H.
   mat_clean6(ABD);
   mat_clean2(H);
-  mat_print6("laminate ABD", ABD);
   // Store matrices.
   memcpy(pl->ABD, ABD, 6*6*sizeof(double));
   memcpy(pl->H, H, 2*2*sizeof(double));
   // Calculate inverted matrices
   double abd[6][6] = {0};
   double h[2][2] = {0};
-  //if (mat_inv6(ABD, abd) == false || mat_inv2(H, h) == false) {
-  //  pl->ok = false;
-  //  return false;
-  //}
-  inv6(ABD, abd);
+  mat_inv6(ABD, abd);
   mat_inv2(H, h);
-  mat_print6("laminate abd", abd);
   // Store inverted matrices.
   memcpy(pl->abd, abd, 6*6*sizeof(double));
   memcpy(pl->h, h, 2*2*sizeof(double));
   // Calculate the engineering properties.
   // Nettles:1994, p. 34 e.v.
   double dABD = mat_det6(ABD);
+  fprintf(stderr, "DEBUG: dABD = %f\n", dABD);
   double tmp[5][5] = {0};
   double dt1 = 0, dt2 = 0, dt3 = 0, dt4 = 0, dt5 = 0;
   mat_delete(ABD, tmp, 0, 0);
@@ -416,7 +402,8 @@ void mat_delete(double a[6][6], double b[5][5], int r, int k)
   }
 }
 
-// Return the Gauss-eliminated top-right triangular for a 6x6 matrix.
+// Return the row-echelon form (REF) for a 6x6 matrix via gaussian
+// elimination.
 void mat_topright6(double dest[6][6], double src[6][6], double extra[6][6])
 {
   double copy[6][6] = {0};
@@ -428,16 +415,13 @@ void mat_topright6(double dest[6][6], double src[6][6], double extra[6][6])
       double fact = copy[p][k] / copy[k][k];
       for (int32_t j = 0; j < 6; j++) {
         copy[p][j] -= fact * copy[k][j];
-        if (fabs(copy[p][j]) < LIMIT) {
-          copy[p][j] = 0.0;
-        }
         rv[p][j] -= fact * rv[k][j];
       }
     }
   }
-  mat_cpy6(dest, copy);
+  mat_cpy6(copy, dest);
   if (extra) {
-    mat_cpy6(extra, rv);
+    mat_cpy6(rv, extra);
   }
 }
 
@@ -463,23 +447,41 @@ void mat_cpy5(double src[5][5], double dest[5][5])
   }
 }
 
-// Return the Gauss-eliminated top-right triangular for a 5x5 matrix.
-void mat_topright5(double dest[5][5], double src[5][5])
+// Set to I matrix
+void mat_unity5(double m[5][5])
+{
+  for (int32_t r = 0; r < 5; r++) {
+    for (int32_t c = 0; c < 5; c++) {
+      if (r==c) {
+        m[r][c] = 1.0;
+      } else {
+        m[r][c] = 0.0;
+      }
+    }
+  }
+}
+
+// Return the row-echelon form (REF) for a 5x5 matrix via gaussian
+// elimination.
+void mat_topright5(double dest[5][5], double src[5][5], double extra[5][5])
 {
   double copy[5][5] = {0};
+  double rv[5][5] = {0};
+  mat_unity5(rv);
   mat_cpy5(src, copy);
   for (int32_t k = 0; k < 5; k++) {
     for (int32_t p = k+1; p < 5; p++) {
       double fact = copy[p][k] / copy[k][k];
       for (int32_t j = 0; j < 5; j++) {
         copy[p][j] -= fact * copy[k][j];
-        if (fabs(copy[p][j]) < LIMIT) {
-          copy[p][j] = 0.0;
-        }
+        rv[p][j] -= fact * rv[k][j];
       }
     }
   }
-  mat_cpy5(dest, copy);
+  mat_cpy5(copy, dest);
+  if (extra) {
+    mat_cpy5(rv, extra);
+  }
 }
 
 // Alternative matrix inversion.
@@ -487,10 +489,10 @@ void mat_topright5(double dest[5][5], double src[5][5])
 void inv6(double m[6][6], double i[6][6])
 {
   double copy[6][6] = {0}, rv[6][6] = {0};
-  mat_topright6(m, copy, rv);
+  mat_topright6(copy, m, rv);
   // Gaussian elimination of top-right triangle
   for (int32_t k = 5; k >= 0 ; k--) {
-    for (int32_t p = 5; p >= 0 ; p--) {
+    for (int32_t p = k-1; p >= 0 ; p--) {
       double fact = copy[p][k] / copy[k][k];
       for (int32_t j = 0; j < 6; j++) {
         copy[p][j] -= fact * copy[k][j];
@@ -515,7 +517,7 @@ void inv6(double m[6][6], double i[6][6])
 double mat_det5(double a[5][5])
 {
   double tr[5][5] = {0};
-  mat_topright5(tr, a);
+  mat_topright5(tr, a, 0);
   double det = 1;
   for (int32_t j = 0; j < 5; j++) {
     det *= tr[j][j];
