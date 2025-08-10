@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-10T13:44:51+0200
+// Last modified: 2025-08-10T15:57:10+0200
 
 // Core functions of lamprop.
 //
@@ -95,7 +95,10 @@
 
 // Generate rotation angle matrix.
 static void tbar(double out[6][6], double angle);
+// Missing matrix functions...
 static void mat_delete(double a[6][6], double b[5][5], int r, int k);
+static double mat_det6(double a[6][6]);
+static double mat_det5(double a[5][5]);
 
 Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf)
 {
@@ -343,8 +346,24 @@ bool finish_laminate(Laminate *pl)
   memcpy(pl->h, h, 2*2*sizeof(double));
   // Calculate the engineering properties.
   // Nettles:1994, p. 34 e.v.
-  // TODO: finish calculations
-
+  double dABD = mat_det6(ABD);
+  double tmp[5][5] = {0};
+  double dt1 = 0, dt2 = 0, dt3 = 0, dt4 = 0, dt5 = 0;
+  mat_delete(ABD, tmp, 0, 0);
+  dt1 = mat_det5(tmp);
+  pl->Ex = dABD/(dt1 * thickness);
+  mat_delete(ABD, tmp, 1, 1);
+  dt2 = mat_det5(tmp);
+  pl->Ey = dABD/(dt2 * thickness);
+  mat_delete(ABD, tmp, 2, 2);
+  dt3 = mat_det5(tmp);
+  pl->Gxy = dABD/(dt3 * thickness);
+  mat_delete(ABD, tmp, 0, 1);
+  dt4 = mat_det5(tmp);
+  mat_delete(ABD, tmp, 1, 0);
+  dt5 = mat_det5(tmp);
+  pl->νxy = dt4 / dt1;
+  pl->νyx = dt5 / dt2;
   // See Barbero:2018, p. 197
   pl->Gyz = H[0][0] / thickness;
   pl->Gxz = H[1][1] / thickness;
@@ -382,6 +401,78 @@ void mat_delete(double a[6][6], double b[5][5], int r, int k)
       b[R-1][K-1] = a[R][K];
     }
   }
+}
+
+// Return the Gauss-eliminated top-right triangular for a 6x6 matrix.
+void mat_topright6(double dest[6][6], double src[6][6])
+{
+  double copy[6][6] = {0};
+  mat_cpy6(src, copy);
+  for (int32_t k = 0; k < 6; k++) {
+    for (int32_t p = k+1; p < 6; p++) {
+      double fact = copy[p][k] / copy[k][k];
+      for (int32_t j = 0; j < 6; j++) {
+        copy[p][j] -= fact * copy[k][j];
+        if (fabs(copy[p][j]) < LIMIT) {
+          copy[p][j] = 0.0;
+        }
+      }
+    }
+  }
+  mat_cpy6(dest, copy);
+}
+
+// Calculate the determinant of a 6x6 matrix.
+double mat_det6(double a[6][6])
+{
+  double tr[6][6] = {0};
+  mat_topright6(tr, a);
+  double det = 1;
+  for (int32_t j = 0; j < 6; j++) {
+    det *= tr[j][j];
+  }
+  return det;
+}
+
+// Copy a 5x5 matrix
+void mat_cpy5(double src[5][5], double dest[5][5])
+{
+  for (int32_t r = 0; r < 5; r++) {
+    for (int32_t c = 0; c < 5; c++) {
+      dest[r][c] = src[r][c];
+    };
+  }
+}
+
+// Return the Gauss-eliminated top-right triangular for a 5x5 matrix.
+void mat_topright5(double dest[5][5], double src[5][5])
+{
+  double copy[5][5] = {0};
+  mat_cpy5(src, copy);
+  for (int32_t k = 0; k < 5; k++) {
+    for (int32_t p = k+1; p < 5; p++) {
+      double fact = copy[p][k] / copy[k][k];
+      for (int32_t j = 0; j < 5; j++) {
+        copy[p][j] -= fact * copy[k][j];
+        if (fabs(copy[p][j]) < LIMIT) {
+          copy[p][j] = 0.0;
+        }
+      }
+    }
+  }
+  mat_cpy5(dest, copy);
+}
+
+
+double mat_det5(double a[5][5])
+{
+  double tr[5][5] = {0};
+  mat_topright5(tr, a);
+  double det = 1;
+  for (int32_t j = 0; j < 5; j++) {
+    det *= tr[j][j];
+  }
+  return det;
 }
 
 
