@@ -500,9 +500,9 @@ bool mat_inv6(double m[6][6], double i[6][6])
   diag *= m2[3][3];
   diag *= m2[4][4];
   diag *= m2[5][5];
-  if (diag > -LIMIT && diag < LIMIT) {
-    return false;
-  }
+//  if (diag > -LIMIT && diag < LIMIT) {
+//    return false;
+//  }
   // Empty the lower half of the matrix
   // Row 1
   f = m2[1][0]/m2[0][0];
