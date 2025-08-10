@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-10T09:10:14+0200
+// Last modified: 2025-08-10T13:44:51+0200
 
 // Core functions of lamprop.
 //
@@ -82,19 +82,20 @@
 //   number =       {Reference Publication 1351}
 // }
 
-
-
-
-
-
 #include "matrix6.h"
+#include "matrix2.h"
 #include "core.h"
 
 #include <string.h>
 #include <math.h>
 
+// Matrix members < limit are set to 0.0.
+#define LIMIT 1e-10
+
+
 // Generate rotation angle matrix.
 static void tbar(double out[6][6], double angle);
+static void mat_delete(double a[6][6], double b[5][5], int r, int k);
 
 Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf)
 {
@@ -209,6 +210,178 @@ bool finish_laminate(Laminate *pl)
   if (pl->magic!=LMNT) {
     return false;
   }
-  // TODO: finish calculations.
+  double thickness = 0.0;
+  double fiber_weight = 0.0;
+  double ρ = 0.0;
+  double vf = 0.0;
+  double resin_weight = 0.0;
+  for (int32_t j = 0; j < pl->nlayers; j++) {
+    thickness += pl->layers[j].thickness;
+    fiber_weight += pl->layers[j].fiber_weight;
+    ρ += pl->layers[j].ρ * pl->layers[j].thickness;
+    vf += pl->layers[j].vf * pl->layers[j].thickness;
+    resin_weight += pl->layers[j].resin_weight;
+  }
+  ρ /= thickness;
+  vf /= thickness;
+  double wf = fiber_weight / (fiber_weight + resin_weight);
+  // Store values in laminate data structure
+  pl->thickness = thickness;
+  pl->fiber_weight = fiber_weight;
+  pl->resin_weight = resin_weight;
+  pl->ρ = ρ;
+  pl->vf = vf;
+  pl->wf = wf;
+  // Calculate C for total laminate
+  double zs = -thickness / 2;
+  double lz2[pl->nlayers], lz3[pl->nlayers];
+  double C[6][6] = {0};
+  for (int32_t j = 0; j < pl->nlayers; j++) {
+    double ze = zs + pl->layers[j].thickness;
+    lz2[j] = (ze * ze - zs * zs) / 2;
+    lz3[j] = (ze * ze * ze - zs * zs * zs) / 3;
+    zs = ze;
+    double scale = pl->layers[j].thickness / thickness;
+    for (int32_t r = 0; r < 6; r++) {
+      for (int32_t c = 0; c < 6; c++) {
+        C[r][c] += pl->layers[j].C[r][c] * scale;
+      }
+    }
+  }
+  // Cleanse C from numbers close to 0.
+  mat_clean6(C);
+  double S[6][6] = {0};
+  if(mat_inv6(C, S) == false) {
+    pl->ok = false;
+    return false;
+  }
+  // Store matrices.
+  memcpy(pl->C, C, 6*6*sizeof(double));
+  memcpy(pl->S, S, 6*6*sizeof(double));
+  // Calculate ABD and H matrices
+  double ABD[6][6] = {0};
+  double H[2][2] = {0};
+  double Ntx = 0.0, Nty = 0.0, Ntxy = 0.0, c3 = 0.0;
+  for (int32_t j = 0; j < pl->nlayers; j++) {
+    // first row
+    ABD[0][0] += pl->layers[j].Q̅11 * pl->layers[j].thickness;  // Hyer:1998, p. 290
+    ABD[0][1] += pl->layers[j].Q̅12 * pl->layers[j].thickness;
+    ABD[0][2] += pl->layers[j].Q̅16 * pl->layers[j].thickness;
+    ABD[0][3] += pl->layers[j].Q̅11 * lz2[j];
+    ABD[0][4] += pl->layers[j].Q̅12 * lz2[j];
+    ABD[0][5] += pl->layers[j].Q̅16 * lz2[j];
+    // second row
+    ABD[1][0] += pl->layers[j].Q̅12 * pl->layers[j].thickness;
+    ABD[1][1] += pl->layers[j].Q̅22 * pl->layers[j].thickness;
+    ABD[1][2] += pl->layers[j].Q̅26 * pl->layers[j].thickness;
+    ABD[1][3] += pl->layers[j].Q̅12 * lz2[j];
+    ABD[1][4] += pl->layers[j].Q̅22 * lz2[j];
+    ABD[1][5] += pl->layers[j].Q̅26 * lz2[j];
+    // third row
+    ABD[2][0] += pl->layers[j].Q̅16 * pl->layers[j].thickness;
+    ABD[2][1] += pl->layers[j].Q̅26 * pl->layers[j].thickness;
+    ABD[2][2] += pl->layers[j].Q̅66 * pl->layers[j].thickness;
+    ABD[2][3] += pl->layers[j].Q̅16 * lz2[j];
+    ABD[2][4] += pl->layers[j].Q̅26 * lz2[j];
+    ABD[2][5] += pl->layers[j].Q̅66 * lz2[j];
+    // fourth row
+    ABD[3][0] += pl->layers[j].Q̅11 * lz2[j];
+    ABD[3][1] += pl->layers[j].Q̅12 * lz2[j];
+    ABD[3][2] += pl->layers[j].Q̅16 * lz2[j];
+    ABD[3][3] += pl->layers[j].Q̅11 * lz3[j];
+    ABD[3][4] += pl->layers[j].Q̅12 * lz3[j];
+    ABD[3][5] += pl->layers[j].Q̅16 * lz3[j];
+    // fifth row
+    ABD[4][0] += pl->layers[j].Q̅12 * lz2[j];
+    ABD[4][1] += pl->layers[j].Q̅22 * lz2[j];
+    ABD[4][2] += pl->layers[j].Q̅26 * lz2[j];
+    ABD[4][3] += pl->layers[j].Q̅12 * lz3[j];
+    ABD[4][4] += pl->layers[j].Q̅22 * lz3[j];
+    ABD[4][5] += pl->layers[j].Q̅26 * lz3[j];
+    // sixth row
+    ABD[5][0] += pl->layers[j].Q̅16 * lz2[j];
+    ABD[5][1] += pl->layers[j].Q̅26 * lz2[j];
+    ABD[5][2] += pl->layers[j].Q̅66 * lz2[j];
+    ABD[5][3] += pl->layers[j].Q̅16 * lz3[j];
+    ABD[5][4] += pl->layers[j].Q̅26 * lz3[j];
+    ABD[5][5] += pl->layers[j].Q̅66 * lz3[j];
+    // Calculate unit thermal stress resultants.
+    // Hyer:1998, p. 445
+    Ntx += (pl->layers[j].Q̅11 * pl->layers[j].αx +
+            pl->layers[j].Q̅12 * pl->layers[j].αy +
+            pl->layers[j].Q̅16 * pl->layers[j].αxy) * pl->layers[j].thickness;
+    Nty += (pl->layers[j].Q̅12 * pl->layers[j].αx +
+            pl->layers[j].Q̅22 * pl->layers[j].αy +
+            pl->layers[j].Q̅26 * pl->layers[j].αxy) * pl->layers[j].thickness;
+    Ntxy += (pl->layers[j].Q̅16 * pl->layers[j].αx +
+             pl->layers[j].Q̅26 * pl->layers[j].αy +
+             pl->layers[j].Q̅66 * pl->layers[j].αxy) * pl->layers[j].thickness;
+    // Calculate H matrix (derived from Barbero:2018, p. 181)
+    double sb = 5 / 4 * (pl->layers[j].thickness - 4 * lz3[j] / (thickness*thickness));
+    H[0][0] += pl->layers[j].Q̅s44 * sb;
+    H[0][1] += pl->layers[j].Q̅s45 * sb;
+    H[1][0] += pl->layers[j].Q̅s45 * sb;
+    H[1][1] += pl->layers[j].Q̅s55 * sb;
+    // Calculate E3
+    c3 += pl->layers[j].thickness / pl->layers[j].E3;
+  }
+  // Finish the matrices, discarding very small numbers in ABD and H.
+  mat_clean6(ABD);
+  mat_clean2(H);
+  // Store matrices.
+  memcpy(pl->ABD, ABD, 6*6*sizeof(double));
+  memcpy(pl->H, H, 2*2*sizeof(double));
+  // Calculate inverted matrices
+  double abd[6][6] = {0};
+  double h[2][2] = {0};
+  if (mat_inv6(ABD, abd) == false || mat_inv2(H, h) == false) {
+    pl->ok = false;
+    return false;
+  }
+  // Store inverted matrices.
+  memcpy(pl->abd, abd, 6*6*sizeof(double));
+  memcpy(pl->h, h, 2*2*sizeof(double));
+  // Calculate the engineering properties.
+  // Nettles:1994, p. 34 e.v.
+  // TODO: finish calculations
+
+  // See Barbero:2018, p. 197
+  pl->Gyz = H[0][0] / thickness;
+  pl->Gxz = H[1][1] / thickness;
+  // All layers experience the same force in Z-direction.
+  pl->Ez = thickness / c3;
+  // Calculate and store the coefficients of thermal expansion.
+  // *Technically* only valid for a symmetric laminate!
+  // Hyer:1998, p. 451, (11.86)
+  pl->αx = abd[0][0] * Ntx + abd[0][1] * Nty + abd[0][2] * Ntxy;
+  pl->αy = abd[1][0] * Ntx + abd[1][1] * Nty + abd[1][2] * Ntxy;
+  // Calculate and store tensor engineering properties
+  pl->tEx = 1 / S[0][0]; pl->tEy = 1 / S[1][1]; pl->tEz = 1 / S[2][2];
+  pl->tGxy  = 1 / S[5][5]; pl->tGxz = 1 / S[4][4]; pl->tGyz = 1 / S[3][3];
+  pl->tνxy = -S[1][0] / S[0][0]; pl->tνxz = -S[2][0] / S[0][0];
+  pl->tνyz = -S[2][1] / S[1][1];
+
   return true;
 }
+
+void mat_delete(double a[6][6], double b[5][5], int r, int k)
+{
+  for (int32_t R = 0; R < r; R++) {
+    for (int32_t K = 0; K < k; K++) {
+      b[R][K] = a[R][K];
+    }
+    for (int32_t K = k+1; K < 6; K++) {
+      b[R][K-1] = a[R][K];
+    }
+  }
+  for (int32_t R = r+1; R < 6; R++) {
+    for (int32_t K = 0; K < k; K++) {
+      b[R-1][K] = a[R][K];
+    }
+    for (int32_t K = k+1; K < 6; K++) {
+      b[R-1][K-1] = a[R][K];
+    }
+  }
+}
+
+

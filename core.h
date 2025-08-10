@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 15:41:55 +0200
-// Last modified: 2025-08-09T19:50:12+0200
+// Last modified: 2025-08-10T13:01:33+0200
 
 #pragma once
 
@@ -81,7 +81,7 @@ typedef struct {
   double C[6][6], S[6][6];
   double tEx, tEy, tEz;
   double tGxy, tGyz, tGxz;
-  double tνxy, tνyx, tνyz;
+  double tνxy, tνxz, tνyz;
   bool ok;
 } Laminate;
 
