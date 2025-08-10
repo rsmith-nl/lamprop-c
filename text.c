@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2025-08-09T23:00:19+0200
+// Last modified: 2025-08-10T16:09:02+0200
 
 #include "core.h"
 #include "version.h"
@@ -46,6 +46,19 @@ void text_out(Laminate *pl, bool eng, bool mat, bool fea)
 
 void engprop(Laminate *pl)
 {
+  puts("In-plane engineering properties:");
+  printf("E_x  = %.0f MPa, E_y  = %.0f MPa, E_z  = %.0f MPa\n",
+         pl->Ex, pl->Ey, pl->Ez);
+  printf("G_xy  = %.0f MPa, G_xz  = %.0f MPa, G_yz  = %.0f MPa\n",
+         pl->Gxy, pl->Gxz, pl->Gyz);
+  printf("ν_xy = %7.5f\n", pl->νxy);
+  printf("α_x =  %9.4g K⁻¹, α_y =  %9.4g K⁻¹\n", pl->αx, pl->αy);
+  puts("Engineering properties derived from 3D stiffness matrix:");
+  printf("E_x  = %.0f MPa, E_y  = %.0f MPa, E_z  = %.0f MPa\n",
+         pl->tEx, pl->tEy, pl->tEz);
+  printf("G_xy  = %.0f MPa, G_xz  = %.0f MPa, G_yz  = %.0f MPa\n",
+         pl->tGxy, pl->tGxz, pl->tGyz);
+  printf("ν_xy = %.3f, ν_xz = %.3f, ν_yz = %.3f\n",  pl->tνxy, pl->tνxz, pl->tνyz);
 }
 
 void matrices(Laminate *pl)
