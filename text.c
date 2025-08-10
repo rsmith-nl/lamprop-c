@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2025-08-10T16:09:02+0200
+// Last modified: 2025-08-10T20:31:24+0200
 
 #include "core.h"
 #include "version.h"
@@ -63,6 +63,22 @@ void engprop(Laminate *pl)
 
 void matrices(Laminate *pl)
 {
+  puts("In-plane stiffness (ABD) matrix:");
+  for (int32_t r = 0; r < 6; r++) {
+    printf("|% 10e % 10e % 10e % 10e % 10e % 10e |\n",
+          pl->ABD[r][0], pl->ABD[r][1], pl->ABD[r][2],
+          pl->ABD[r][3], pl->ABD[r][4], pl->ABD[r][5]);
+  }
+  puts("Transverse (H) stiffness matrix:");
+  printf("|% 10e % 10e |\n", pl->H[0][0], pl->H[0][1]);
+  printf("|% 10e % 10e |\n", pl->H[1][0], pl->H[1][1]);
+  puts("3D stiffness tensor [C], contracted notation:");
+  puts("(indices for stress/strain are in the order 11, 22, 33, 23, 13, 12)");
+  for (int32_t r = 0; r < 6; r++) {
+    printf("|% 10e % 10e % 10e % 10e % 10e % 10e |\n",
+          pl->C[r][0], pl->C[r][1], pl->C[r][2],
+          pl->C[r][3], pl->C[r][4], pl->C[r][5]);
+  }
 }
 
 void _fea(Laminate *pl)
