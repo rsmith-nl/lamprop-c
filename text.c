@@ -66,8 +66,8 @@ void matrices(Laminate *pl)
   puts("In-plane stiffness (ABD) matrix:");
   for (int32_t r = 0; r < 6; r++) {
     printf("|% 10e % 10e % 10e % 10e % 10e % 10e |\n",
-          pl->ABD[r][0], pl->ABD[r][1], pl->ABD[r][2],
-          pl->ABD[r][3], pl->ABD[r][4], pl->ABD[r][5]);
+           pl->ABD[r][0], pl->ABD[r][1], pl->ABD[r][2],
+           pl->ABD[r][3], pl->ABD[r][4], pl->ABD[r][5]);
   }
   puts("Transverse (H) stiffness matrix:");
   printf("|% 10e % 10e |\n", pl->H[0][0], pl->H[0][1]);
@@ -76,8 +76,8 @@ void matrices(Laminate *pl)
   puts("(indices for stress/strain are in the order 11, 22, 33, 23, 13, 12)");
   for (int32_t r = 0; r < 6; r++) {
     printf("|% 10e % 10e % 10e % 10e % 10e % 10e |\n",
-          pl->C[r][0], pl->C[r][1], pl->C[r][2],
-          pl->C[r][3], pl->C[r][4], pl->C[r][5]);
+           pl->C[r][0], pl->C[r][1], pl->C[r][2],
+           pl->C[r][3], pl->C[r][4], pl->C[r][5]);
   }
 }
 
