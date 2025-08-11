@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-09T22:39:19+0200
+// Last modified: 2025-08-11T20:25:35+0200
 
 #include "core.h"
 #include "logging.h"
@@ -17,6 +17,8 @@
 
 // text.c
 extern void text_out(Laminate *pl, bool eng, bool mat, bool fea);
+// latex.c
+extern void latex_out(Laminate *pl, bool eng, bool mat, bool fea);
 
 int main(int argc, char *argv[])
 {
@@ -53,8 +55,15 @@ int main(int argc, char *argv[])
         pl->magic = 0; // disable the laminate.
       }
       // TODO: print laminates and properties....
-      if (opt.output == TEXT) {
-        text_out(pl, opt.eng, opt.matrix, opt.fea);
+      switch (opt.output) {
+        case TEXT:
+          text_out(pl, opt.eng, opt.matrix, opt.fea);
+          break;
+        case LATEX:
+          latex_out(pl, opt.eng, opt.matrix, opt.fea);
+          break;
+        case HTML:
+          break;
       }
 #ifndef NDEBUG
       if (pl->magic == LMNT) {

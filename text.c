@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2025-08-11T18:21:27+0200
+// Last modified: 2025-08-11T21:45:55+0200
 
 #include "core.h"
 #include "version.h"
@@ -14,7 +14,7 @@
 
 static void engprop(Laminate *pl);
 static void matrices(Laminate *pl);
-static void _fea(Laminate *pl);
+void text_fea(Laminate *pl);
 
 void text_out(Laminate *pl, bool eng, bool mat, bool fea)
 {
@@ -40,7 +40,7 @@ void text_out(Laminate *pl, bool eng, bool mat, bool fea)
     matrices(pl);
   }
   if (fea) {
-    _fea(pl);
+    text_fea(pl);
   }
   puts("");
 }
@@ -82,7 +82,7 @@ void matrices(Laminate *pl)
   }
 }
 
-void _fea(Laminate *pl)
+void text_fea(Laminate *pl)
 {
   puts("** Material data for CalculiX / Abaqus (SI units):");
   double D[6][6] = {0};
