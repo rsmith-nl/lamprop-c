@@ -14,12 +14,12 @@ VPATCH   = 11
 CFLAGS = -pipe -std=c11 -fPIC -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
                 -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
                 -fsanitize=address,undefined
-LFLAGS = -s -pipe -fsanitize=address,undefined
+LFLAGS = -pipe -fsanitize=address,undefined
 
 .ifdef NDEBUG
 CFLAGS = -Os -pipe -std=c11 -fPIC -ffast-math
 CFLAGS += -DNDEBUG=1
-LFLAGS = -s -pipe
+LFLAGS = -pipe
 .endif
 
 
@@ -53,7 +53,7 @@ clean:  ## Remove all generated files.
 .PHONY: install
 install: $(BASENAME)  ## Install the program.
 	install -d $(BINDIR)
-	install -m 755 $(BASENAME) $(BINDIR)
+	install -m 755 -s $(BASENAME) $(BINDIR)
 	install -m 644 $(BASENAME).1 $(MANDIR)
 	gzip -f -q $(MANDIR)/$(BASENAME).1
 
