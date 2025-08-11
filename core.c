@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-11T00:34:42+0200
+// Last modified: 2025-08-12T00:44:43+0200
 
 // Core functions of lamprop.
 //
@@ -84,6 +84,7 @@
 
 #include "logging.h"
 #include "matrix6.h"
+#include "matrix5.h"
 #include "matrix2.h"
 #include "core.h"
 
@@ -99,9 +100,6 @@
 static void tbar(double out[6][6], double angle);
 // Missing matrix functions...
 static void mat_delete(double a[6][6], double b[5][5], int r, int k);
-static double mat_det6(double a[6][6]);
-static double mat_det5(double a[5][5]);
-//static void inv6(double m[6][6], double i[6][6]);
 
 Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf)
 {
@@ -441,127 +439,3 @@ void mat_delete(double a[6][6], double b[5][5], int r, int k)
     }
   }
 }
-
-// Return the row-echelon form (REF) for a 6x6 matrix via gaussian
-// elimination.
-void mat_topright6(double dest[6][6], double src[6][6], double extra[6][6])
-{
-  double copy[6][6] = {0};
-  double rv[6][6] = {0};
-  mat_unity6(rv);
-  mat_cpy6(src, copy);
-  for (int32_t k = 0; k < 6; k++) {
-    for (int32_t p = k+1; p < 6; p++) {
-      double fact = copy[p][k] / copy[k][k];
-      for (int32_t j = 0; j < 6; j++) {
-        copy[p][j] -= fact * copy[k][j];
-        rv[p][j] -= fact * rv[k][j];
-      }
-    }
-  }
-  mat_cpy6(copy, dest);
-  if (extra) {
-    mat_cpy6(rv, extra);
-  }
-}
-
-// Calculate the determinant of a 6x6 matrix.
-double mat_det6(double a[6][6])
-{
-  double tr[6][6] = {0};
-  mat_topright6(tr, a, 0);
-  double det = 1;
-  for (int32_t j = 0; j < 6; j++) {
-    det *= tr[j][j];
-  }
-  return det;
-}
-
-// Copy a 5x5 matrix
-void mat_cpy5(double src[5][5], double dest[5][5])
-{
-  for (int32_t r = 0; r < 5; r++) {
-    for (int32_t c = 0; c < 5; c++) {
-      dest[r][c] = src[r][c];
-    };
-  }
-}
-
-// Set to I matrix
-void mat_unity5(double m[5][5])
-{
-  for (int32_t r = 0; r < 5; r++) {
-    for (int32_t c = 0; c < 5; c++) {
-      if (r==c) {
-        m[r][c] = 1.0;
-      } else {
-        m[r][c] = 0.0;
-      }
-    }
-  }
-}
-
-// Return the row-echelon form (REF) for a 5x5 matrix via gaussian
-// elimination.
-void mat_topright5(double dest[5][5], double src[5][5], double extra[5][5])
-{
-  double copy[5][5] = {0};
-  double rv[5][5] = {0};
-  mat_unity5(rv);
-  mat_cpy5(src, copy);
-  for (int32_t k = 0; k < 5; k++) {
-    for (int32_t p = k+1; p < 5; p++) {
-      double fact = copy[p][k] / copy[k][k];
-      for (int32_t j = 0; j < 5; j++) {
-        copy[p][j] -= fact * copy[k][j];
-        rv[p][j] -= fact * rv[k][j];
-      }
-    }
-  }
-  mat_cpy5(copy, dest);
-  if (extra) {
-    mat_cpy5(rv, extra);
-  }
-}
-
-// Alternative matrix inversion.
-// Copy from Python version.
-//void inv6(double m[6][6], double i[6][6])
-//{
-//  double copy[6][6] = {0}, rv[6][6] = {0};
-//  mat_topright6(copy, m, rv);
-//  // Gaussian elimination of top-right triangle
-//  for (int32_t k = 5; k >= 0 ; k--) {
-//    for (int32_t p = k-1; p >= 0 ; p--) {
-//      double fact = copy[p][k] / copy[k][k];
-//      for (int32_t j = 0; j < 6; j++) {
-//        copy[p][j] -= fact * copy[k][j];
-//        if (fabs(copy[p][j]) < LIMIT) {
-//          copy[p][j] = 0.0;
-//        }
-//        rv[p][j] -= fact * rv[k][j];
-//      }
-//    }
-//  }
-//  // Divide by diagonals
-//  for (int32_t r = 0; r < 6; r++) {
-//    for (int32_t k = 0; k < 6; k++) {
-//      rv[r][k] /= copy[r][r];
-//    }
-//  }
-//  mat_clean6(rv);
-//  mat_cpy6(rv, i);
-//}
-
-double mat_det5(double a[5][5])
-{
-  double tr[5][5] = {0};
-  mat_topright5(tr, a, 0);
-  double det = 1;
-  for (int32_t j = 0; j < 5; j++) {
-    det *= tr[j][j];
-  }
-  return det;
-}
-
-
