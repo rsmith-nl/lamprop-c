@@ -17,7 +17,7 @@ CFLAGS = -pipe -std=c11 -fPIC -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
 LFLAGS = -pipe -fsanitize=address,undefined
 
 .ifdef NDEBUG
-CFLAGS = -Os -pipe -std=c11 -fPIC -ffast-math
+CFLAGS = -Os -pipe -std=c11 -fPIC -ffast-math -march=native
 CFLAGS += -DNDEBUG=1
 LFLAGS = -pipe
 .endif
