@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-11T20:25:35+0200
+// Last modified: 2025-08-14T00:13:50+0200
 
 #include "core.h"
 #include "logging.h"
@@ -14,6 +14,8 @@
 #include <stdio.h>  // for fprintf(3)
 #include <stdlib.h> // for abort(3)
 #include <string.h> // for memset(3), memcpy(3)
+
+#define PASZ 33554432
 
 // text.c
 extern void text_out(Laminate *pl, bool eng, bool mat, bool fea);
@@ -29,7 +31,7 @@ int main(int argc, char *argv[])
   // General allocation arena. Stores file contents.
   // This is also used as the storage for strings.
   if (opt.argv != 0) {
-    Arena permanent = arena_create(33554432);
+    Arena permanent = arena_create(PASZ);
     Sv8 contents = read_file(opt.argv, &permanent);
     if (opt.info) {
       fprintf(stderr, "file “%s” is %td bytes.\n", opt.argv, contents.len);
@@ -78,6 +80,23 @@ int main(int argc, char *argv[])
         debug("  it has %d/%d valid lamina", valid_la, pl->nlayers);
       }
 #endif
+    }
+    if (opt.info) {
+      ptrdiff_t used = permanent.cur - permanent.begin;
+      fprintf(stderr, "#lamprop-c INFO: "
+              "permanent arena, %td of %td bytes used\n", used, (ptrdiff_t)PASZ);
+      used = (fr.resina.cur - fr.resina.begin)/sizeof(Resin);
+      fprintf(stderr, "#lamprop-c INFO: "
+              "resin arena, %td of %d resins used\n", used, NRESINS);
+      used = (fr.fibera.cur - fr.fibera.begin)/sizeof(Fiber);
+      fprintf(stderr, "#lamprop-c INFO: "
+              "fiber arena, %td of %d fibers used\n", used, NRESINS);
+      used = (ld.laminaa.cur - ld.laminaa.begin)/sizeof(Lamina);
+      fprintf(stderr, "#lamprop-c INFO: "
+              "lamina arena, %td of %d lamina used\n", used, NLAMINA);
+      used = (ld.laminatesa.cur - ld.laminatesa.begin)/sizeof(Laminate);
+      fprintf(stderr, "#lamprop-c INFO: "
+              "laminate arena, %td of %d laminates used\n", used, NLAMINATES);
     }
     // Clean up
     arena_destroy(&permanent);
