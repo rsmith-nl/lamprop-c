@@ -19,7 +19,7 @@ LFLAGS = -pipe -fsanitize=address,undefined
 .ifdef NDEBUG
 CFLAGS = -Os -pipe -std=c11 -fPIC -ffast-math -march=native
 CFLAGS += -DNDEBUG=1
-LFLAGS = -pipe
+LFLAGS = -pipe -flto
 .endif
 
 
