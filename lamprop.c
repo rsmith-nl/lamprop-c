@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2025-08-14T00:13:50+0200
+// Last modified: 2025-08-16T23:19:21+0200
 
 #include "core.h"
 #include "logging.h"
@@ -26,19 +26,19 @@ int main(int argc, char *argv[])
 {
   debug("starting lamprop...");
   Options opt = setup(argc, argv);
-  debug("opt.argc = %d", opt.argc);
-  debug("opt.argv = %s", opt.argv);
-  // General allocation arena. Stores file contents.
-  // This is also used as the storage for strings.
-  if (opt.argv != 0) {
+  while (opt.argc > 0) {
+    debug("opt.argc = %d", opt.argc);
+    debug("opt.argv[0] = %s", opt.argv[0]);
+    // General allocation arena. Stores file contents.
+    // This is also used as the storage for strings.
     Arena permanent = arena_create(PASZ);
-    Sv8 contents = read_file(opt.argv, &permanent);
+    Sv8 contents = read_file(opt.argv[0], &permanent);
     if (opt.info) {
-      fprintf(stderr, "file “%s” is %td bytes.\n", opt.argv, contents.len);
+      fprintf(stderr, "file “%s” is %td bytes.\n", opt.argv[0], contents.len);
     }
     ptrdiff_t nlines = sv8count(contents, '\n');
     if (opt.info) {
-      fprintf(stderr, "file “%s” contains %td lines.\n", opt.argv, nlines);
+      fprintf(stderr, "file “%s” contains %td lines.\n", opt.argv[0], nlines);
     }
     // Scan for fibers and resins
     FRdata fr = fibers_and_resins(contents, opt.info);
@@ -104,9 +104,12 @@ int main(int argc, char *argv[])
     arena_destroy(&fr.fibera);
     arena_destroy(&ld.laminaa);
     arena_destroy(&ld.laminatesa);
-  } else {
-    fprintf(stderr, "WARNING: no laminate file name supplied.\n");
-  }
+    // Advance
+    opt.argv++;
+    opt.argc--;
+  } //else {
+  //  fprintf(stderr, "WARNING: no laminate file name supplied.\n");
+  //}
   debug("ending lamprop normally...");
   return 0;
 }
