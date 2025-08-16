@@ -4,7 +4,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2025-08-13T21:44:12+0200
+// Last modified: 2025-08-16T23:26:31+0200
 
 #include "core.h"
 #include "version.h"
@@ -74,6 +74,7 @@ void latex_out(Laminate *pl, bool eng, bool mat, bool fea)
   }
   puts("\\end{table}");
   puts("");
+  fflush(stdout);
 }
 
 void engprop(Laminate *pl)

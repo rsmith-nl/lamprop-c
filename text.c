@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2025-08-11T21:45:55+0200
+// Last modified: 2025-08-16T23:26:22+0200
 
 #include "core.h"
 #include "version.h"
@@ -43,6 +43,7 @@ void text_out(Laminate *pl, bool eng, bool mat, bool fea)
     text_fea(pl);
   }
   puts("");
+  fflush(stdout);
 }
 
 void engprop(Laminate *pl)
