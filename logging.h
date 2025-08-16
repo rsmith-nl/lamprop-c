@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:49:24 +0200
-// Last modified: 2025-08-11T18:29:41+0200
+// Last modified: 2025-08-16T23:25:07+0200
 
 #pragma once
 
@@ -12,25 +12,28 @@
 
 #undef error
 #ifndef NDEBUG
-#define error(...)                                            \
+#define error(...) \
   fprintf(stderr, NM"ERROR %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__);                               \
-  fprintf(stderr, "\n");                                      \
+  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, "\n"); \
+  fflush(stderr); \
   abort()
 #else
-#define error(...)                \
-  fprintf(stderr, NM"ERROR: ");     \
-  fprintf(stderr, __VA_ARGS__);   \
-  fprintf(stderr, "\n");          \
+#define error(...) \
+  fprintf(stderr, NM"ERROR: "); \
+  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, "\n"); \
+  fflush(stderr); \
   abort()
 #endif  // NDEBUG
 
 #undef debug
 #ifndef NDEBUG
-#define debug(...)                                            \
+#define debug(...) \
   fprintf(stderr, NM"DEBUG %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__);                               \
-  fprintf(stderr, "\n")
+  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, "\n"); \
+  fflush(stderr)
 #else
 #define debug(...) (void)0
 #endif  // NDEBUG
@@ -40,20 +43,23 @@
 #define warn(...)                                            \
   fprintf(stderr, NM"WARNING %s, line %i: ", __FILE__, __LINE__); \
   fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n")
+  fprintf(stderr, "\n"); \
+  fflush(stderr)
 #else
 #define warn(...) \
   fprintf(stderr, NM"WARNING: "); \
   fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n")
+  fprintf(stderr, "\n"); \
+  fflush(stderr)
 #endif  // NDEBUG
 
 #undef info
 #ifndef NDEBUG
-#define info(...)                                            \
+#define info(...) \
   fprintf(stderr, NM"INFO %s, line %i: ", __FILE__, __LINE__); \
   fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n")
+  fprintf(stderr, "\n"); \
+  fflush(stderr)
 #else
 #define info(...) (void)0
 #endif  // NDEBUG
