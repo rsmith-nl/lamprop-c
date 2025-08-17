@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-10T00:33:13+0200
+// Last modified: 2025-08-17T15:25:13+0200
 
 #include "logging.h"
 #include "core.h"
@@ -57,7 +57,7 @@ Resin parse_resin(Sv8 line)
 {
   Resin rv = {0};
   rv.magic = RESN;
-  // This function is only called when *line* starts with 'f:'.
+  // This function is only called when *line* starts with 'r:'.
   // So discard that.
   Sv8Cut cut = sv8lsplit(line);
   // cut.tail now starts with the Young's modulus after whitespace.
