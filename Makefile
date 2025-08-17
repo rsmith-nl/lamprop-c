@@ -2,7 +2,7 @@
 BASENAME = lamprop  ## Name for the project
 VMAJOR   = 2025
 VMINOR   = 08
-VPATCH   = 11
+VPATCH   = 17
 
 # Release build.
 #NDEBUG=1
