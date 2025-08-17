@@ -19,11 +19,10 @@ extern void text_fea(Laminate *pl);
 
 void html_out(Laminate *pl, bool eng, bool mat, bool fea)
 {
-
   puts("<!DOCTYPE html>");
   puts("<html lang=\"en-US\">");
   puts("<head><meta charset=\"UTF-8\">"
-         "<meta name=\"description\" content=\"lamprop output\">");
+       "<meta name=\"description\" content=\"lamprop output\">");
   puts("<title>lamprop output</title>");
   puts("</head>");
   puts("<body>");
@@ -44,8 +43,6 @@ void html_out(Laminate *pl, bool eng, bool mat, bool fea)
   puts("<tr><td></td><td>[g/m&sup2;]</td><td>[&deg;]</td><td>[%]</td></tr>");
   puts("</thead>");
   puts("<tbody align=\"right\">");
-
-
   for (int32_t k = 0; k < pl->nlayers; k++) {
     Lamina *la = pl->layers + k;
     puts("<tr>");
@@ -103,7 +100,6 @@ void html_out(Laminate *pl, bool eng, bool mat, bool fea)
 
 void engprop(Laminate *pl)
 {
-
   puts("</tbody>");
   puts("<tbody>");
   puts("<tr><td colspan=\"6\" align=\"center\">"
@@ -156,20 +152,16 @@ void engprop(Laminate *pl)
 
 void matrices(Laminate *pl)
 {
-
   for (int32_t r = 0; r < 6; r++) {
     printf("%10e & %10e & %10e & %10e & %10e & %10e\\\\\n",
            pl->ABD[r][0], pl->ABD[r][1], pl->ABD[r][2],
            pl->ABD[r][3], pl->ABD[r][4], pl->ABD[r][5]);
   }
-
   printf("%10e & %10e\\\\\n", pl->H[0][0], pl->H[0][1]);
   printf("%10e & %10e\\\\\n", pl->H[1][0], pl->H[1][1]);
-
   for (int32_t r = 0; r < 6; r++) {
     printf("%10e & %10e & %10e & %10e & %10e & %10e\\\\\n",
            pl->C[r][0], pl->C[r][1], pl->C[r][2],
            pl->C[r][3], pl->C[r][4], pl->C[r][5]);
   }
-
 }

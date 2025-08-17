@@ -152,7 +152,6 @@ static void pm(int32_t n, double m[n][n])
         cut.tail.data--;
         cut.tail.data[0] = '-';
         cut.tail.len++;
-
       }
       if ((255-offset) > cut.tail.len + 14) {
         memcpy(linebuf+offset, "\\times 10^{", 11);
