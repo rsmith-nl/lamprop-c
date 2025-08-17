@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-17T16:04:40+0200
+// Last modified: 2025-08-17T16:19:55+0200
 
 #include "logging.h"
 #include "core.h"
@@ -24,6 +24,18 @@ typedef struct {
   Sv8 fiber_name;
   bool ok, optvf;
 } Lline;
+
+static const Resin generic_resins[3] = {
+  {RESN, 2900.0, 0.29, 40e-6, 1.15, SV8("generic-epoxy"), true},
+  {RESN, 4000.0, 0.36, 40e-6, 1.20, SV8("generic-polyester"), true},
+  {RESN, 3500.0, 0.36, 51.5e-6, 1.10, SV8("generic-vinylester"), true}
+};
+
+static const Fiber generic_fibers[3] = {
+  {FIBR, 73000.0, 0.33, 5.3e-6, 2.60, SV8("generic-e-glas"), true},
+  {FIBR, 230000.0, 0.27, -0.38e-6, 1.80, SV8("generic-carbon"), true},
+  {FIBR, 124000.0, 0.36, -4.9e-6, 1.44, SV8("generic-aramid49"), true},
+};
 
 static Resin parse_resin(Sv8 line);
 static Fiber parse_fiber(Sv8 line);
@@ -250,8 +262,14 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
   FRdata rv = {0};
   rv.resina = arena_create(NRESINS*sizeof(Resin));
   rv.resins = (void*)rv.resina.begin;
+  // Add generic resins
+  memcpy(arena_new(&rv.resina, Resin, 3), generic_resins, 3*sizeof(Resin));
+  rv.nresins += 3;
   rv.fibera = arena_create(NRESINS*sizeof(Fiber));
   rv.fibers = (void*)rv.fibera.begin;
+  // Add generic fibers
+  memcpy(arena_new(&rv.fibera, Fiber, 3), generic_fibers, 3*sizeof(Fiber));
+  rv.nfibers += 3;
   int32_t lineno = 1;
   Sv8Cut ccut = sv8cut(contents, '\n');
   Fiber f = {0};
