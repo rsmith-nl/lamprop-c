@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2025-08-16T23:26:22+0200
+// Last modified: 2025-08-17T23:11:32+0200
 
 #include "core.h"
 #include "version.h"
@@ -67,17 +67,17 @@ void matrices(Laminate *pl)
 {
   puts("In-plane stiffness (ABD) matrix:");
   for (int32_t r = 0; r < 6; r++) {
-    printf("|% 10e % 10e % 10e % 10e % 10e % 10e |\n",
+    printf("|% -10.4g % -10.4g % -10.4g % -10.4g % -10.4g % -10.4g |\n",
            pl->ABD[r][0], pl->ABD[r][1], pl->ABD[r][2],
            pl->ABD[r][3], pl->ABD[r][4], pl->ABD[r][5]);
   }
   puts("Transverse (H) stiffness matrix:");
-  printf("|% 10e % 10e |\n", pl->H[0][0], pl->H[0][1]);
-  printf("|% 10e % 10e |\n", pl->H[1][0], pl->H[1][1]);
+  printf("|% -10.4g % -10.4g |\n", pl->H[0][0], pl->H[0][1]);
+  printf("|% -10.4g % -10.4g |\n", pl->H[1][0], pl->H[1][1]);
   puts("3D stiffness tensor [C], contracted notation:");
   puts("(indices for stress/strain are in the order 11, 22, 33, 23, 13, 12)");
   for (int32_t r = 0; r < 6; r++) {
-    printf("|% 10e % 10e % 10e % 10e % 10e % 10e |\n",
+    printf("|% -10.4g % -10.4g % -10.4g % -10.4g % -10.4g % -10.4g |\n",
            pl->C[r][0], pl->C[r][1], pl->C[r][2],
            pl->C[r][3], pl->C[r][4], pl->C[r][5]);
   }
