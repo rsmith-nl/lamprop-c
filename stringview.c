@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-09T11:32:23+0200
+// Last modified: 2025-08-17T11:02:49+0200
 
 #include "stringview.h"
 
@@ -39,7 +39,7 @@ Sv8 sv8lstrip(Sv8 s)
 
 Sv8 sv8rstrip(Sv8 s)
 {
-  while (s.len && _isspace(s.data[s.len-1])) {
+  while (s.len && (_isspace(s.data[s.len-1]) || s.data[s.len-1]==0)) {
     s.len--;
   }
   return s;
@@ -47,10 +47,10 @@ Sv8 sv8rstrip(Sv8 s)
 
 Sv8 sv8strip(Sv8 s)
 {
-  while (s.len && *s.data<=' ') {
+  while (s.len && _isspace(*s.data)) {
     s.data++, s.len--;
   }
-  while (s.len && s.data[s.len-1]<=' ') {
+  while (s.len && (_isspace(s.data[s.len-1]) || s.data[s.len-1]==0)) {
     s.len--;
   }
   return s;
