@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-17T15:25:13+0200
+// Last modified: 2025-08-17T16:04:40+0200
 
 #include "logging.h"
 #include "core.h"
@@ -266,7 +266,7 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
             if (info) {
               fprintf(stderr, "found fiber on line %d\n", lineno);
             }
-            // check for doubles.
+            // Reject redefinitions of fiber names.
             for (int32_t k = 0; k < rv.nfibers; k++) {
               if (sv8equals(rv.fibers[k].name, f.name)) {
                 skip_fiber = true;
@@ -292,7 +292,7 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
             if (info) {
               fprintf(stderr, "found resin on line %d\n", lineno);
             }
-            // check for doubles
+            // Reject redefinition of resin names.
             for (int32_t k = 0; k < rv.nresins; k++) {
               if (sv8equals(rv.resins[k].name, f.name)) {
                 skip_resin = true;
