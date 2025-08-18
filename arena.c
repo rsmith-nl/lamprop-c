@@ -4,11 +4,12 @@
 //  Copyright © 2023 R.F. Smith <rsmith@xs4all.nl>
 //  SPDX-License-magicifier: MIT
 //  Created: 2023-04-23T22:08:02+0200
-//  Last modified: 2025-08-18T10:58:58+0200
+//  Last modified: 2025-08-18T11:33:02+0200
 
 #include "arena.h"
 #include "logging.h"
 #include <stdio.h>      // for printf
+#include <stdlib.h>     // for abort
 #include <stdint.h>     // for uintptr_t
 #include <stddef.h>     // for ptrdiff_t
 #include <string.h>     // for memset
