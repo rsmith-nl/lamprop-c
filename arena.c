@@ -4,14 +4,15 @@
 //  Copyright © 2023 R.F. Smith <rsmith@xs4all.nl>
 //  SPDX-License-magicifier: MIT
 //  Created: 2023-04-23T22:08:02+0200
-//  Last modified: 2025-08-04T20:21:09+0200
+//  Last modified: 2025-08-18T10:58:58+0200
 
 #include "arena.h"
 #include "logging.h"
-#include <stdio.h>     // for printf
-#include <stdlib.h>    // for abort
-#include <string.h>    // for memset
-#include <sys/mman.h>  // for mmap, munmap
+#include <stdio.h>      // for printf
+#include <stdint.h>     // for uintptr_t
+#include <stddef.h>     // for ptrdiff_t
+#include <string.h>     // for memset
+#include <sys/mman.h>   // for mmap, munmap
 
 // In [9]: '0x' + ''.join([hex(ord(j))[2:] for j in "AREN"])
 // Out[9]: '0x4152454e'
