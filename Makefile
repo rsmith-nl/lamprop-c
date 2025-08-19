@@ -11,17 +11,15 @@ VPATCH   = 17
 #CC = gcc
 
 # The next lines are for building debugging libraries.
-CFLAGS = -pipe -std=c11 -fPIC -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
-                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
-                -fsanitize=address,undefined
-LFLAGS = -pipe -fsanitize=address,undefined
+#CFLAGS = -pipe -std=c11 -fPIC -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
+#                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
+#                -fsanitize=address,undefined
+#LFLAGS = -pipe -fsanitize=address,undefined
 
-.ifdef NDEBUG
 # The next lines are for release builds.
 CFLAGS = -Os -pipe -std=c11 -fPIC -ffast-math -march=native
 CFLAGS += -DNDEBUG=1
 LFLAGS = -pipe -flto
-.endif
 
 
 # Other libraries to link against
