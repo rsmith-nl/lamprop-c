@@ -1,5 +1,5 @@
 // file: stringview.h
-// vim:fileencoding=utf-8:ft=cpp:tabstop=2
+// vim:fileencoding=utf-8:ft=c:tabstop=2
 // This is free and unencumbered software released into the public domain.
 //
 // Author: R.F. Smith <rsmith@xs4all.nl>

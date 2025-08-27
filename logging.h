@@ -1,5 +1,5 @@
 // file: logging.h
-// vim:fileencoding=utf-8:ft=cpp:tabstop=2
+// vim:fileencoding=utf-8:ft=c:tabstop=2
 //
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
