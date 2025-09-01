@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-17T11:02:49+0200
+// Last modified: 2025-09-01T00:23:05+0200
 
 #include "stringview.h"
 
@@ -13,7 +13,6 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 
 static bool _isspace(char c)
@@ -148,7 +147,7 @@ Sv8Int sv8toi(Sv8 s)
   while (beg<end && !stop) {
     char c = *beg++;
     switch (state) {
-      case 0:
+      case 0:   // Atart state.
         if (c=='+') {
           state = 1;
         } else if (c=='-') {
@@ -163,7 +162,7 @@ Sv8Int sv8toi(Sv8 s)
           goto fail2;
         }
         break;
-      case 1:
+      case 1:   // After a leading + or -.
         if (c=='0') {
           state = 2;
         } else if (c>='1' && c <='9') {
@@ -173,7 +172,7 @@ Sv8Int sv8toi(Sv8 s)
           goto fail2;
         }
         break;
-      case 2:
+      case 2:   // Skip leading zeros.
         if (c=='0') {
           state = 2;
         } else if (c>='1' && c <='9') {
@@ -184,7 +183,7 @@ Sv8Int sv8toi(Sv8 s)
           stop = true;
         }
         break;
-      case 3:
+      case 3:   // Process digits.
         if (c>='0' && c <='9') {
           state = 3;
           if ((1<<30)/number < 10) { // will overflow.
@@ -232,8 +231,10 @@ Sv8Double sv8tod(Sv8 s)
   while (beg<end && !stop) {
     char c = *beg++;
     switch (state) {
-      case 0:
-        if (c=='-') {
+      case 0:   // start state.
+        if (c=='0') {
+          state = 2;
+        } else if (c=='-') {
           state = 1;
           neg_num = true;
         } else if (c=='+') {
@@ -247,7 +248,7 @@ Sv8Double sv8tod(Sv8 s)
           goto fail1; // invalid start token
         }
         break;
-      case 1:
+      case 1:   // After a leading + or -.
         if (c=='0') {
           state = 2;
         } else if (c>='1' && c<='9') {
@@ -257,11 +258,16 @@ Sv8Double sv8tod(Sv8 s)
           goto fail1; // non-number after starting '-'.
         }
         break;
-      case 2:
+      case 2:   // Skip leading zeroes.
         if (c=='.') {
           state = 3;
         } else if (c=='e' || c=='E') {
           state = 5;
+        } else if (c=='0') {
+          state = 2;
+        } else if (c>='1' && c<='9') {
+          state = 8;
+          whole = c - '0';
         } else {
           // return 0.
           rv.result = neg_num?-0.0:0.0;
@@ -270,7 +276,7 @@ Sv8Double sv8tod(Sv8 s)
           return rv;
         }
         break;
-      case 3:
+      case 3:   // After the decimal point.
         if (c>='0' && c<='9') {
           state = 4;
           fpower *= 10;
@@ -279,7 +285,7 @@ Sv8Double sv8tod(Sv8 s)
           stop = true;
         }
         break;
-      case 4:
+      case 4:   // Decimal digits.
         if (c>='0' && c<='9') {
           state = 4;
           fpower *= 10;
@@ -290,8 +296,10 @@ Sv8Double sv8tod(Sv8 s)
           stop = true;
         }
         break;
-      case 5:
-        if (c>='0' && c<='9') {
+      case 5:   // Found ‘e’ or ‘E’.
+        if (c == '0') {
+          state = 9;
+        } else if (c>='1' && c<='9') {
           state = 7;
           exponent = 10*exponent + c - '0';
         } else if (c=='+') {
@@ -303,15 +311,17 @@ Sv8Double sv8tod(Sv8 s)
           goto fail1; // e or E without number.
         }
         break;
-      case 6:
-        if (c>='0' && c<='9') {
+      case 6:   // Found + or - in exponent.
+        if (c == '0') {
+          state = 9;
+        } else if (c>='1' && c<='9') {
           state = 7;
           exponent = 10*exponent + c - '0';
         } else {
           goto fail1; // not a number after [eE][+-]
         }
         break;
-      case 7:
+      case 7:   // Parse exponent digits.
         if (c>='0' && c<='9') {
           state = 7;
           exponent = 10*exponent + c - '0';
@@ -319,7 +329,7 @@ Sv8Double sv8tod(Sv8 s)
           stop = true;
         }
         break;
-      case 8:
+      case 8:   // Process digits before the decimal point.
         if (c=='.') {
           state = 3;
         } else if (c>='0' && c<='9') {
@@ -329,6 +339,16 @@ Sv8Double sv8tod(Sv8 s)
           state = 5;
         } else {
           stop = true; // in this case it is a whole number.
+        }
+        break;
+      case 9:   // Skip 0 digits in exponent.
+        if (c == '0') {
+          state = 9;
+        } else if (c>='1' && c<='9') {
+          state = 7;
+          exponent = 10*exponent + c - '0';
+        } else {
+          goto fail1; // not a number after leading 0 in exponent.
         }
         break;
     } // switch
