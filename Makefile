@@ -32,7 +32,7 @@ DISTFILES = Makefile
 
 # Source files.
 SRCS = lamprop.c stringview.c parser.c arena.c setup.c core.c
-SRCS += matrix6.c matrix5.c matrix2.c text.c latex.c
+SRCS += matrix.c text.c latex.c
 
 ##### No editing necessary beyond this point
 

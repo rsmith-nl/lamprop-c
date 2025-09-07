@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-08-12T00:44:43+0200
+// Last modified: 2025-09-07T12:38:08+0200
 
 // Core functions of lamprop.
 //
@@ -82,24 +82,15 @@
 //   number =       {Reference Publication 1351}
 // }
 
-#include "logging.h"
-#include "matrix6.h"
-#include "matrix5.h"
-#include "matrix2.h"
+#include "matrix.h"
 #include "core.h"
 
-#include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 
-// Matrix members < limit are set to 0.0.
-#define LIMIT 1e-10
-
-
 // Generate rotation angle matrix.
 static void tbar(double out[6][6], double angle);
-// Missing matrix functions...
-static void mat_delete(double a[6][6], double b[5][5], int r, int k);
 
 Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf)
 {
@@ -213,6 +204,9 @@ void tbar(double out[6][6], double angle)
 bool finish_laminate(Laminate *pl)
 {
   if (pl->magic!=LMNT) {
+    return false;
+  }
+  if (pl->nlayers == 0) {
     return false;
   }
   double thickness = 0.0;
@@ -418,24 +412,4 @@ void toabaqusi(double src[6][6], double dest[6][6])
   dest[2][5] = src[2][3] * 1e6;
   dest[3][3] = src[5][5] * 1e6;
   dest[5][5] = src[3][3] * 1e6;
-}
-
-void mat_delete(double a[6][6], double b[5][5], int r, int k)
-{
-  for (int32_t R = 0; R < r; R++) {
-    for (int32_t K = 0; K < k; K++) {
-      b[R][K] = a[R][K];
-    }
-    for (int32_t K = k+1; K < 6; K++) {
-      b[R][K-1] = a[R][K];
-    }
-  }
-  for (int32_t R = r+1; R < 6; R++) {
-    for (int32_t K = 0; K < k; K++) {
-      b[R-1][K] = a[R][K];
-    }
-    for (int32_t K = k+1; K < 6; K++) {
-      b[R-1][K-1] = a[R][K];
-    }
-  }
 }

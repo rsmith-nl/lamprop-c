@@ -4,11 +4,10 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 15:41:55 +0200
-// Last modified: 2025-08-10T22:57:50+0200
+// Last modified: 2025-09-07T12:37:15+0200
 
 #pragma once
 
-#include "arena.h"
 #include "stringview.h"
 
 #include <stdbool.h>
@@ -65,7 +64,7 @@ typedef struct {
 typedef struct {
   uint32_t magic;
   Sv8 name;
-  int32_t nlayers;
+  uint32_t nlayers;
   Lamina *layers;
   Resin r;
   double thickness;
