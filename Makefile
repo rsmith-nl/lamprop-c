@@ -1,8 +1,8 @@
 # Package name and version: BASENAME-VMAJOR.VMINOR.VPATCH.tar.gz
 BASENAME = lamprop
-VMAJOR   = 2025
-VMINOR   = 08
-VPATCH   = 17
+VMAJOR   = 2026
+VMINOR   = 01
+VPATCH   = 20
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
