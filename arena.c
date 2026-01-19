@@ -4,11 +4,10 @@
 //  Copyright © 2023 R.F. Smith <rsmith@xs4all.nl>
 //  SPDX-License-magicifier: MIT
 //  Created: 2023-04-23T22:08:02+0200
-//  Last modified: 2026-01-19T16:59:40+0100
+//  Last modified: 2026-01-19T23:56:36+0100
 
 #include "arena.h"
 #include "logging.h"
-#include <stdlib.h>
 #include <stdio.h>      // for printf
 #include <stdint.h>     // for uintptr_t
 #include <stddef.h>     // for ptrdiff_t
@@ -31,11 +30,13 @@ Arena arena_create(ptrdiff_t length)
     length = 1048576;
   }
   arena.magic = ARENA_MAGIC;
-  arena.begin =
 #ifdef _WIN32
-    VirtualAlloc(0, length, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+  arena.begin = VirtualAlloc(0, length, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+  if (arena.begin == 0) {
+    arena.begin = ((void *)-1); // MAP_FAILED
+  }
 #else
-    mmap(0, length, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+  arena.begin = mmap(0, length, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 #endif
   if (arena.begin == MAP_FAILED) {
     error("arena allocation of size %td failed\n", length);
@@ -89,10 +90,11 @@ void arena_destroy(Arena *arena)
     error("invalid arena %p; magic %d ignored\n", (void *)arena, arena->magic);
     return;
   }
+  int rv =
 #ifdef _WIN32
-  int rv = VirtualFree(arena->begin, 0, MEM_RELEASE|MEM_DECOMMIT);
+  VirtualFree(arena->begin, 0, MEM_RELEASE|MEM_DECOMMIT);
 #else
-  int rv = munmap(arena->begin, arena->guard - arena->begin);
+  munmap(arena->begin, arena->guard - arena->begin);
 #endif
   if (rv == -1) {
     error("destroying arena %p failed\n", (void *)arena);
