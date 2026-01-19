@@ -4,9 +4,12 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:49:24 +0200
-// Last modified: 2025-08-16T23:25:07+0200
+// Last modified: 2026-01-19T23:12:40+0100
 
 #pragma once
+
+#include <stdio.h>
+#include <stdlib.h>  // for abort
 
 #define NM "#lamprop-c "
 
