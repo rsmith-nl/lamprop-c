@@ -1,0 +1,39 @@
+# Package name and version: BASENAME-VMAJOR.VMINOR.VPATCH.tar.gz
+BASENAME = lamprop
+VMAJOR   = 2026
+VMINOR   = 01
+VPATCH   = 21
+
+# Define the C compiler to be used, if not cc.
+#CC = gcc
+
+# The next lines are for building debugging libraries.
+#CFLAGS = -pipe -std=c11 -fPIC -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
+#                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
+#                -fsanitize=address,undefined
+#LFLAGS = -pipe -fsanitize=address,undefined
+
+# The next lines are for release builds.
+CFLAGS = -Os -pipe -std=c11 -fPIC -ffast-math -march=native
+CFLAGS += -D_POSIX_SOURCE
+CFLAGS += -DNDEBUG=1
+LFLAGS = -pipe
+
+# Other libraries to link against
+LIBS += -lm
+
+# Source files.
+SRCS = lamprop.c stringview.c parser.c arena.c setup.c core.c
+SRCS += matrix.c text.c latex.c
+
+##### No editing necessary beyond this point
+
+all: $(BASENAME).exe  ## Compile the program. (default)
+
+# This makefile uses a unit build.
+$(BASENAME).exe: $(SRCS) version.h
+	$(CC) $(CFLAGS) $(LFLAGS) $(LDIRS) -o $(BASENAME) $(SRCS) $(LIBS)
+
+.PHONY: clean
+clean:  ## Remove all generated files.
+	rm -f $(BASENAME).exe *~ core gmon.out $(TARFILE) version.h backup-*

@@ -4,7 +4,7 @@
 //  Copyright © 2023 R.F. Smith <rsmith@xs4all.nl>
 //  SPDX-License-magicifier: MIT
 //  Created: 2023-04-23T22:08:02+0200
-//  Last modified: 2026-01-19T23:56:36+0100
+//  Last modified: 2026-01-21T19:57:16+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -38,7 +38,7 @@ Arena arena_create(ptrdiff_t length)
 #else
   arena.begin = mmap(0, length, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 #endif
-  if (arena.begin == MAP_FAILED) {
+  if (arena.begin == (void *)-1) {
     error("arena allocation of size %td failed\n", length);
   }
   info("arena; %td bytes allocated", length);
