@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2026-01-22T20:07:47+0100
+// Last modified: 2026-01-23T00:32:27+0100
 
 #include "core.h"
 #include "logging.h"
@@ -12,8 +12,9 @@
 #include "setup.h"
 
 #ifdef _WIN32
-#include <io.h>
-#include <fcntl.h>
+//#include <io.h>
+//#include <fcntl.h>
+#include <stdlib.h>
 #endif
 #include <stdio.h>  // for fprintf(3)
 
@@ -28,7 +29,8 @@ int main(int argc, char *argv[])
 {
 #ifdef _WIN32
   debug("setting output to unicode...");
-  _setmode(_fileno(stdout), _O_U8TEXT);
+  //_setmode(_fileno(stdout), _O_U8TEXT);
+  system( "chcp 65001 >nul" );
 #endif
   debug("starting lamprop...");
   Options opt = setup(argc, argv);
