@@ -34,6 +34,9 @@ all: $(BASENAME).exe  ## Compile the program. (default)
 $(BASENAME).exe: $(SRCS) version.h
 	$(CC) $(CFLAGS) $(LFLAGS) $(LDIRS) -o $(BASENAME) $(SRCS) $(LIBS)
 
+version.h:
+	echo '#define VERSION "'${VMAJOR}"."${VMINOR}"."${VPATCH}'"' >version.h
+
 .PHONY: clean
 clean:  ## Remove all generated files.
 	rm -f $(BASENAME).exe *~ core gmon.out $(TARFILE) version.h backup-*
