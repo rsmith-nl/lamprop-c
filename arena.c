@@ -92,9 +92,9 @@ void arena_destroy(Arena *arena)
   }
   int rv =
 #ifdef _WIN32
-  VirtualFree(arena->begin, 0, MEM_RELEASE|MEM_DECOMMIT);
+    VirtualFree(arena->begin, 0, MEM_RELEASE|MEM_DECOMMIT);
 #else
-  munmap(arena->begin, arena->guard - arena->begin);
+    munmap(arena->begin, arena->guard - arena->begin);
 #endif
   if (rv == -1) {
     error("destroying arena %p failed\n", (void *)arena);
