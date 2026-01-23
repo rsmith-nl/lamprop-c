@@ -50,8 +50,8 @@ clean:  ## Remove all generated files.
 install: $(BASENAME)  ## Install the program.
 	install -d $(BINDIR)
 	install -m 755 -s $(BASENAME) $(BINDIR)
-	install -m 644 $(BASENAME).1 $(MANDIR)
-	gzip -f -q $(MANDIR)/$(BASENAME).1
+#	install -m 644 $(BASENAME).1 $(MANDIR)
+#	gzip -f -q $(MANDIR)/$(BASENAME).1
 
 .PHONY: uninstall
 uninstall:  ## Uninstall the program.
