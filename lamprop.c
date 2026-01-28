@@ -4,13 +4,18 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2026-01-24T02:36:07+0100
+// Last modified: 2026-01-28T19:22:09+0100
 
 #include "core.h"
 #include "logging.h"
 #include "parser.h"
 #include "setup.h"
 
+#ifdef _WIN32
+#include <io.h> // for _setmode
+// instead of including windows.h....
+extern int __stdcall SetConsoleOutputCP(unsigned int);
+#endif
 #include <stdio.h>  // for fprintf(3)
 
 #define PASZ 33554432
@@ -22,6 +27,11 @@ extern void latex_out(Laminate *pl, bool eng, bool mat, bool fea);
 
 int main(int argc, char *argv[])
 {
+#ifdef _WIN32
+   _setmode(0, 0x8000);
+   _setmode(1, 0x8000);
+   SetConsoleOutputCP(65001);
+#endif
   debug("starting lamprop...");
   Options opt = setup(argc, argv);
   while (opt.argc > 0) {

@@ -2,7 +2,7 @@
 BASENAME = lamprop
 VMAJOR   = 2026
 VMINOR   = 01
-VPATCH   = 21
+VPATCH   = 28
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
@@ -31,8 +31,8 @@ SRCS += matrix.c text.c latex.c
 all: $(BASENAME).exe  ## Compile the program. (default)
 
 # This makefile uses a unit build.
-$(BASENAME).exe: $(SRCS) version.h resources/libwinsane.o
-	$(CC) $(CFLAGS) $(LFLAGS) $(LDIRS) -o $(BASENAME) $(SRCS) resources/libwinsane.o $(LIBS)
+$(BASENAME).exe: $(SRCS) version.h
+	$(CC) $(CFLAGS) $(LFLAGS) $(LDIRS) -o $(BASENAME) $(SRCS) $(LIBS)
 
 version.h:
 	echo '#define VERSION "'${VMAJOR}"."${VMINOR}"."${VPATCH}'"' >version.h
