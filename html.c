@@ -4,11 +4,12 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-01-31T18:30:41+0100
+// Last modified: 2026-01-31T20:19:24+0100
 
 #include "core.h"
 #include "version.h"
 
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -108,79 +109,95 @@ void engprop(Laminate *pl)
   puts("<td colspan=\"3\" align=\"center\">"
        "<strong>3D stiffness tensor</strong></td></tr>");
   puts("<tr>");
-  printf("<td>E<sub>x</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->Ex);
-  printf("<td>E<sub>x</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->tEx);
+  printf("<td>E<sub>x</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->Ex);
+  printf("<td>E<sub>x</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->tEx);
   puts("</tr>");
   puts("<tr>");
-  printf("<td>E<sub>y</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->Ey);
-  printf("<td>E<sub>y</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->tEy);
+  printf("<td>E<sub>y</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->Ey);
+  printf("<td>E<sub>y</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->tEy);
   puts("</tr>");
   puts("<tr>");
-  printf("<td>E<sub>z</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->Ez);
-  printf("<td>E<sub>z</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->tEz);
+  printf("<td>E<sub>z</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->Ez);
+  printf("<td>E<sub>z</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->tEz);
   puts("</tr>");
   puts("<tr>");
-  printf("<td>G<sub>xy</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->Gxy);
-  printf("<td>G<sub>xy</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->tGxy);
+  printf("<td>G<sub>xy</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->Gxy);
+  printf("<td>G<sub>xy</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->tGxy);
   puts("</tr>");
   puts("<tr>");
-  printf("<td>G<sub>xz</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->Gxz);
-  printf("<td>G<sub>xz</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->tGxz);
+  printf("<td>G<sub>xz</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->Gxz);
+  printf("<td>G<sub>xz</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->tGxz);
   puts("</tr>");
   puts("<tr>");
-  printf("<td>G<sub>yz</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->Gyz);
-  printf("<td>G<sub>yz</sub></td><td>%8.0f</td><td align=\"left\">MPa</td>\n", pl->tGyz);
+  printf("<td>G<sub>yz</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->Gyz);
+  printf("<td>G<sub>yz</sub></td><td>%.0f</td><td align=\"left\">MPa</td>\n", pl->tGyz);
   puts("</tr>");
   puts("<tr>");
-  printf("<td>&nu;<sub>xy</sub></td><td>%.4f</td><td align=\"left\">-</td>\n", pl->νxy);
-  printf("<td>&nu;<sub>xy</sub></td><td>%.4f</td><td align=\"left\">-</td>\n", pl->tνxy);
+  printf("<td>&nu;<sub>xy</sub></td><td>%7.5f</td><td align=\"left\">-</td>\n", pl->νxy);
+  printf("<td>&nu;<sub>xy</sub></td><td>%7.5f</td><td align=\"left\">-</td>\n", pl->tνxy);
   puts("</tr>");
   puts("<tr>");
-  printf("<td>&nu;<sub>yx</sub></td><td>%.4f</td><td align=\"left\">-</td>\n", pl->νyx);
-  printf("<td>&nu;<sub>xz</sub></td><td>%.4f</td><td align=\"left\">-</td>\n", pl->tνxz);
+  printf("<td>&nu;<sub>yx</sub></td><td>%7.5f</td><td align=\"left\">-</td>\n", pl->νyx);
+  printf("<td>&nu;<sub>xz</sub></td><td>%7.5f</td><td align=\"left\">-</td>\n", pl->tνxz);
   puts("</tr>");
   puts("<tr>");
-  printf("<td>&alpha;<sub>x</sub></td><td>%.4g</td>"
+  printf("<td>&alpha;<sub>x</sub></td><td>%9.4g</td>"
          "<td align=\"left\">K<sup>-1</sup></td>\n", pl->αx);
-  printf("<td>&nu;<sub>yz</sub></td><td>%.4f</td><td align=\"left\">-</td>\n", pl->tνyz);
+  printf("<td>&nu;<sub>yz</sub></td><td>%7.5f</td><td align=\"left\">-</td>\n", pl->tνyz);
   puts("</tr>");
   puts("<tr>");
-  printf("<td>&alpha;<sub>y</sub></td><td>%.4g</td>"
+  printf("<td>&alpha;<sub>y</sub></td><td>%9.4g</td>"
          "<td align=\"left\">K<sup>-1</sup></td>\n", pl->αy);
   puts("</tr>");
+}
+
+#define BUFSZ 256
+typedef struct {
+  ptrdiff_t used;
+  int error;
+  char data[BUFSZ];
+} Buf;
+
+static void buf_append(Buf *b, char *str)
+{
+  if (b->error || str == 0) {
+    return;
+  }
+  size_t alen = strlen(str);
+  ptrdiff_t rem = BUFSZ - b->used - 1;
+  if (alen > rem) {
+    b->error = 1;
+    return;
+  }
+  memcpy(b->data+b->used, str, alen);
+  b->used += alen;
+  b->error = 0;
 }
 
 // Print a formatted row from a matrix.
 static void pr(int n, double mat[n][n], int row)
 {
-#define BUFSZ 256
-  char buf[BUFSZ] = {0};
-  int bufused = 0;
-  memcpy(buf, "          <td>", 14);
-  bufused += 14;
+  Buf b = {0};
+  buf_append(&b, "          <td>");
   for (int32_t j = 0; j < n; j++) {
     double num = mat[row][j];
     if (fpclassify(num) == FP_ZERO || (-1e-7 <= num && num <= 1e-7 )) {
-        buf[bufused++] = '0';
+      buf_append(&b, "0");
     } else if (isnan(num)) {
-        buf[bufused++] = 'N';
-        buf[bufused++] = 'a';
-        buf[bufused++] = 'N';
+      buf_append(&b, "NaN");
     } else if (isinf(num)) {
-        buf[bufused++] = 0xE2;
-        buf[bufused++] = 0x88;
-        buf[bufused++] = 0x9E;
+      char inf[4] = {0xE2, 0x88, 0x9E, 0};
+      buf_append(&b, inf);
     } else {
-      int rem = BUFSZ-bufused;
-      bufused += snprintf(buf+bufused, rem, "%10e", num);
+      ptrdiff_t rem = BUFSZ - b.used;
+      b.used += snprintf(b.data+b.used, rem, "%-10.4g", num);
     }
     if (j<(n-1)) {
-      memcpy(buf+bufused, "</td><td>", 9);
-      bufused += 9;
+      buf_append(&b, "</td><td>");
     }
   }
-  memcpy(buf+bufused, "</td>", 5);
-  puts(buf);
+  buf_append(&b, "</td>");
+  puts(b.data);
 }
 
 void matrices(Laminate *pl)

@@ -4,7 +4,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2025-08-17T22:04:22+0200
+// Last modified: 2026-01-31T21:25:02+0100
 
 #include "core.h"
 #include "stringview.h"
@@ -84,29 +84,28 @@ void engprop(Laminate *pl)
   puts("      \\multicolumn{6}{c}{\\small\\textbf{Engineering properties}}\\\\[0.1em]");
   puts("      \\multicolumn{3}{c}{\\small\\textbf{In-plane}} & ");
   puts("      \\multicolumn{3}{c}{\\small\\textbf{3D stiffness tensor}}\\\\[0.1em]");
-  printf("      $\\mathrm{E_x}$ & %8.0f & MPa & $\\mathrm{E_x}$ & %8.0f & MPa\\\\\n",
+  printf("      $\\mathrm{E_x}$ & %.0f & MPa & $\\mathrm{E_x}$ & %.0f & MPa\\\\\n",
          pl->Ex, pl->tEx);
-  printf("      $\\mathrm{E_y}$ & %8.0f & MPa & $\\mathrm{E_y}$ & %8.0f & MPa\\\\\n",
+  printf("      $\\mathrm{E_y}$ & %.0f & MPa & $\\mathrm{E_y}$ & %.0f & MPa\\\\\n",
          pl->Ey, pl->tEy);
-  printf("      $\\mathrm{E_z}$ & %8.0f & MPa & $\\mathrm{E_z}$ & %8.0f & MPa\\\\\n",
+  printf("      $\\mathrm{E_z}$ & %.0f & MPa & $\\mathrm{E_z}$ & %.0f & MPa\\\\\n",
          pl->Ez, pl->tEz);
-  printf("      $\\mathrm{G_{xy}}$ & %8.0f & MPa & ", pl->Gxy);
-  printf("$\\mathrm{G_{xy}}$ & %8.0f & MPa\\\\\n", pl->tGxy);
-  printf("      $\\mathrm{G_{xz}}$ & %8.0f & MPa & ", pl->Gxz);
-  printf("$\\mathrm{G_{xz}}$ & %8.0f & MPa\\\\\n", pl->tGxz);
-  printf("      $\\mathrm{G_{yz}}$ & %8.0f & MPa & ", pl->Gyz);
-  printf("$\\mathrm{G_{yz}}$ & %8.0f & MPa\\\\\n", pl->tGyz);
-  printf("      $\\mathrm{\\nu_{xy}}$ & %.4f &- & ", pl->νxy);
-  printf("$\\mathrm{\\nu_{xy}}$ & %.4f &-\\\\\n", pl->tνxy);
-  printf("      $\\mathrm{\\nu_{yx}}$ & %.4f &- & ", pl->νyx);
+  printf("      $\\mathrm{G_{xy}}$ & %.0f & MPa & ", pl->Gxy);
+  printf("$\\mathrm{G_{xy}}$ & %.0f & MPa\\\\\n", pl->tGxy);
+  printf("      $\\mathrm{G_{xz}}$ & %.0f & MPa & ", pl->Gxz);
+  printf("$\\mathrm{G_{xz}}$ & %.0f & MPa\\\\\n", pl->tGxz);
+  printf("      $\\mathrm{G_{yz}}$ & %.0f & MPa & ", pl->Gyz);
+  printf("$\\mathrm{G_{yz}}$ & %.0f & MPa\\\\\n", pl->tGyz);
+  printf("      $\\mathrm{\\nu_{xy}}$ & %7.5f &- & ", pl->νxy);
+  printf("$\\mathrm{\\nu_{xy}}$ & %7.5f &-\\\\\n", pl->tνxy);
+  printf("      $\\mathrm{\\nu_{yx}}$ & %7.5f &- & ", pl->νyx);
   printf("$\\mathrm{\\nu_{xz}}$ & %.4f &-\\\\\n", pl->tνxz);
-  printf("      $\\mathrm{\\alpha_x}$ & %.4g & K$^{-1}$ & ", pl->αx);
-  printf("$\\mathrm{\\nu_{yz}}$ & %.4f &-\\\\\n", pl->tνyz);
-  printf("      $\\mathrm{\\alpha_y}$ & %.4g & K$^{-1}$\\\\\n", pl->αy);
+  printf("      $\\mathrm{\\alpha_x}$ & %9.4g & K$^{-1}$ & ", pl->αx);
+  printf("$\\mathrm{\\nu_{yz}}$ & %7.5f &-\\\\\n", pl->tνyz);
+  printf("      $\\mathrm{\\alpha_y}$ & %9.4g & K$^{-1}$\\\\\n", pl->αy);
 }
 
 
-//static void pm(double m[6][6])
 static void pm(int32_t n, double m[n][n])
 {
   for (int32_t r = 0; r < n; r++) {
@@ -114,8 +113,8 @@ static void pm(int32_t n, double m[n][n])
     int32_t offset = 0;
     Sv8 zero = SV8("0.000000e+00");
     for (int32_t k = 0; k < n; k++) {
-      char numbuf[20] = {0};
-      snprintf(numbuf, 20, "%10e", m[r][k]);
+      char numbuf[30] = {0};
+      snprintf(numbuf, 30, "%10e", m[r][k]);
       Sv8 content = {numbuf, strlen(numbuf)};
       if (sv8equals(content, zero)) {
         if (offset < 251) {
