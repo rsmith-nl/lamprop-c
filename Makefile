@@ -7,17 +7,16 @@ VPATCH   = 28
 # Define the C compiler to be used, if not cc.
 #CC = gcc
 
-# The next lines are for building debugging libraries.
-#CFLAGS = -pipe -std=c11 -fPIC -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
+# For debugging builds.
+#CFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
 #                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
 #                -fsanitize=address,undefined
 #LFLAGS = -pipe -fsanitize=address,undefined
 
-# The next lines are for release builds.
-CFLAGS = -Os -pipe -std=c11 -fPIC -ffast-math -march=native
+# For release builds.
+CFLAGS = -Os -pipe -std=c11 -ffast-math -march=native
 CFLAGS += -DNDEBUG=1
 LFLAGS = -pipe -flto
-
 
 # Other libraries to link against
 LIBS += -lm
