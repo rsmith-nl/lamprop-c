@@ -2,7 +2,7 @@
 BASENAME = lamprop
 VMAJOR   = 2026
 VMINOR   = 01
-VPATCH   = 28
+VPATCH   = 31
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
@@ -24,7 +24,7 @@ LIBS += -lm
 
 # Source files.
 SRCS = lamprop.c stringview.c parser.c arena.c setup.c core.c
-SRCS += matrix.c text.c latex.c
+SRCS += matrix.c text.c latex.c html.c
 
 ##### No editing necessary beyond this point
 
@@ -34,7 +34,7 @@ all: $(BASENAME).exe  ## Compile the program. (default)
 $(BASENAME).exe: $(SRCS) version.h
 	$(CC) $(CFLAGS) $(LFLAGS) $(LDIRS) -o $(BASENAME) $(SRCS) $(LIBS)
 
-version.h:
+version.h: Makefile.win32
 	echo '#define VERSION "'${VMAJOR}"."${VMINOR}"."${VPATCH}'"' >version.h
 
 .PHONY: clean

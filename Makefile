@@ -2,7 +2,7 @@
 BASENAME = lamprop
 VMAJOR   = 2026
 VMINOR   = 01
-VPATCH   = 28
+VPATCH   = 31
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
@@ -31,7 +31,7 @@ DISTFILES = Makefile
 
 # Source files.
 SRCS = lamprop.c stringview.c parser.c arena.c setup.c core.c
-SRCS += matrix.c text.c latex.c
+SRCS += matrix.c text.c latex.c html.c
 
 ##### No editing necessary beyond this point
 
@@ -56,7 +56,7 @@ install: $(BASENAME)  ## Install the program.
 uninstall:  ## Uninstall the program.
 	rm -f $(BINDIR)/$(BASENAME)
 
-version.h:
+version.h: Makefile
 	echo '#define VERSION "'${VMAJOR}"."${VMINOR}"."${VPATCH}'"' >version.h
 
 .PHONY: style
