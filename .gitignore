@@ -1,5 +1,4 @@
 *.o
 lamprop
 lamprop.exe
-version.h
 !resources/libwinsane.o

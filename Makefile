@@ -43,7 +43,7 @@ $(BASENAME): $(SRCS) version.h
 
 .PHONY: clean
 clean:  ## Remove all generated files.
-	rm -f $(BASENAME) *~ core gmon.out $(TARFILE) version.h backup-*
+	rm -f $(BASENAME) *~ core gmon.out $(TARFILE) backup-*
 
 .PHONY: install
 install: $(BASENAME)  ## Install the program.
