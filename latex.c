@@ -1,10 +1,11 @@
 // file: latex.c
 // vim:fileencoding=utf-8:ft=c:tabstop=2
+// LaTeX output for lamprop.
 //
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-01T01:55:03+0100
+// Last modified: 2026-02-01T02:04:38+0100
 
 #include "core.h"
 #include "stringview.h"
