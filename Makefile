@@ -30,7 +30,7 @@ DOCSDIR= $(PREFIX)/share/doc/$(BASENAME)
 DISTFILES = Makefile
 
 # Source files.
-SRCS = lamprop.c stringview.c parser.c arena.c setup.c core.c
+SRCS = lamprop.c stringview.c sbuf.c parser.c arena.c setup.c core.c
 SRCS += matrix.c text.c latex.c html.c
 
 ##### No editing necessary beyond this point

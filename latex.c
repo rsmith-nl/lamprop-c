@@ -4,10 +4,11 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-01-31T21:25:02+0100
+// Last modified: 2026-02-01T01:55:03+0100
 
 #include "core.h"
 #include "stringview.h"
+#include "sbuf.h"
 #include "version.h"
 
 #include <string.h>
@@ -109,20 +110,14 @@ void engprop(Laminate *pl)
 static void pm(int32_t n, double m[n][n])
 {
   for (int32_t r = 0; r < n; r++) {
-    char linebuf[256] = {0};
-    int32_t offset = 0;
+    Sbuf linebuf = {0};
     Sv8 zero = SV8("0.000000e+00");
     for (int32_t k = 0; k < n; k++) {
       char numbuf[30] = {0};
       snprintf(numbuf, 30, "%10e", m[r][k]);
       Sv8 content = {numbuf, strlen(numbuf)};
       if (sv8equals(content, zero)) {
-        if (offset < 251) {
-          linebuf[offset++] = '0';
-          linebuf[offset++] = ' ';
-          linebuf[offset++] = '&';
-          linebuf[offset++] = ' ';
-        }
+        sbuf_append(&linebuf, "0 & ", 4);
         continue;
       }
       Sv8Cut cut = sv8cut(content, 'e');
@@ -130,10 +125,7 @@ static void pm(int32_t n, double m[n][n])
         continue;
       }
       // Add mantissa to buffer.
-      if ((offset + cut.head.len) < 256) {
-        memcpy(linebuf+offset, cut.head.data, cut.head.len);
-        offset += cut.head.len;
-      }
+      sbuf_append(&linebuf, cut.head.data, cut.head.len);
       bool neg = false, advance = true;
       if (cut.tail.data[0] == '-') {
         neg = true;
@@ -152,21 +144,13 @@ static void pm(int32_t n, double m[n][n])
         cut.tail.data[0] = '-';
         cut.tail.len++;
       }
-      if ((255-offset) > cut.tail.len + 14) {
-        memcpy(linebuf+offset, "\\times 10^{", 11);
-        offset += 11;
-        memcpy(linebuf+offset, cut.tail.data, cut.tail.len);
-        offset += cut.tail.len;
-        linebuf[offset++] = '}';
-        linebuf[offset++] = ' ';
-        linebuf[offset++] = '&';
-        linebuf[offset++] = ' ';
-      }
+      sbuf_append(&linebuf, "\\times 10^{", 11);
+      sbuf_append(&linebuf, cut.tail.data, cut.tail.len);
+      sbuf_append(&linebuf, "} & ", 4);
     } // end of columns
-    linebuf[--offset] = 0;
-    linebuf[--offset] = '\\';
-    linebuf[--offset] = '\\';
-    puts(linebuf);
+    linebuf.used -= 3;
+    sbuf_append(&linebuf, "\\\\\n", 3);
+    sbuf_fputs(&linebuf, stdout);
   }
 }
 
