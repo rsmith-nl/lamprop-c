@@ -1,8 +1,8 @@
 # Package name and version: BASENAME-VMAJOR.VMINOR.VPATCH.tar.gz
 BASENAME = lamprop
 VMAJOR   = 2026
-VMINOR   = 01
-VPATCH   = 31
+VMINOR   = 02
+VPATCH   = 01
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
@@ -31,7 +31,7 @@ DISTFILES = Makefile
 
 # Source files.
 SRCS = lamprop.c stringview.c sbuf.c parser.c arena.c setup.c core.c
-SRCS += matrix.c text.c latex.c html.c
+SRCS += matrix.c text.c latex.c html.c utils.c
 
 ##### No editing necessary beyond this point
 

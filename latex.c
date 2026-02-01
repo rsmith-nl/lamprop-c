@@ -2,14 +2,15 @@
 // vim:fileencoding=utf-8:ft=c:tabstop=2
 // LaTeX output for lamprop.
 //
-// Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
+// SPDX-License-Identifier: MIT
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-01T02:04:38+0100
+// Last modified: 2026-02-01T16:27:50+0100
 
 #include "core.h"
 #include "stringview.h"
 #include "sbuf.h"
+#include "utils.h"
 #include "version.h"
 
 #include <string.h>
@@ -107,47 +108,19 @@ void engprop(Laminate *pl)
   printf("      $\\mathrm{\\alpha_y}$ & %9.4g & K$^{-1}$\\\\\n", pl->αy);
 }
 
-
 static void pm(int32_t n, double m[n][n])
 {
   for (int32_t r = 0; r < n; r++) {
     Sbuf linebuf = {0};
-    Sv8 zero = SV8("0.000000e+00");
     for (int32_t k = 0; k < n; k++) {
-      char numbuf[30] = {0};
-      snprintf(numbuf, 30, "%10e", m[r][k]);
-      Sv8 content = {numbuf, strlen(numbuf)};
-      if (sv8equals(content, zero)) {
+      if (m[r][k] > -1e-7 && m[r][k] < 1e-7) {
         sbuf_append(&linebuf, "0 & ", 4);
         continue;
       }
-      Sv8Cut cut = sv8cut(content, 'e');
-      if (cut.ok == false) { // no e found, should not happen.
-        continue;
-      }
-      // Add mantissa to buffer.
-      sbuf_append(&linebuf, cut.head.data, cut.head.len);
-      bool neg = false, advance = true;
-      if (cut.tail.data[0] == '-') {
-        neg = true;
-      } else if (cut.tail.data[0] != '+') {
-        advance = false;
-      }
-      while (advance == true && cut.tail.len > 0) {
-        cut.tail.data++;
-        cut.tail.len--;
-        if (cut.tail.data[0] != '0') {
-          advance = false;
-        }
-      }
-      if (neg) {
-        cut.tail.data--;
-        cut.tail.data[0] = '-';
-        cut.tail.len++;
-      }
-      sbuf_append(&linebuf, "\\times 10^{", 11);
-      sbuf_append(&linebuf, cut.tail.data, cut.tail.len);
-      sbuf_append(&linebuf, "} & ", 4);
+      int exp = 0;
+      double mantissa = frexp10(m[r][k], &exp);
+      sbuf_printf(&linebuf, "%.3f", mantissa);
+      sbuf_printf(&linebuf, "\\times 10^{%d} & ", exp);
     } // end of columns
     linebuf.used -= 3;
     sbuf_append(&linebuf, "\\\\\n", 3);
