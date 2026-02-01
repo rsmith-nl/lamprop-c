@@ -1,17 +1,18 @@
 // file: latex.c
 // vim:fileencoding=utf-8:ft=c:tabstop=2
+// HTML output for lamprop.
 //
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-01-31T20:19:24+0100
+// Last modified: 2026-02-01T02:23:12+0100
 
 #include "core.h"
 #include "version.h"
+#include "sbuf.h"
 
 #include <stddef.h>
 #include <stdio.h>
-#include <string.h>
 #include <math.h>
 
 static void engprop(Laminate *pl);
@@ -151,52 +152,28 @@ void engprop(Laminate *pl)
   puts("</tr>");
 }
 
-#define BUFSZ 256
-typedef struct {
-  ptrdiff_t used;
-  int error;
-  char data[BUFSZ];
-} Buf;
-
-static void buf_append(Buf *b, char *str)
-{
-  if (b->error || str == 0) {
-    return;
-  }
-  size_t alen = strlen(str);
-  ptrdiff_t rem = BUFSZ - b->used - 1;
-  if (alen > rem) {
-    b->error = 1;
-    return;
-  }
-  memcpy(b->data+b->used, str, alen);
-  b->used += alen;
-  b->error = 0;
-}
-
 // Print a formatted row from a matrix.
 static void pr(int n, double mat[n][n], int row)
 {
-  Buf b = {0};
-  buf_append(&b, "          <td>");
+  Sbuf b = {0};
+  sbuf_appends(&b, "          <td>");
   for (int32_t j = 0; j < n; j++) {
     double num = mat[row][j];
     if (fpclassify(num) == FP_ZERO || (-1e-7 <= num && num <= 1e-7 )) {
-      buf_append(&b, "0");
+      sbuf_appends(&b, "0");
     } else if (isnan(num)) {
-      buf_append(&b, "NaN");
+      sbuf_appends(&b, "NaN");
     } else if (isinf(num)) {
       char inf[4] = {0xE2, 0x88, 0x9E, 0};
-      buf_append(&b, inf);
+      sbuf_appends(&b, inf);
     } else {
-      ptrdiff_t rem = BUFSZ - b.used;
-      b.used += snprintf(b.data+b.used, rem, "%-10.4g", num);
+      sbuf_printf(&b, "%-10.4g", num);
     }
     if (j<(n-1)) {
-      buf_append(&b, "</td><td>");
+      sbuf_appends(&b, "</td><td>");
     }
   }
-  buf_append(&b, "</td>");
+  sbuf_appends(&b, "</td>");
   puts(b.data);
 }
 
