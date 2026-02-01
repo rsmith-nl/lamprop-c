@@ -3,7 +3,7 @@
 %
 % Copyright © 2018,2020 R.F. Smith <rsmith@xs4all.nl>. All rights reserved.
 % Created: 2018-05-13 23:48:04 +0200
-% Last modified: 2023-10-11T23:50:48+0200
+% Last modified: 2026-02-01T19:50:52+0100
 
 \newcommand{\twodigits}[1]{\ifnum#1<10 0\number#1\else\number#1\fi}
 \newcommand{\TheDate}{\number\year-\twodigits\month-\twodigits\day}
@@ -30,7 +30,7 @@
 \usepackage[italic]{mathastext}
 
 % Hyperref moet als laatste geladen worden,
-\usepackage[bookmarks,pdfborder={0 0 0}]{hyperref}
+\usepackage[bookmarks,pdfborder={0 0 0},colorlinks=true]{hyperref}
 % met uitzondering van uitbreidingen erop.
 \usepackage{memhfixc}
 
@@ -53,7 +53,7 @@
 \setlrmargins{*}{*}{1}
 \setheadfoot{\onelineskip}{1.5\onelineskip}
 \setheaderspaces{*}{*}{1}
-\checkandfixthelayout
+\checkandfixthelayout%
 
 % Instellingen van het siunitx pakket.
 \sisetup{detect-all=true, mode=text, group-digits=true,
@@ -71,7 +71,7 @@
 %\setmainlanguage[babelshorthands=true]{english}
 
 % Opmaak van  listings {{{1
-\lstset{
+\lstset{%
   language=python,
 %  backgroundcolor=\color{inputbackground},
   extendedchars=\true,
@@ -102,7 +102,7 @@
   {€}{{\euro}}1 {£}{{\pounds}}1 {«}{{\guillemotleft}}1
   {»}{{\guillemotright}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1
 }
-\lstdefinestyle{plain}{
+\lstdefinestyle{plain}{%
     basicstyle=\tiny\ttfamily,
     columns=fixed,
     language={},
@@ -224,12 +224,6 @@ fiber-reinforced composite laminates. It calculates:
     \item stiffness and compliance matrices (\textsc{abd} and abd)
 \end{itemize}
 
-
-Although these properties are not very difficult to calculate, (the relevant
-equations and formulas can be readily found in the available composite
-literature) the calculation is time-consuming and error-prone when done by
-hand.
-
 This program can \emph{not} calculate the strength of composite laminates;
 because there are many different failure modes, strengths of composite
 laminates cannot readily be calculated from the strengths of the separate
@@ -237,20 +231,7 @@ materials that form the laminate. These strengths really have to be determined f
 tests. However, the author has found \citet{1992WeiEn..52...29H} useful for
 initial estimation of the strengths of multi-layer laminates.
 
-The original version of this program was written in C, since implementing
-it in a spreadsheet proved cumbersome, inflexible and even produced
-incorrect results. The C version ran up to 1.3.x.
-
-As an exercise in learning the language, the author ported the program to
-the Python programming language. This proved to be a much cleaner, more
-maintainable and shorter implementation.
-
-In the meantime, the program was ported from python version 2 to python
-version 3 and the core objects were replaced by functions. (now in
-\texttt{core.py} ) Also the output method was made generic to enable output in
-different formats, such as \LaTeX and \textsc{html}.
-
-Additionally, the generally hard to obtain transverse fiber properties
+The generally hard to obtain transverse fiber properties
 were replaced with properties derived from the matrix.
 
 The books from \citet{Hyer:1998} and \citet{Tsai:1992} and the report from
@@ -262,83 +243,85 @@ code.
 The article \citet{Giner:2014} provided a refinement in the estimation of
 $E_2$.
 
-All the important code is covered by tests using pytest, and pylama is used to
-check the code when it is saved.
+In this manual, UNIX-like systems like Linux, FreeBSD, Open BSD, NetBSD and macOS will be
+referred to as “POSIX” for brevity.
 
-\chapter{Building and installing the program} % {{{1
 
-\section{Requirements} % {{{2
+\chapter{Requirements} % {{{2
 
-The only requirement is Python (version 3.6 or later). Currently the
-development is done using Python 3.9.
+To build this program you will need a C compiler that supports the C11
+standard.
+The build has been tested with \texttt{clang} version 19 and \texttt{gcc}
+version 15.
 
-For developers: You will need pytest\footnote{\url{https://docs.pytest.org/}}
-to run the provided tests. Code checks are done using
-pylama\footnote{\url{http://pylama.readthedocs.io/en/latest/}}. Both should be
-invoked from the root directory of the repository.
+Using the \texttt{make} program is optional but recommended.
+Both GNU \texttt{make} and BSD \texttt{make} have been shown to work.
 
-There are basically two versions of this program; a console version (installed
-as \texttt{lamprop}) primarily meant for \textsc{posix} operating systems and
-a \textsc{gui} version (installed as \texttt{lamprop-gui}) primarily meant for
-ms-windows.
+\section{POSIX}
 
-You can try both versions without installing them first, with the following
-invocations in a shell from the root directory of the repository.
+On a POSIX system, the program can be built by simply invoking \texttt{make}.
 
-Use \texttt{python3 console.py -h} for the console version, and
-\texttt{python3 gui.py} for the \textsc{gui} version.
+\section{Ms-windows}
 
-\section{Installation} % {{{2
-
-First, you need to install Python 3. For \textsc{unix}-like operating systems,
-use the packages or build scripts that your operating system provides.
-
-There are Python binaries for ms-windows available from
-python.org\footnote{\url{https://www.python.org/downloads/}}, and those should
-work fine for lamprop.
-
-Once the requirements are met, you can proceed with the installation of lamprop.
-\begin{itemize}
-    \item Unpack the tarball or zipfile, or clone the github repository.
-    \item Open a terminal window or (on ms-windows a \texttt{cmd} window).
-    \item Change into the directory where lamprop was unpacked or cloned.
-    \item Run \texttt{python setup.py}.
-        This will tell you where it will try to install the programs.
-        It will also create both self-contained scripts.
-    \item Run \texttt{python setup.py install}. This will install the
-        self-contained scripts in the standard location for your operating
-        system.
-\end{itemize}
-
-The installation locations are:
-\begin{itemize}
-    \item \verb|$HOME/.local/bin| for \textsc{posix} operating systems.
-    \item The \verb|Scripts| folder of your Python installation on
-        ms-windows
-\end{itemize}
-If the \verb|Scripts| folder isn't writable on ms-windows, the installer will
-try a different location in your documents folder.
-For Python scripts to work well, the installation location should be named in
-your \textsc{path} environment variable.
+The only tested build method on ms-windows is using
+\href{https://github.com/skeeto/w64devkit}{w64devkit}.
+Open \texttt{w64devkit}, change to the directory where you have stored the source,
+and issue the command \texttt{make~-f~Makefile.win32}.
 
 
 \chapter{Using the program} % {{{1
 
-There are basically two ways to use lamprop.
+The program does not \emph{require} installation to run. Only the binary is
+required.
 
-\begin{enumerate}
-    \item Use the command-line program \texttt{lamprop}.
-    \item Use the \textsc{gui}-program \texttt{lamprop-gui}.
-\end{enumerate}
+For convenience you can copy the binary to a location mentioned in the
+environment variable \texttt{PATH} (POSIX) or \texttt{Path} (ms-windows).
 
-They depend on files written in a domain-specific language, which is
-documented in the next section.
 
-\section{The lamprop file format} % {{{2
+\texttt{lamprop} processes input files with laminate descriptions.
+These files are written in plain text, and have the extension \texttt{lam}.
+The format of these files is documented in the next chapter.
+
+The \texttt{lamprop} program runs on the command line.
+
+\section{POSIX}
+
+Assuming that \texttt{lamprop} in installed in your \texttt{PATH}, simply call
+it as \texttt{lamprop} from your shell, X11 or Wayland terminal emulator.
+
+If the location is not in your \texttt{PATH}, call the program with its
+location:
+\verb|~/.local/bin/lamprop -h|
+.
+
+\section{Ms-windows}
+
+To run \texttt{lamprop.exe}, open the folder where the \texttt{lam} file you
+want to process resides in the windows explorer.
+Right-click in that folder, and select “Open in Terminal”.
+%, see \frefpi{fig:open-in-terminal1}.
+
+%\begin{figure}[!h]
+%  \centerline{\includegraphics[scale=0.451]%
+%    {fotos/lamprop/open-in-terminal1}}
+%  \caption{\label{fig:open-in-terminal1}Open a terminal}
+%\end{figure}
+
+To run \texttt{lamprop.exe}, you have to specify the complete path where the
+program is located, unless it is stored in a location that is located in the
+\texttt{Path} environment variable.
+When there are spaces in the path, the whole path has to be enclosed in double
+quotation marks, and it has to be preceded by an ampersand, 
+%see
+for example:
+\verb| & "C:\users\John Doe\lamprop\lamprop.exe" -h|
+.
+
+\chapter{The lamprop file format} % {{{2
 
 The file format is very simple. Functional lines have either \texttt{f},
 \texttt{r}, \texttt{t}, \texttt{m}, \texttt{l}, \texttt{c} or \texttt{s} as
-the first non whitespace character. This character must immediately be
+the first non white space character. This character must immediately be
 followed by a colon \texttt{:}. All other lines are seen as comments and
 disregarded.
 
@@ -369,16 +352,12 @@ required the Young's modulus perpendicular to the fiber to calculate
 transverse properties of the lamina. Since this value is generally not given
 in the manufacturer documentation, it has been replaced by
 a value calculated with the Halpin-Tsai formula from
-\citet[p.  117]{Barbero:2018} as of version 2020.12.26.
+\citet[p.  117]{Barbero:2018}.
 Previously the modulus of the matrix multiplied by a factor was used,
 according to \citet{Tsai:1992}. However, the author has found that the factor
 provided by Tsai overestimates $E_2$.
-As of version 2023.10.10, the factor $\xi$ was reduced from 2 to 1.5 conform
+So the factor $\xi$ was reduced from 2 to 1.5 conform
 \citet{Giner:2014}
-
-In the \texttt{tools} subdirectory of the source distribution you will find
-a script called \texttt{convert-lamprop.py} to convert old-style fiber lines
-to the new format.
 
 The \texttt{r:}-line line contains a definition of a resin. Like with the
 fibers, this becomes an instance of a \texttt{Resin} object in the code. The
@@ -406,7 +385,7 @@ following values, separated by white space:
 \begin{description}
     \item[$vf$] The fiber volume fraction. This should be a number between
         0 and 1 or between 1 up to and including 100. In the latter case it
-        is interpreted als a percentage.
+        is interpreted as a percentage.
     \item[$name$] The name of the resin to use. This must have been previously
         declared with an \texttt{r:}-line.
 \end{description}
@@ -423,7 +402,7 @@ separated by white space (optional items in brackets):
 \end{description}
 
 The last line in a laminate definition can be an \texttt{s:} line, which stands
-for "symmetry". This signifies that all the lamina before it are to be added
+for ``symmetry''. This signifies that all the lamina before it are to be added
 again in reverse order, making a symmetric laminate stack. An \texttt{s:} line in any
 other position is an error.
 
@@ -446,10 +425,20 @@ l: 100 90 Hyer's carbon fiber
 s:
 \end{lstlisting}
 
-There is no artificial limit to the amount of layers that you can use other
-than Python running out of memory. The author has used laminates with up to
-250 layers. Calculating the properties of that laminate took approximately
-\SI{0.5}{s} on a machine with an Intel Core2 Q9300 running FreeBSD.
+The program has the following storage limits:
+\begin{itemize}
+  \item 1000 resins
+  \item 1000 fibers
+  \item 25000 lamina
+  \item 100 laminates
+\end{itemize}
+
+By using the \texttt{-i} option, you can see how many of that space has been
+used.
+
+The author has personally used laminates with up to 250 layers.
+Calculating the properties of that laminate took approximately
+\SI{0.005}{s} on a machine with an Intel Core2 Q9300 running FreeBSD.
 
 Interspersed between the \texttt{l:} lines (and before the \texttt{s:} line)
 there can be \texttt{c:} lines.
@@ -599,22 +588,25 @@ Several resins are shown in \tref{tb:resins}. For resins, $\nu$ is estimated
 The command \texttt{lamrop -h} produces the following overview of the options.
 
 \begin{lstlisting}[style=plain]
-usage: lamprop [-h] [-l | -H] [-e] [-m] [-f] [-L | -v] [--log {debug,info,warning,error}] [file ...]
+usage: lamprop [-h] [-i | -l | -H] [-e] [-m] [-f] [-L | -v]
+               [file ...]
+
+Calculate the elastic properties of a fibrous composite laminate. See the manual (lamprop-manual.pdf)
+for more in-depth information.
 
 positional arguments:
   file                  one or more files to process
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
+  -i, --info            show information about source file (the default is not to)
   -l, --latex           generate LaTeX output (the default is plain text)
   -H, --html            generate HTML output
-  -e, --eng             output only the layers and engineering properties
-  -m, --mat             output only the ABD and abd matrices
+  -e, --eng             output only the engineering properties
+  -m, --mat             output only the ABD matrix and stiffness tensor
   -f, --fea             output only material data for FEA
   -L, --license         print the license
   -v, --version         show program's version number and exit
-  --log {debug,info,warning,error}
-                        logging level (defaults to 'warning')
 \end{lstlisting}
 
 Running \texttt{lamprop} from the command line produces text output by
@@ -622,32 +614,6 @@ default. Output in \LaTeX{} or \textsc{html} format can be requested with the
 appropriate arguments. As of 4.0, \textsc{rtf} output (for inclusion in word
 processor documents) has been removed. Since most word processors can read
 \textsc{html}, use that instead.
-
-
-\section{Using the \textsc{gui} program} % {{{2
-
-The \textsc{gui} program was written (using \texttt{tkinter}) primarily for
-users of ms-windows, since they are generally not used to the command-line
-interface. The contents of its window are shown in \fref{fig:lamprop-gui}. The
-image shows the looks of the widgets on \textsc{unix}-like operating systems.
-On ms-windows it follows the native look.
-
-The \textsf{File} button allows you to load a lamprop file. If a file is
-loaded its name is shown right of the button. The \textsf{Reload} button
-re-loads a file.
-If a file is loaded, the \textsf{text} and \textsf{html} buttons allow you
-to save the output as a file.
-The checkboxes below determine which results are shown. If
-a file contains different laminates, the dropbox allows you to select
-a laminate to display. The textbox at the bottom shows the lamprop output as
-text.
-
-\begin{figure}[!htbp]
-  \centerline{\includegraphics[scale=0.5]{lamprop-gui.png}}
-  \caption{\label{fig:lamprop-gui}lamprop \textsc{gui}}
-\end{figure}
-
-
 
 \section{Meaning of the ABD, H and C matrices} % {{{2
 
@@ -698,7 +664,7 @@ The indices first indicate the row, then the column.
 \]
 The matrix indices use Voight notation, see \citet[p. 310]{Barbero:2008}.
 This contraction is possible because symmetries in the tensor reduce the
-number of independant material constants from 81 to 21.
+number of independent material constants from 81 to 21.
 
 Note that the indices in the stress and strain vectors are not the same as
 those used in the C matrix!
@@ -849,7 +815,7 @@ equally sized 90\textdegree{} layer, but the author disagrees. For beam-like
 parts it is often desirable to have the majority of the fibers in the
 0\textdegree{} direction.
 
-Classical laminate theory strictly speaking is only valid for stackings of
+Classical laminate theory strictly speaking is only valid for stacks of
 unidirectional layers. For woven fabrics and random oriented fiber products
 approximations are used.
 
