@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-08-28 23:49:02 +0200
-// Last modified: 2026-02-01T02:13:50+0100
+// Last modified: 2026-02-01T02:22:23+0100
 
 #include "sbuf.h"
 #include <stddef.h>
@@ -32,7 +32,6 @@ inline void sbuf_appends(Sbuf *buf, const char *str)
 {
   sbuf_append(buf, str, strlen(str));
 }
-
 
 void sbuf_printf(Sbuf *buf, const char *fmt, ...)
 {
