@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2026-01-31T13:57:46+0100
+// Last modified: 2026-02-01T19:39:12+0100
 
 #include "core.h"
 #include "logging.h"
@@ -118,9 +118,7 @@ int main(int argc, char *argv[])
     // Advance
     opt.argv++;
     opt.argc--;
-  } //else {
-  //  fprintf(stderr, "WARNING: no laminate file name supplied.\n");
-  //}
+  }
   debug("ending lamprop normally...");
   return 0;
 }
