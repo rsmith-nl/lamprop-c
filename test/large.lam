@@ -1,0 +1,313 @@
+Vezel definitie
+    E1      ν12     α1         ρ        name
+f:  70000   0.33    5e-6        2.54    e-glas
+
+Matrix definitie
+# ν is estimated 0.36 unless known.
+# α is estimated 40e-6 unless known.
+    Em      ν       α       ρ       name
+r:  4000    0.36    40e-6   1.22    UP
+
+t: large-laminate
+m: 0.475 UP
+----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
+l: 100  0 0.285 e-glas
+l: 100 60 0.285 e-glas
+l: 100 120 0.285 e-glas
+l: 400  0 e-glas
+l: 400 90 e-glas
+-----
