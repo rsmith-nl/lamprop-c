@@ -5,7 +5,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-01T16:27:50+0100
+// Last modified: 2026-02-01T16:41:46+0100
 
 #include "core.h"
 #include "stringview.h"
@@ -108,19 +108,25 @@ void engprop(Laminate *pl)
   printf("      $\\mathrm{\\alpha_y}$ & %9.4g & K$^{-1}$\\\\\n", pl->αy);
 }
 
+// Print a formatted matrix.
 static void pm(int32_t n, double m[n][n])
 {
   for (int32_t r = 0; r < n; r++) {
     Sbuf linebuf = {0};
     for (int32_t k = 0; k < n; k++) {
-      if (m[r][k] > -1e-7 && m[r][k] < 1e-7) {
-        sbuf_append(&linebuf, "0 & ", 4);
-        continue;
+      double num = m[r][k];
+      if (num > -1e-7 && num < 1e-7) {
+        sbuf_appends(&linebuf, "0 & ");
+      } else if (isnan(num)) {
+        sbuf_appends(&linebuf, "\\mathrm{NaN} & ");
+      } else if (isinf(num)) {
+        sbuf_appends(&linebuf, "\\infty & ");
+      } else {
+        int exp = 0;
+        double mantissa = frexp10(m[r][k], &exp);
+        sbuf_printf(&linebuf, "%.3f", mantissa);
+        sbuf_printf(&linebuf, "\\times 10^{%d} & ", exp);
       }
-      int exp = 0;
-      double mantissa = frexp10(m[r][k], &exp);
-      sbuf_printf(&linebuf, "%.3f", mantissa);
-      sbuf_printf(&linebuf, "\\times 10^{%d} & ", exp);
     } // end of columns
     linebuf.used -= 3;
     sbuf_append(&linebuf, "\\\\\n", 3);
