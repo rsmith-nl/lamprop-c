@@ -37,6 +37,10 @@ $(BASENAME).exe: $(SRCS) version.h
 version.h: Makefile.win32
 	echo '#define VERSION "'${VMAJOR}"."${VMINOR}"."${VPATCH}'"' >version.h
 
+.PHONY: test
+test: $(BASENAME).exe  ## Run a test
+	./lamprop test/hyer.lam
+
 .PHONY: clean
 clean:  ## Remove all generated files.
 	rm -f $(BASENAME).exe *~ core gmon.out $(TARFILE) version.h backup-*

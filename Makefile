@@ -45,7 +45,6 @@ $(BASENAME): $(SRCS) version.h
 clean:  ## Remove all generated files.
 	rm -f $(BASENAME) *~ core gmon.out $(TARFILE) backup-*
 
-.PHONY: install
 install: $(BASENAME)  ## Install the program.
 	install -d $(BINDIR)
 	install -m 755 -s $(BASENAME) $(BINDIR)
@@ -73,6 +72,10 @@ man:  ## Show the rendered manual page
 
 tags: $(SRCS) *.h  ## Update tags file
 	uctags --language-force=C --kinds-C=+p-f *.h *.c
+
+.PHONY: test
+test: $(BASENAME)  ## Run a test
+	./lamprop test/hyer.lam
 
 .PHONY: help
 help:  ## List available commands
