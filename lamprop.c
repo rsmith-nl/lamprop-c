@@ -30,9 +30,9 @@ extern void html_out(Laminate *pl, bool eng, bool mat, bool fea);
 int main(int argc, char *argv[])
 {
 #ifdef _WIN32
-   _setmode(0, 0x8000);
-   _setmode(1, 0x8000);
-   SetConsoleOutputCP(65001);
+  _setmode(0, 0x8000);
+  _setmode(1, 0x8000);
+  SetConsoleOutputCP(65001);
 #endif
   debug("starting lamprop...");
   Options opt = setup(argc, argv);

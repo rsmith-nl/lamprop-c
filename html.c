@@ -251,7 +251,6 @@ void matrices(Laminate *pl)
   puts("</table>");
   puts("</td>");
   puts("</tr>");
-
   char *fstr2[6] = {
     "<td>&sigma;<sub>11</sub></td>",
     "<td>&sigma;<sub>22</sub></td>",
@@ -268,7 +267,6 @@ void matrices(Laminate *pl)
     "<td>2&epsilon;<sub>13</sub></td>",
     "<td>2&epsilon;<sub>12</sub></td>",
   };
-
   puts("<tr>");
   puts("<!-- next row, stiffness tensor -->");
   puts("<td colspan=\"2\">");

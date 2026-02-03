@@ -27,7 +27,7 @@ typedef struct {
   char data[SBUF_MAX];
 } Sbuf;
 
-// Appends at most “len” bytes to “buf” from “str”. 
+// Appends at most “len” bytes to “buf” from “str”.
 // Sets “error” to “false” if there is not enough space.
 extern void sbuf_append(Sbuf *buf, const char *str, const ptrdiff_t len);
 // Appends null-terminated strings “str” to “buf”.
