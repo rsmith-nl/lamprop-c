@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2026-02-01T19:39:12+0100
+// Last modified: 2026-02-04T20:01:42+0100
 
 #include "core.h"
 #include "logging.h"
@@ -93,19 +93,19 @@ int main(int argc, char *argv[])
 #endif
     }
     if (opt.info) {
-      ptrdiff_t used = permanent.cur - permanent.begin;
+      ptrdiff_t used = permanent.current_offset;
       fprintf(stderr, "#lamprop-c INFO: "
               "permanent arena, %td of %td bytes used\n", used, (ptrdiff_t)PASZ);
-      used = (fr.resina.cur - fr.resina.begin)/sizeof(Resin);
+      used = fr.resina.current_offset/sizeof(Resin);
       fprintf(stderr, "#lamprop-c INFO: "
               "resin arena, %td of %d resins used\n", used, NRESINS);
-      used = (fr.fibera.cur - fr.fibera.begin)/sizeof(Fiber);
+      used = fr.fibera.current_offset/sizeof(Fiber);
       fprintf(stderr, "#lamprop-c INFO: "
               "fiber arena, %td of %d fibers used\n", used, NRESINS);
-      used = (ld.laminaa.cur - ld.laminaa.begin)/sizeof(Lamina);
+      used = ld.laminaa.current_offset/sizeof(Lamina);
       fprintf(stderr, "#lamprop-c INFO: "
               "lamina arena, %td of %d lamina used\n", used, NLAMINA);
-      used = (ld.laminatesa.cur - ld.laminatesa.begin)/sizeof(Laminate);
+      used = ld.laminatesa.current_offset/sizeof(Laminate);
       fprintf(stderr, "#lamprop-c INFO: "
               "laminate arena, %td of %d laminates used\n", used, NLAMINATES);
     }

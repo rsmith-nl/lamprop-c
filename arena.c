@@ -1,26 +1,25 @@
-//  file: arena.c
-//  vim:fileencoding=utf-8:fdm=marker:ft=c
+// file: arena.c
+// vim:fileencoding=utf-8:ft=c:tabstop=2
+// This is free and unencumbered software released into the public domain.
 //
-//  Copyright © 2023 R.F. Smith <rsmith@xs4all.nl>
-//  SPDX-License-magicifier: MIT
-//  Created: 2023-04-23T22:08:02+0200
-//  Last modified: 2026-01-21T19:57:16+0100
+// Author: R.F. Smith <rsmith@xs4all.nl>
+// SPDX-License-Identifier: Unlicense
+// Created: 2023-04-23T22:08:02+0200
+// Last modified: 2026-02-04T20:06:58+0100
 
 #include "arena.h"
 #include "logging.h"
+#include <assert.h>
 #include <stdio.h>      // for printf
 #include <stdint.h>     // for uintptr_t
 #include <stddef.h>     // for ptrdiff_t
 #include <string.h>     // for memset
 #ifdef _WIN32
 #include <memoryapi.h>
+#define MAP_FAILED ((void *)-1)
 #else
 #include <sys/mman.h>   // for mmap, munmap
 #endif
-
-// In [9]: '0x' + ''.join([hex(ord(j))[2:] for j in "AREN"])
-// Out[9]: '0x4152454e'
-#define ARENA_MAGIC 0x4152454e
 
 Arena arena_create(ptrdiff_t length)
 {
@@ -29,72 +28,56 @@ Arena arena_create(ptrdiff_t length)
   if (length <= 0) {
     length = 1048576;
   }
-  arena.magic = ARENA_MAGIC;
 #ifdef _WIN32
   arena.begin = VirtualAlloc(0, length, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
   if (arena.begin == 0) {
-    arena.begin = ((void *)-1); // MAP_FAILED
+    arena.begin = MAP_FAILED;
   }
 #else
   arena.begin = mmap(0, length, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 #endif
-  if (arena.begin == (void *)-1) {
+  if (arena.begin == MAP_FAILED) {
     error("arena allocation of size %td failed\n", length);
   }
   info("arena; %td bytes allocated", length);
-  arena.cur = arena.begin;
-  // Do *not* write to the location pointed to by guard!
-  // it is outside the allocated area.
-  arena.guard = arena.begin + length;
+  arena.current_offset = 0;
+  arena.length = length;
   return arena;
 }
 
 ptrdiff_t arena_remaining(Arena *arena)
 {
-  if (arena == 0) {
-    error("null pointer used for arena\n");
-  }
-  if (arena->magic != ARENA_MAGIC) {
-    error("invalid arena %p; magic %d\n", (void*)arena, arena->magic);
-  }
-  ptrdiff_t remaining = arena->guard - arena->cur;
-  return remaining;
+  assert(arena!=0);
+  return arena->length - arena->current_offset;
 }
 
 void *arena_alloc(Arena *arena, ptrdiff_t size, ptrdiff_t count, ptrdiff_t align)
 {
-  if (arena == 0) {
-    error("null pointer used for arena\n");
-  }
-  if (arena->magic != ARENA_MAGIC) {
-    error("invalid arena %p; magic %d\n", (void *)arena, arena->magic);
-  }
-  ptrdiff_t padding = -(uintptr_t)arena->cur & (align - 1);
-  ptrdiff_t remaining = arena->guard - arena->cur - padding;
+  assert(arena!=0);
+  assert(size>0);
+  assert(count>0);
+  ptrdiff_t padding = -arena->current_offset & (align - 1);
+  ptrdiff_t remaining = arena->length - arena->current_offset - padding;
   if (count > remaining/size) {
     error("arena %p exhausted; %td items of %td bytes requested, %td available\n",
           (void *)arena, count, size, remaining/size);
   }
-  void *rv = arena->cur + padding;
-  arena->cur += padding + count * size;
+  void *rv = arena->begin + arena->current_offset + padding;
+  arena->current_offset += padding + count * size;
   return memset(rv, 0, count * size);
 }
 
 void arena_destroy(Arena *arena)
 {
-  if (arena == 0) {
-    error("null pointer used for arena ignored\n");
-    return;
-  }
-  if (arena->magic != ARENA_MAGIC) {
-    error("invalid arena %p; magic %d ignored\n", (void *)arena, arena->magic);
-    return;
-  }
-  int rv =
+  assert(arena!=0);
+  int rv;
 #ifdef _WIN32
-    VirtualFree(arena->begin, 0, MEM_RELEASE|MEM_DECOMMIT);
+  rv = VirtualFree(arena->begin, 0, MEM_RELEASE|MEM_DECOMMIT);
+  if (rv == 0) {
+    rv = -1;
+  }
 #else
-    munmap(arena->begin, arena->guard - arena->begin);
+  rv = munmap(arena->begin, arena->length);
 #endif
   if (rv == -1) {
     error("destroying arena %p failed\n", (void *)arena);
@@ -105,11 +88,9 @@ void arena_destroy(Arena *arena)
 
 void arena_empty(Arena *arena)
 {
-  if (arena == 0) {
-    error("null pointer used for arena ignored\n");
-  }
-  if (arena->magic != ARENA_MAGIC) {
-    error("invalid arena %p; magic %d ignored\n", (void *)arena, arena->magic);
-  }
-  arena->cur = arena->begin;
+  assert(arena!=0);
+  // Clear all the used memory.
+  memset(arena->begin, 0, arena->current_offset);
+  // Reset the use counter.
+  arena->current_offset = 0;
 }

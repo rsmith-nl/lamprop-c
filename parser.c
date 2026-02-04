@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2025-08-17T16:19:55+0200
+// Last modified: 2026-02-04T19:57:18+0100
 
 #include "logging.h"
 #include "core.h"
@@ -374,7 +374,7 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
             if (!skip_lm) {
               // Store the current pointer to the lamina arena in the
               // laminate. This is where the lamina will go.
-              lm.layers = (void*)rv.laminaa.cur;
+              lm.layers = (void*)(rv.laminaa.begin+rv.laminaa.current_offset);
               // Store laminate in the laminate arena.
               pcurlam = arena_new(&rv.laminatesa, Laminate, 1);
               *pcurlam = lm;
@@ -411,8 +411,8 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
                      sv8cstring(ml.resin_name), sv8cstring(pcurlam->name));
                 // Delete laminate from arena.
                 rv.nlaminates--;
-                rv.laminatesa.cur -= sizeof(Laminate);
-                memset(rv.laminatesa.cur, 0, sizeof(Laminate));
+                rv.laminatesa.current_offset -= sizeof(Laminate);
+                memset(rv.laminatesa.begin+rv.laminatesa.current_offset, 0, sizeof(Laminate));
                 state=' ';
               } else {
                 // Now that we know the resin, store it and the vf in the
