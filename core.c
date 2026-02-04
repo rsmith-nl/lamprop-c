@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2025-09-07T12:38:08+0200
+// Last modified: 2026-02-04T20:13:53+0100
 
 // Core functions of lamprop.
 //
@@ -85,6 +85,7 @@
 #include "matrix.h"
 #include "core.h"
 
+#include <assert.h>
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
@@ -188,6 +189,7 @@ Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf
 
 void tbar(double out[6][6], double angle)
 {
+  assert(out!=0);
   double c = cos(angle), s = sin(angle);
   double Tbar[6][6] = {
     {c * c, s * s, 0, 0, 0, c * s},
@@ -203,6 +205,7 @@ void tbar(double out[6][6], double angle)
 
 bool finish_laminate(Laminate *pl)
 {
+  assert(pl!=0);
   if (pl->magic!=LMNT) {
     return false;
   }
@@ -379,9 +382,9 @@ bool finish_laminate(Laminate *pl)
   return true;
 }
 
-
 bool isortho(double src[6][6])
 {
+  assert(src!=0);
   int32_t r[24] = {0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5};
   int32_t c[24] = {3, 4, 5, 3, 4, 5, 3, 4, 5, 0, 1, 2, 4, 5, 0, 1, 2, 3, 5, 0, 1, 2, 3, 4};
   int32_t count = 0;
@@ -398,6 +401,8 @@ bool isortho(double src[6][6])
 
 void toabaqusi(double src[6][6], double dest[6][6])
 {
+  assert(src!=0);
+  assert(dest!=0);
   for (int32_t r = 0; r < 6; r++) {
     for (int32_t c = 0; c < 6; c++) {
       dest[r][c] = src[r][c] * 1e6;

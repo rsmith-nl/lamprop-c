@@ -5,12 +5,13 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-01T02:23:12+0100
+// Last modified: 2026-02-04T20:14:27+0100
 
 #include "core.h"
 #include "version.h"
 #include "sbuf.h"
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <math.h>
@@ -21,6 +22,7 @@ extern void text_fea(Laminate *pl);
 
 void html_out(Laminate *pl, bool eng, bool mat, bool fea)
 {
+  assert(pl!=0);
   puts("<!DOCTYPE html>");
   puts("<html lang=\"en-US\">");
   puts("<head><meta charset=\"UTF-8\">"

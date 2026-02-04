@@ -5,7 +5,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-01T16:41:46+0100
+// Last modified: 2026-02-04T20:15:26+0100
 
 #include "core.h"
 #include "stringview.h"
@@ -13,6 +13,7 @@
 #include "utils.h"
 #include "version.h"
 
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -23,6 +24,7 @@ extern void text_fea(Laminate *pl);
 
 void latex_out(Laminate *pl, bool eng, bool mat, bool fea)
 {
+  assert(pl!=0);
   // Escape underscores in the name.
   char texlname[pl->name.len*2];
   memset(texlname, 0, pl->name.len*2);

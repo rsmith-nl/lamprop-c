@@ -7,7 +7,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-09-07 12:24:36 +0200
-// Last modified: 2025-09-07T12:32:41+0200
+// Last modified: 2026-02-04T20:18:20+0100
 
 #include "matrix.h"
 
@@ -68,10 +68,10 @@ bool mat_inv2(double m[2][2], double i[2][2])
   return true;
 }
 
-
 // Cleans matrix a of small numbers, sets them to 0.
 void mat_clean2(double a[2][2])
 {
+  assert(a!=0);
   if (a[0][0] < LIMIT && a[0][0] > -LIMIT) {
     a[0][0] = 0.0;
   }

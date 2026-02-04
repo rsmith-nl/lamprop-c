@@ -4,12 +4,13 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-04T19:57:18+0100
+// Last modified: 2026-02-04T20:20:31+0100
 
 #include "logging.h"
 #include "core.h"
 #include "parser.h"
 
+#include <assert.h>
 #include <stdio.h>  // for fopen
 #include <string.h> // for memset(3), memcpy(3)
 
@@ -45,6 +46,8 @@ static Lline parse_l(Sv8 line, Laminate *pcurlam);
 
 Sv8 read_file(char *path, Arena *permanent)
 {
+  assert(path!=0);
+  assert(permanent!=0);
   Sv8 contents = {0};
   FILE *inputfile = fopen(path, "r");
   if (inputfile==0) {
@@ -190,6 +193,7 @@ Laminate parse_laminate(Sv8 line)
 
 Mline parse_m(Sv8 line, Laminate *pcurlam)
 {
+  assert(pcurlam!=0);
   Mline rv = {0};
   // This function is only called when *line* starts with 'm:'.
   // So discard that.
@@ -215,6 +219,7 @@ Mline parse_m(Sv8 line, Laminate *pcurlam)
 
 Lline parse_l(Sv8 line, Laminate *pcurlam)
 {
+  assert(pcurlam!=0);
   Lline rv = {0};
   // This function is only called when *line* starts with 'l:'.
   // So discard that.
