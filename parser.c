@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-04T20:20:31+0100
+// Last modified: 2026-02-06T12:20:22+0100
 
 #include "logging.h"
 #include "core.h"
@@ -62,7 +62,7 @@ Sv8 read_file(char *path, Arena *permanent)
   fclose(inputfile);
   if (rv != size) {
     fprintf(stderr,
-            "WARNING: file “%s” has size %td bytes, but only %td bytes read.\n",
+            "INFO: file “%s” has size %td bytes, but only %td bytes read.\n",
             path, size, rv);
   }
   return contents;
