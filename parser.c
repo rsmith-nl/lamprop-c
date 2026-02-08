@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-06T12:20:22+0100
+// Last modified: 2026-02-08T22:38:21+0100
 
 #include "logging.h"
 #include "core.h"
@@ -66,200 +66,6 @@ Sv8 read_file(char *path, Arena *permanent)
             path, size, rv);
   }
   return contents;
-}
-
-Resin parse_resin(Sv8 line)
-{
-  Resin rv = {0};
-  rv.magic = RESN;
-  // This function is only called when *line* starts with 'r:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the Young's modulus after whitespace.
-  Sv8Double E = sv8tod(cut.tail);
-  if (E.ok) {
-    rv.E = E.result;
-    rv.ok = true;
-    //debug("E = %g\n", E.result);
-  } else {
-    return rv; // empty
-  }
-  // E.tail now starts with the Poisson constant after whitespace.
-  Sv8Double ν = sv8tod(E.tail);
-  if (ν.ok) {
-    rv.ν = ν.result;
-    rv.ok = true;
-    //debug("ν = %g\n", ν.result);
-  } else {
-    rv.ok = false;
-    return rv;
-  }
-  // ν.tail now starts with the CTE after whitespace.
-  Sv8Double α = sv8tod(ν.tail);
-  if (α.ok) {
-    rv.α = α.result;
-    rv.ok = true;
-    //debug("α = %g\n", α.result);
-  } else {
-    rv.ok = false;
-    return rv;
-  }
-  // α.tail now starts with the density after whitespace.
-  Sv8Double ρ = sv8tod(α.tail);
-  if (ρ.ok) {
-    rv.ρ = ρ.result;
-    rv.ok = true;
-    //debug("ρ = %g\n", ρ.result);
-  } else {
-    rv.ok = false;
-    return rv;
-  }
-  // ρ.tail now starts with the name after whitespace.
-  rv.name = sv8strip(ρ.tail);
-  //debug("rv.name.len = %ld\n", rv.name.len);
-  rv.ok = true;
-  return rv;
-}
-
-Fiber parse_fiber(Sv8 line)
-{
-  Fiber rv = {0};
-  rv.magic = FIBR;
-  // This function is only called when *line* starts with 'f:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the Young's modulus after whitespace.
-  Sv8Double E1 = sv8tod(cut.tail);
-  if (E1.ok) {
-    rv.E1 = E1.result;
-    rv.ok = true;
-    //debug("E1 = %g\n", E1.result);
-  } else {
-    return rv; // empty
-  }
-  // E1.tail now starts with the Poisson constant after whitespace.
-  Sv8Double ν12 = sv8tod(E1.tail);
-  if (ν12.ok) {
-    rv.ν12 = ν12.result;
-    rv.ok = true;
-    //debug("ν12 = %g\n", ν12.result);
-  } else {
-    rv.ok = false;
-    return rv;
-  }
-  // ν12.tail now starts with the CTE after whitespace.
-  Sv8Double α1 = sv8tod(ν12.tail);
-  if (α1.ok) {
-    rv.α1 = α1.result;
-    rv.ok = true;
-    //debug("α1 = %g\n", α1.result);
-  } else {
-    rv.ok = false;
-    return rv;
-  }
-  // α1.tail now starts with the density after whitespace.
-  Sv8Double ρ = sv8tod(α1.tail);
-  if (ρ.ok) {
-    rv.ρ = ρ.result;
-    rv.ok = true;
-    //debug("ρ = %g\n", ρ.result);
-  } else {
-    rv.ok = false;
-    return rv;
-  }
-  // ρ.tail now starts with the name after whitespace.
-  rv.name = sv8strip(ρ.tail);
-  rv.ok = true;
-  return rv;
-}
-
-Laminate parse_laminate(Sv8 line)
-{
-  Laminate rv = {0};
-  rv.magic = LMNT;
-  // This function is only called when *line* starts with 't:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the name after whitespace.
-  rv.name = sv8strip(cut.tail);
-  //debug("rv.name = %s\n", sv8ctring(rv.name));
-  rv.ok = true;
-  if (rv.name.len==0) {
-    warn("laminate without a name found");
-    rv.ok = false;
-  }
-  return rv;
-}
-
-Mline parse_m(Sv8 line, Laminate *pcurlam)
-{
-  assert(pcurlam!=0);
-  Mline rv = {0};
-  // This function is only called when *line* starts with 'm:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the fiber volume fraction after whitespace.
-  Sv8Double vf = sv8tod(cut.tail);
-  if (vf.ok) {
-    rv.vf = vf.result;
-    // Also set vf in the laminate.
-    pcurlam->vf = rv.vf;
-  } else {
-    return rv;
-  }
-  // vf.tail should now contain the name of the resin.
-  Sv8 resin_name = sv8strip(vf.tail);
-  if (resin_name.len != 0) {
-    rv.resin_name = resin_name;
-    //debug("rv.resin_name = %s\n", sv8cstring(rv.resin_name));
-    rv.ok = true;
-  }
-  return rv;
-}
-
-Lline parse_l(Sv8 line, Laminate *pcurlam)
-{
-  assert(pcurlam!=0);
-  Lline rv = {0};
-  // This function is only called when *line* starts with 'l:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the fiber area weight after whitespace.
-  Sv8Double area_weight = sv8tod(cut.tail);
-  if (area_weight.ok) {
-    rv.area_weight = area_weight.result;
-    //debug("rv.area_weight = %g", rv.area_weight);
-  } else {
-    //debug("reading area weight failed");
-    return rv;
-  }
-  Sv8Double angle = sv8tod(area_weight.tail);
-  if (angle.ok) {
-    rv.angle = angle.result;
-    //debug("rv.angle = %g", rv.angle);
-  } else {
-    //debug("reading angle failed");
-    return rv;
-  }
-  Sv8Double vf = sv8tod(angle.tail);
-  Sv8 next = angle.tail;
-  if (vf.ok) {
-    // found optional vf.
-    rv.optvf = true;
-    rv.vf = vf.result;
-    next = vf.tail;
-  }
-  Sv8 fiber_name = sv8strip(next);
-  if (fiber_name.len != 0) {
-    rv.fiber_name = fiber_name;
-    //debug("rv.fiber_name = %s", sv8cstring(rv.fiber_name));
-    rv.ok = true;
-  } //else {
-  //debug("fiber name empty");
-  //}
-  // Increase the layer count in the laminate.
-  pcurlam->nlayers++;
-  return rv;
 }
 
 FRdata fibers_and_resins(Sv8 contents, bool info)
@@ -500,5 +306,199 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
     ccut = sv8cut(ccut.tail, '\n');
     lineno++;
   }
+  return rv;
+}
+
+Resin parse_resin(Sv8 line)
+{
+  Resin rv = {0};
+  rv.magic = RESN;
+  // This function is only called when *line* starts with 'r:'.
+  // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
+  // cut.tail now starts with the Young's modulus after whitespace.
+  Sv8Double E = sv8tod(cut.tail);
+  if (E.ok) {
+    rv.E = E.result;
+    rv.ok = true;
+    //debug("E = %g\n", E.result);
+  } else {
+    return rv; // empty
+  }
+  // E.tail now starts with the Poisson constant after whitespace.
+  Sv8Double ν = sv8tod(E.tail);
+  if (ν.ok) {
+    rv.ν = ν.result;
+    rv.ok = true;
+    //debug("ν = %g\n", ν.result);
+  } else {
+    rv.ok = false;
+    return rv;
+  }
+  // ν.tail now starts with the CTE after whitespace.
+  Sv8Double α = sv8tod(ν.tail);
+  if (α.ok) {
+    rv.α = α.result;
+    rv.ok = true;
+    //debug("α = %g\n", α.result);
+  } else {
+    rv.ok = false;
+    return rv;
+  }
+  // α.tail now starts with the density after whitespace.
+  Sv8Double ρ = sv8tod(α.tail);
+  if (ρ.ok) {
+    rv.ρ = ρ.result;
+    rv.ok = true;
+    //debug("ρ = %g\n", ρ.result);
+  } else {
+    rv.ok = false;
+    return rv;
+  }
+  // ρ.tail now starts with the name after whitespace.
+  rv.name = sv8strip(ρ.tail);
+  //debug("rv.name.len = %ld\n", rv.name.len);
+  rv.ok = true;
+  return rv;
+}
+
+Fiber parse_fiber(Sv8 line)
+{
+  Fiber rv = {0};
+  rv.magic = FIBR;
+  // This function is only called when *line* starts with 'f:'.
+  // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
+  // cut.tail now starts with the Young's modulus after whitespace.
+  Sv8Double E1 = sv8tod(cut.tail);
+  if (E1.ok) {
+    rv.E1 = E1.result;
+    rv.ok = true;
+    //debug("E1 = %g\n", E1.result);
+  } else {
+    return rv; // empty
+  }
+  // E1.tail now starts with the Poisson constant after whitespace.
+  Sv8Double ν12 = sv8tod(E1.tail);
+  if (ν12.ok) {
+    rv.ν12 = ν12.result;
+    rv.ok = true;
+    //debug("ν12 = %g\n", ν12.result);
+  } else {
+    rv.ok = false;
+    return rv;
+  }
+  // ν12.tail now starts with the CTE after whitespace.
+  Sv8Double α1 = sv8tod(ν12.tail);
+  if (α1.ok) {
+    rv.α1 = α1.result;
+    rv.ok = true;
+    //debug("α1 = %g\n", α1.result);
+  } else {
+    rv.ok = false;
+    return rv;
+  }
+  // α1.tail now starts with the density after whitespace.
+  Sv8Double ρ = sv8tod(α1.tail);
+  if (ρ.ok) {
+    rv.ρ = ρ.result;
+    rv.ok = true;
+    //debug("ρ = %g\n", ρ.result);
+  } else {
+    rv.ok = false;
+    return rv;
+  }
+  // ρ.tail now starts with the name after whitespace.
+  rv.name = sv8strip(ρ.tail);
+  rv.ok = true;
+  return rv;
+}
+
+Laminate parse_laminate(Sv8 line)
+{
+  Laminate rv = {0};
+  rv.magic = LMNT;
+  // This function is only called when *line* starts with 't:'.
+  // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
+  // cut.tail now starts with the name after whitespace.
+  rv.name = sv8strip(cut.tail);
+  //debug("rv.name = %s\n", sv8ctring(rv.name));
+  rv.ok = true;
+  if (rv.name.len==0) {
+    warn("laminate without a name found");
+    rv.ok = false;
+  }
+  return rv;
+}
+
+Mline parse_m(Sv8 line, Laminate *pcurlam)
+{
+  assert(pcurlam!=0);
+  Mline rv = {0};
+  // This function is only called when *line* starts with 'm:'.
+  // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
+  // cut.tail now starts with the fiber volume fraction after whitespace.
+  Sv8Double vf = sv8tod(cut.tail);
+  if (vf.ok) {
+    rv.vf = vf.result;
+    // Also set vf in the laminate.
+    pcurlam->vf = rv.vf;
+  } else {
+    return rv;
+  }
+  // vf.tail should now contain the name of the resin.
+  Sv8 resin_name = sv8strip(vf.tail);
+  if (resin_name.len != 0) {
+    rv.resin_name = resin_name;
+    //debug("rv.resin_name = %s\n", sv8cstring(rv.resin_name));
+    rv.ok = true;
+  }
+  return rv;
+}
+
+Lline parse_l(Sv8 line, Laminate *pcurlam)
+{
+  assert(pcurlam!=0);
+  Lline rv = {0};
+  // This function is only called when *line* starts with 'l:'.
+  // So discard that.
+  Sv8Cut cut = sv8lsplit(line);
+  // cut.tail now starts with the fiber area weight after whitespace.
+  Sv8Double area_weight = sv8tod(cut.tail);
+  if (area_weight.ok) {
+    rv.area_weight = area_weight.result;
+    //debug("rv.area_weight = %g", rv.area_weight);
+  } else {
+    //debug("reading area weight failed");
+    return rv;
+  }
+  Sv8Double angle = sv8tod(area_weight.tail);
+  if (angle.ok) {
+    rv.angle = angle.result;
+    //debug("rv.angle = %g", rv.angle);
+  } else {
+    //debug("reading angle failed");
+    return rv;
+  }
+  Sv8Double vf = sv8tod(angle.tail);
+  Sv8 next = angle.tail;
+  if (vf.ok) {
+    // found optional vf.
+    rv.optvf = true;
+    rv.vf = vf.result;
+    next = vf.tail;
+  }
+  Sv8 fiber_name = sv8strip(next);
+  if (fiber_name.len != 0) {
+    rv.fiber_name = fiber_name;
+    //debug("rv.fiber_name = %s", sv8cstring(rv.fiber_name));
+    rv.ok = true;
+  } //else {
+  //debug("fiber name empty");
+  //}
+  // Increase the layer count in the laminate.
+  pcurlam->nlayers++;
   return rv;
 }
