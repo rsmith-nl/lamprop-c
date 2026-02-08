@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 12:21:26 +0200
-// Last modified: 2026-02-04T20:13:53+0100
+// Last modified: 2026-02-08T14:17:22+0100
 
 // Core functions of lamprop.
 //
@@ -209,7 +209,7 @@ bool finish_laminate(Laminate *pl)
   if (pl->magic!=LMNT) {
     return false;
   }
-  if (pl->nlayers == 0) {
+  if (pl->nlayers <= 0) {
     return false;
   }
   double thickness = 0.0;
