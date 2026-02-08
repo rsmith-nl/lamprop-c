@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-08T22:38:21+0100
+// Last modified: 2026-02-08T22:43:38+0100
 
 #include "logging.h"
 #include "core.h"
@@ -99,10 +99,7 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
             for (int32_t k = 0; k < rv.nfibers; k++) {
               if (sv8equals(rv.fibers[k].name, f.name)) {
                 skip_fiber = true;
-                char buf[f.name.len+1];
-                memset(buf, 0, f.name.len+1);
-                memcpy(buf, f.name.data, f.name.len);
-                warn("a fiber named “%s” already exists; will be skipped", buf);
+                warn("a fiber named “%s” already exists; will be skipped", sv8cstring(f.name));
               }
             }
             if (!skip_fiber) {
@@ -125,10 +122,7 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
             for (int32_t k = 0; k < rv.nresins; k++) {
               if (sv8equals(rv.resins[k].name, f.name)) {
                 skip_resin = true;
-                char buf[f.name.len+1];
-                memset(buf, 0, f.name.len+1);
-                memcpy(buf, f.name.data, f.name.len);
-                warn("a resin named “%s” already exists; will be skipped", buf);
+                warn("a resin named “%s” already exists; will be skipped", sv8cstring(f.name));
               }
             }
             if (!skip_resin) {
