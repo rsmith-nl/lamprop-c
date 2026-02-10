@@ -4,13 +4,16 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-08T22:43:38+0100
+// Last modified: 2026-02-10T08:14:19+0100
 
+#include "arena.h"
 #include "logging.h"
 #include "core.h"
+#include "stringview.h"
 #include "parser.h"
 
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>  // for fopen
 #include <string.h> // for memset(3), memcpy(3)
 
@@ -26,6 +29,10 @@ typedef struct {
   bool ok, optvf;
 } Lline;
 
+typedef struct {
+  int32_t f, r, t, m, l, c, s;
+} Counts;
+
 static const Resin generic_resins[3] = {
   {RESN, 2900.0, 0.29, 40e-6, 1.15, SV8("generic-epoxy"), true},
   {RESN, 4000.0, 0.36, 40e-6, 1.20, SV8("generic-polyester"), true},
@@ -38,6 +45,10 @@ static const Fiber generic_fibers[3] = {
   {FIBR, 124000.0, 0.36, -4.9e-6, 1.44, SV8("generic-aramid49"), true},
 };
 
+// Scan the file contents, count different entity types.
+static Counts count_lines(Sv8 contents);
+// Scan the file contents, allocate space for entities.
+static Allocations allocate(Sv8 contents, Arena *permanent);
 static Resin parse_resin(Sv8 line);
 static Fiber parse_fiber(Sv8 line);
 static Laminate parse_laminate(Sv8 line);
@@ -68,66 +79,128 @@ Sv8 read_file(char *path, Arena *permanent)
   return contents;
 }
 
-FRdata fibers_and_resins(Sv8 contents, bool info)
+Counts count_lines(Sv8 contents)
+{
+  Counts rv = {0};
+  Sv8Cut ccut = sv8cut(contents, '\n');
+  while (ccut.ok == true) {
+    Sv8 stripped = sv8strip(ccut.head);
+    if (stripped.data[1] == ':') {  // It is a command
+      switch (stripped.data[0]) {
+        case 'f': rv.f++; break;
+        case 'r': rv.r++; break;
+        case 't': rv.t++; break;
+        case 'm': rv.m++; break;
+        case 'l': rv.l++; break;
+        case 'c': rv.c++; break;
+        case 's': rv.s++; break;
+      }
+    }
+    ccut = sv8cut(ccut.tail, '\n');
+  }
+  // Assume all laminates are mirrored.
+  rv.l *= 2;
+  return rv;
+}
+
+Allocations allocate(Sv8 contents, Arena *permanent)
+{
+  Allocations rv = {0};
+  Sv8Cut ccut = sv8cut(contents, '\n');
+  while (ccut.ok == true) {
+    Sv8 stripped = sv8strip(ccut.head);
+    if (stripped.data[1] == ':') {  // It is a command
+      switch (stripped.data[0]) {
+        case 'f': rv.f++; break;
+        case 'r': rv.r++; break;
+        case 't': rv.t++; break;
+        case 'm': rv.m++; break;
+        case 'l': rv.l++; break;
+        case 'c': rv.c++; break;
+        case 's': rv.s++; break;
+      }
+    }
+    ccut = sv8cut(ccut.tail, '\n');
+  }
+  // Worst case assumption: all laminates are mirrored.
+  rv.l *= 2;
+  // Worst case assumption: all comments are mirrored.
+  rv.c *= 2;
+  // Worst case assumption: choose largest of m or t.
+  rv.t = rv.m>rv.t?rv.m:rv.t;
+  rv.m = rv.t;
+  // Allocate memory
+  rv.resins = arena_new(permanent, Resin, rv.f);
+  rv.fibers = arena_new(permanent, Fiber, rv.f);
+  rv.laminas = arena_new(permanent, Lamina, rv.l);
+  rv.laminates = arena_new(permanent, Laminate, rv.t);
+  // FIXME: allocate memory for comments.
+  return rv;
+}
+
+FRdata fibers_and_resins(Sv8 contents, Arena *permanent, bool info)
 {
   FRdata rv = {0};
-  rv.resina = arena_create(NRESINS*sizeof(Resin));
-  rv.resins = (void*)rv.resina.begin;
+  Arena resina = arena_create(NRESINS*sizeof(Resin));
+  Resin *resins = (void*)resina.begin;
+  int32_t nresins = 0;
   // Add generic resins
-  memcpy(arena_new(&rv.resina, Resin, 3), generic_resins, 3*sizeof(Resin));
-  rv.nresins += 3;
-  rv.fibera = arena_create(NRESINS*sizeof(Fiber));
-  rv.fibers = (void*)rv.fibera.begin;
+  memcpy(arena_new(&resina, Resin, 3), generic_resins, 3*sizeof(Resin));
+  nresins += 3;
+  Arena fibera = arena_create(NRESINS*sizeof(Fiber));
+  Fiber *fibers = (void*)fibera.begin;
+  int32_t nfibers = 0;
   // Add generic fibers
-  memcpy(arena_new(&rv.fibera, Fiber, 3), generic_fibers, 3*sizeof(Fiber));
-  rv.nfibers += 3;
+  memcpy(arena_new(&fibera, Fiber, 3), generic_fibers, 3*sizeof(Fiber));
+  nfibers += 3;
   int32_t lineno = 1;
   Sv8Cut ccut = sv8cut(contents, '\n');
   Fiber f = {0};
   Resin r = {0};
   while (ccut.ok == true) {
-    if (ccut.head.data[1] == ':') {
-      switch (ccut.head.data[0]) {
+    Sv8 stripped = sv8strip(ccut.head);
+    if (stripped.data[1] == ':') {
+      switch (stripped.data[0]) {
         case 'f':
-          f = parse_fiber(ccut.head);
+          f = parse_fiber(stripped);
           if (f.ok) {
             bool skip_fiber = false;
             if (info) {
               fprintf(stderr, "found fiber on line %d\n", lineno);
             }
             // Reject redefinitions of fiber names.
-            for (int32_t k = 0; k < rv.nfibers; k++) {
-              if (sv8equals(rv.fibers[k].name, f.name)) {
+            for (int32_t k = 0; k < nfibers; k++) {
+              if (sv8equals(fibers[k].name, f.name)) {
                 skip_fiber = true;
                 warn("a fiber named “%s” already exists; will be skipped", sv8cstring(f.name));
               }
             }
             if (!skip_fiber) {
               // Store fiber in the fiber arena.
-              *arena_new(&rv.fibera, Fiber, 1) = f;
-              rv.nfibers++;
+              *arena_new(&fibera, Fiber, 1) = f;
+              nfibers++;
             }
           } else {
             warn("error reading fiber on line %d...", lineno);
           }
           break;
         case 'r':
-          r = parse_resin(ccut.head);
+          r = parse_resin(stripped);
           if (r.ok) {
             bool skip_resin = false;
             if (info) {
               fprintf(stderr, "found resin on line %d\n", lineno);
             }
             // Reject redefinition of resin names.
-            for (int32_t k = 0; k < rv.nresins; k++) {
-              if (sv8equals(rv.resins[k].name, f.name)) {
+            for (int32_t k = 0; k < nresins; k++) {
+              if (sv8equals(resins[k].name, f.name)) {
                 skip_resin = true;
                 warn("a resin named “%s” already exists; will be skipped", sv8cstring(f.name));
               }
             }
             if (!skip_resin) {
-              // Store fiber in the fiber arena.
-              *arena_new(&rv.resina, Resin, 1) = r;
+              // Store resin in the resin arena.
+              *arena_new(&resina, Resin, 1) = r;
               rv.nresins++;
             }
           } else {
@@ -141,6 +214,14 @@ FRdata fibers_and_resins(Sv8 contents, bool info)
     ccut = sv8cut(ccut.tail, '\n');
     lineno++;
   }
+  // Allocate and copy resins and fibers into the global arena.
+  rv.fibers = arena_new(permanent, Fiber, nfibers);
+  memcpy(rv.fibers, fibera.begin, nfibers*sizeof(Fiber));
+  rv.resins = arena_new(permanent, Resin, nresins);
+  memcpy(rv.resins, resina.begin, nresins*sizeof(Resin));
+  // Release memory arenas
+  arena_destroy(&resina);
+  arena_destroy(&fibera);
   return rv;
 }
 
@@ -180,7 +261,7 @@ Ldata laminates(Sv8 contents, bool info, FRdata fr)
               // Store the current pointer to the lamina arena in the
               // laminate. This is where the lamina will go.
               lm.layers = (void*)(rv.laminaa.begin+rv.laminaa.current_offset);
-              // Store laminate in the laminate arena.
+              // Allocate and copy the laminate into the laminate arena.
               pcurlam = arena_new(&rv.laminatesa, Laminate, 1);
               *pcurlam = lm;
               rv.nlaminates++;
