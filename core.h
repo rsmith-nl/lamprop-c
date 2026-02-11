@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 15:41:55 +0200
-// Last modified: 2026-02-08T14:16:16+0100
+// Last modified: 2026-02-10T21:37:56+0100
 
 #pragma once
 
@@ -58,6 +58,7 @@ typedef struct {
   double Q̅11, Q̅12, Q̅16, Q̅22, Q̅26, Q̅66, Q̅s44, Q̅s55, Q̅s45;
   double ρ;
   double C[6][6];
+  Sv8 comment;
   bool ok;
 } Lamina;
 
