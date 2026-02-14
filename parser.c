@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-12T00:07:40+0100
+// Last modified: 2026-02-14T22:39:20+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -224,162 +224,6 @@ void fibers_and_resins(Sv8 contents, ParseResult *result, bool info)
   }
 }
 
-static Laminate parse_laminate(Sv8 line);
-
-void laminates(Sv8 contents, ParseResult *result, bool info)
-{
-  char state = ' ';
-  // Restart from the beginning.
-  Sv8Cut ccut = sv8cut(contents, '\n');
-  int32_t lineno = 1;
-  Resin *pcurresin = 0;
-  Laminate *pcurlam = 0;
-  while (ccut.ok == true) {
-    if (ccut.head.data[1] == ':') {
-      switch (ccut.head.data[0]) {
-        case 't':
-          // This resets the state machine.
-          state = 't';
-          // This laminate structure is empty exept for the name.
-          Laminate lm = parse_laminate(ccut.head);
-          if (lm.ok) {
-            // Check for existing laminate with the same name.
-            bool skip_lm = false;
-            for (int32_t k = 0; k < rv.nlaminates; k++) {
-              if (sv8equals(rv.laminates[k].name, lm.name)) {
-                skip_lm = true;
-                state = 'k'; // sKip m, l and s-lines.
-                warn("a laminate named “%s” already exists; will be skipped",
-                     sv8cstring(lm.name));
-              }
-            }
-            if (!skip_lm) {
-              // Store the current pointer to the lamina arena in the
-              // laminate. This is where the lamina will go.
-              lm.layers = (void*)(rv.laminaa.begin+rv.laminaa.current_offset);
-              // Allocate and copy the laminate into the laminate arena.
-              pcurlam = arena_new(&rv.laminatesa, Laminate, 1);
-              *pcurlam = lm;
-              rv.nlaminates++;
-              if (info) {
-                fprintf(stderr, "found laminate named “%s” on line %d\n",
-                        sv8cstring(lm.name), lineno);
-              }
-            }
-          } else {
-            warn("error reading laminate on line %d...", lineno);
-          }
-          break;
-        case 'm':
-          if (state == 'k') {
-            warn("skipping m-line");
-          } else if (state != 't') {
-            warn("unexpected m:-line; will be ignored");
-          } else {
-            pcurlam = rv.laminates + (rv.nlaminates-1);
-            state = 'm';
-            Mline ml = parse_m(ccut.head, pcurlam);
-            if (ml.ok) {
-              bool unknown_resin = true;
-              for (int32_t k = 0; k < fr.nresins; k++) {
-                if (sv8equals(fr.resins[k].name, ml.resin_name)) {
-                  unknown_resin = false;
-                  pcurresin = fr.resins + k;
-                  break;
-                }
-              }
-              if (unknown_resin) {
-                warn("resin “%s” does not exist; skipping laminate “%s”",
-                     sv8cstring(ml.resin_name), sv8cstring(pcurlam->name));
-                // Delete laminate from arena.
-                rv.nlaminates--;
-                rv.laminatesa.current_offset -= sizeof(Laminate);
-                memset(rv.laminatesa.begin+rv.laminatesa.current_offset, 0, sizeof(Laminate));
-                state=' ';
-              } else {
-                // Now that we know the resin, store it and the vf in the
-                // laminate.
-                pcurlam->r = *pcurresin;
-                pcurlam->vf = ml.vf;
-                if (info) {
-                  fprintf(stderr, "using resin “%s” on line %d\n",
-                          sv8cstring(ml.resin_name), lineno);
-                }
-              }
-            } else {
-              warn("could not parse m-line on line %d", lineno);
-            }
-          }
-          break;
-        case 'l':
-          if (state == 'k') {
-            warn("skipping l-line on %d", lineno);
-          } else if (state == 's') {
-            warn("l-line after an s-line on line %d; skipping", lineno);
-          } else if (state != 'm' && state != 'l') {
-            warn("unexpected l:-line on line %d; will be ignored", lineno);
-          } else {
-            state = 'l';
-            Lline lmn = parse_l(ccut.head, pcurlam);
-            if (lmn.ok) {
-              bool unknown_fiber = true;
-              Fiber *pf = 0;
-              for (int32_t k = 0; k < fr.nfibers; k++) {
-                if (sv8equals(fr.fibers[k].name, lmn.fiber_name)) {
-                  unknown_fiber = false;
-                  pf = fr.fibers + k;
-                  break;
-                }
-              }
-              if (unknown_fiber) {
-                warn("fiber “%s” on line %d does not exist; skipping lamina",
-                     sv8cstring(lmn.fiber_name), lineno);
-                state='l';
-              } else {
-                // Fill lamina properties
-                Lamina la = init_lamina(*pf, *pcurresin, lmn.area_weight,
-                                        lmn.angle, lmn.optvf?lmn.vf:pcurlam->vf);
-                // Store lamina in the arena.
-                *arena_new(&rv.laminaa, Lamina, 1) = la;
-                rv.nlamina++;
-                if (info) {
-                  fprintf(stderr, "using fiber “%s” on line %d\n",
-                          sv8cstring(lmn.fiber_name), lineno);
-                }
-              }
-            } else {
-              warn("could not parse l-line on line %d", lineno);
-            }
-          }
-          break;
-        case 's':
-          if (state == 'k') {
-            warn("skipping s-line on %d", lineno);
-          } else if (state != 'l') {
-            warn("unexpected s:-line on line %d; will be ignored", lineno);
-          } else {
-            state = 's';
-            Lamina *begin = pcurlam->layers;
-            Lamina *end = begin + (pcurlam->nlayers -1);
-            for (Lamina *p = end; p >= begin; p--) {
-              *arena_new(&rv.laminaa, Lamina, 1) = *p;
-              pcurlam->nlayers++;
-            }
-            if (info) {
-              fprintf(stderr, "found s-line on line %d\n", lineno);
-            }
-          }
-          break;
-        default:
-          break;
-      }
-    }
-    ccut = sv8cut(ccut.tail, '\n');
-    lineno++;
-  }
-  return rv;
-}
-
 Resin parse_resin(Sv8 line)
 {
   Resin rv = {0};
@@ -485,7 +329,171 @@ Fiber parse_fiber(Sv8 line)
   return rv;
 }
 
-Laminate parse_laminate(Sv8 line)
+static Laminate parse_t(Sv8 line);
+static Sv8 parse_m(Sv8 line, Laminate *pcurlam, ParseResult *result);
+static Lamina parse_l(Sv8 line, Laminate *pcurlam, ParseResult *result);
+
+void laminates(Sv8 contents, ParseResult *result, bool info)
+{
+  char state = ' ';
+  // valid states: ' ' = start, 'k' = skip invalid laminate, 't' = start laminate,
+  // 'm' = matrix, 'l' = lamina, 'c' = comment, 's' = symmetry
+  // Restart from the beginning.
+  Sv8Cut ccut = sv8cut(contents, '\n');
+  int32_t lineno = 1;
+  Resin *pcurresin = 0;
+  Laminate *pcurlam = 0;
+  while (ccut.ok == true) {
+    if (ccut.head.data[1] == ':') {
+      switch (ccut.head.data[0]) {
+        case 't':
+          // This resets the state machine.
+          state = 't';
+          // This laminate structure is empty exept for the name.
+          Laminate lm = parse_t(ccut.head);
+          if (lm.ok) {
+            // Check for existing laminate with the same name.
+            bool skip_lm = false;
+            for (int32_t k = 0; k < result->tu; k++) {
+              if (sv8equals(result->laminates[k].name, lm.name)) {
+                skip_lm = true;
+                state = 'k'; // sKip m, l and s-lines.
+                warn("a laminate named “%s” already exists; will be skipped",
+                     sv8cstring(lm.name));
+              }
+            }
+            pcurlam = 0;
+            if (!skip_lm) {
+              // Store the current pointer to the lamina in the laminate.
+              lm.layers = (void*)(result->laminas+result->lu);
+              // Allocate and copy the laminate into the laminate arena.
+              result->laminates[result->tu] = lm;
+              pcurlam = result->laminates + result->tu;
+              result->tu++;
+              if (info) {
+                fprintf(stderr, "found laminate named “%s” on line %d\n",
+                        sv8cstring(lm.name), lineno);
+              }
+            }
+          } else {
+            warn("error reading laminate on line %d...", lineno);
+          }
+          break;
+        case 'm':
+          if (state == 'k') {
+            warn("skipping m-line");
+            break;
+          }
+          if (state != 't') {
+            warn("unexpected m:-line; will be ignored");
+            break;
+          }
+          state = 'm';
+          Sv8 resin_name = parse_m(ccut.head, pcurlam, result);
+          if (resin_name.data == 0) {
+            warn("could not parse m-line on line %d", lineno);
+            state = 'k';
+            break;
+          }
+          bool unknown_resin = true;
+          for (int32_t k = 0; k < result->ru; k++) {
+            if (sv8equals(result->resins[k].name, resin_name)) {
+              unknown_resin = false;
+              pcurresin = result->resins + k;
+              break;
+            }
+          }
+          if (unknown_resin) {
+            warn("resin “%s” does not exist; skipping laminate “%s”",
+                  sv8cstring(resin_name), sv8cstring(pcurlam->name));
+            // Delete laminate from arena.
+            memset(result->laminates + --result->lu, 0, sizeof(Laminate));
+            state='k';
+          } else {
+            // Now that we know the resin, store it and the vf in the
+            // laminate.
+            pcurlam->r = *pcurresin;
+            pcurlam->vf = ml.vf;
+            if (info) {
+              fprintf(stderr, "using resin “%s” on line %d\n",
+                      sv8cstring(ml.resin_name), lineno);
+            }
+          }
+          break;
+        case 'l':
+          if (state == 'k') {
+            warn("skipping l-line on %d", lineno);
+            break;
+          }
+          if (state == 's') {
+            warn("l-line after an s-line on line %d; skipping", lineno);
+            break;
+          }
+          if (state != 'm' && state != 'l') {
+            warn("unexpected l:-line on line %d; will be ignored", lineno);
+            break;
+          }
+          state = 'l';
+          Lamina lmn = parse_l(ccut.head, pcurlam, result);
+          if (lmn.ok) {
+            bool unknown_fiber = true;
+            Fiber *pf = 0;
+            for (int32_t k = 0; k < result->fu; k++) {
+              if (sv8equals(result->fibers[k].name, lmn.fiber_name)) {
+                unknown_fiber = false;
+                pf = fr.fibers + k;
+                break;
+              }
+            }
+            if (unknown_fiber) {
+              warn("fiber “%s” on line %d does not exist; skipping lamina",
+                    sv8cstring(lmn.fiber_name), lineno);
+              state='l';
+            } else {
+              // Fill lamina properties
+              Lamina la = init_lamina(*pf, *pcurresin, lmn.area_weight,
+                                      lmn.angle, lmn.optvf?lmn.vf:pcurlam->vf);
+              // Store lamina in the arena.
+              *arena_new(&rv.laminaa, Lamina, 1) = la;
+              rv.nlamina++;
+              if (info) {
+                fprintf(stderr, "using fiber “%s” on line %d\n",
+                        sv8cstring(lmn.fiber_name), lineno);
+              }
+            }
+          } else {
+            warn("could not parse l-line on line %d", lineno);
+          }
+          break;
+        case 's':
+          if (state == 'k') {
+            warn("skipping s-line on %d", lineno);
+          } else if (state != 'l') {
+            warn("unexpected s:-line on line %d; will be ignored", lineno);
+          } else {
+            state = 's';
+            Lamina *begin = pcurlam->layers;
+            Lamina *end = begin + (pcurlam->nlayers -1);
+            for (Lamina *p = end; p >= begin; p--) {
+              *arena_new(&rv.laminaa, Lamina, 1) = *p;
+              pcurlam->nlayers++;
+            }
+            if (info) {
+              fprintf(stderr, "found s-line on line %d\n", lineno);
+            }
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    ccut = sv8cut(ccut.tail, '\n');
+    lineno++;
+  }
+  return rv;
+}
+
+Laminate parse_t(Sv8 line)
 {
   Laminate rv = {0};
   rv.magic = LMNT;
@@ -503,44 +511,38 @@ Laminate parse_laminate(Sv8 line)
   return rv;
 }
 
-Mline parse_m(Sv8 line, Laminate *pcurlam)
+Sv8 parse_m(Sv8 line, Laminate *pcurlam, ParseResult *result)
 {
   assert(pcurlam!=0);
-  Mline rv = {0};
+  result->ok = false;
   // This function is only called when *line* starts with 'm:'.
   // So discard that.
   Sv8Cut cut = sv8lsplit(line);
   // cut.tail now starts with the fiber volume fraction after whitespace.
   Sv8Double vf = sv8tod(cut.tail);
   if (vf.ok) {
-    rv.vf = vf.result;
-    // Also set vf in the laminate.
+    pcurlam->vf = vf.result;
     pcurlam->vf = rv.vf;
-  } else {
-    return rv;
   }
   // vf.tail should now contain the name of the resin.
   Sv8 resin_name = sv8strip(vf.tail);
   if (resin_name.len != 0) {
-    rv.resin_name = resin_name;
-    //debug("rv.resin_name = %s\n", sv8cstring(rv.resin_name));
-    rv.ok = true;
+    return (Sv8){0};
   }
-  return rv;
+  return resin_name;
 }
 
-Lline parse_l(Sv8 line, Laminate *pcurlam)
+Lamina parse_l(Sv8 line, Laminate *pcurlam, ParseResult *result)
 {
   assert(pcurlam!=0);
-  Lline rv = {0};
+  Lamina rv = {0};
   // This function is only called when *line* starts with 'l:'.
   // So discard that.
   Sv8Cut cut = sv8lsplit(line);
   // cut.tail now starts with the fiber area weight after whitespace.
   Sv8Double area_weight = sv8tod(cut.tail);
   if (area_weight.ok) {
-    rv.area_weight = area_weight.result;
-    //debug("rv.area_weight = %g", rv.area_weight);
+    rv.fiber_weight = area_weight.result;
   } else {
     //debug("reading area weight failed");
     return rv;
@@ -557,9 +559,10 @@ Lline parse_l(Sv8 line, Laminate *pcurlam)
   Sv8 next = angle.tail;
   if (vf.ok) {
     // found optional vf.
-    rv.optvf = true;
     rv.vf = vf.result;
     next = vf.tail;
+  } else {
+    rv.vf = pcurlam->vf;
   }
   Sv8 fiber_name = sv8strip(next);
   if (fiber_name.len != 0) {
