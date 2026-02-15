@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2026-02-04T20:01:42+0100
+// Last modified: 2026-02-16T00:32:37+0100
 
 #include "core.h"
 #include "logging.h"
@@ -16,7 +16,6 @@
 // instead of including windows.h....
 extern int __stdcall SetConsoleOutputCP(unsigned int);
 #endif
-#include <stdio.h>  // for fprintf(3)
 
 #define PASZ 33554432
 
@@ -42,27 +41,9 @@ int main(int argc, char *argv[])
     // General allocation arena. Stores file contents.
     // This is also used as the storage for strings.
     Arena permanent = arena_create(PASZ);
-    Sv8 contents = read_file(opt.argv[0], &permanent);
-    if (opt.info) {
-      fprintf(stderr, "file “%s” is %td bytes.\n", opt.argv[0], contents.len);
-    }
-    ptrdiff_t nlines = sv8count(contents, '\n');
-    if (opt.info) {
-      fprintf(stderr, "file “%s” contains %td lines.\n", opt.argv[0], nlines);
-    }
-    // Scan for fibers and resins
-    FRdata fr = fibers_and_resins(contents, opt.info);
-    if (opt.info) {
-      fprintf(stderr, "found %d fibers\n", fr.nfibers);
-      fprintf(stderr, "found %d resins\n", fr.nresins);
-    }
-    // Scan for laminates
-    Ldata ld = laminates(contents, opt.info, fr);
-    if (opt.info) {
-      fprintf(stderr, "found %d laminates\n", ld.nlaminates);
-    }
-    for (int32_t j = 0; j < ld.nlaminates; j++) {
-      Laminate *pl = ld.laminates + j;
+    ParseResult file_result = parse_file(opt.argv[0], &permanent, opt.info);
+    for (int32_t j = 0; j < file_result.tu; j++) {
+      Laminate *pl = file_result.laminates + j;
       if (!finish_laminate(pl)) {
         pl->magic = 0; // disable the laminate.
       }
@@ -93,28 +74,15 @@ int main(int argc, char *argv[])
 #endif
     }
     if (opt.info) {
-      ptrdiff_t used = permanent.current_offset;
-      fprintf(stderr, "#lamprop-c INFO: "
-              "permanent arena, %td of %td bytes used\n", used, (ptrdiff_t)PASZ);
-      used = fr.resina.current_offset/sizeof(Resin);
-      fprintf(stderr, "#lamprop-c INFO: "
-              "resin arena, %td of %d resins used\n", used, NRESINS);
-      used = fr.fibera.current_offset/sizeof(Fiber);
-      fprintf(stderr, "#lamprop-c INFO: "
-              "fiber arena, %td of %d fibers used\n", used, NRESINS);
-      used = ld.laminaa.current_offset/sizeof(Lamina);
-      fprintf(stderr, "#lamprop-c INFO: "
-              "lamina arena, %td of %d lamina used\n", used, NLAMINA);
-      used = ld.laminatesa.current_offset/sizeof(Laminate);
-      fprintf(stderr, "#lamprop-c INFO: "
-              "laminate arena, %td of %d laminates used\n", used, NLAMINATES);
+      int32_t used = permanent.current_offset;
+      info("permanent arena, %d of %d bytes used", used, PASZ);
+      info("%d of %d resins used", file_result.ru, file_result.r);
+      info("%d of %d fibers used", file_result.fu, file_result.f);
+      info("%d of %d laminates used", file_result.tu, file_result.t);
+      info("%d of %d lamina used", file_result.lu, file_result.l);
     }
     // Clean up
     arena_destroy(&permanent);
-    arena_destroy(&fr.resina);
-    arena_destroy(&fr.fibera);
-    arena_destroy(&ld.laminaa);
-    arena_destroy(&ld.laminatesa);
     // Advance
     opt.argv++;
     opt.argc--;
