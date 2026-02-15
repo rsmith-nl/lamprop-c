@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-16T00:33:32+0100
+// Last modified: 2026-02-16T00:51:40+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -299,6 +299,7 @@ Fiber parse_fiber(Sv8 line)
   return rv;
 }
 
+static Laminate *current_laminate(ParseResult *result);
 static Laminate parse_t(Sv8 line, int32_t lineno);
 static Sv8 parse_m(Sv8 line, int32_t lineno, ParseResult *result);
 static Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result);
@@ -369,7 +370,7 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
               break;
             }
           }
-          Laminate *pcurlam = result->laminates + result->tu - 1;
+          Laminate *pcurlam = current_laminate(result);
           if (unknown_resin) {
             warn("resin “%s” does not exist on line %d", sv8cstring(resin_name), lineno);
             warn("skipping laminate “%s”", sv8cstring(pcurlam->name));
@@ -405,7 +406,7 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
           if (lmn.ok) {
             // Store the lamina
             result->laminas[result->lu++] = lmn;
-            pcurlam = result->laminates + result->tu - 1;
+            pcurlam = current_laminate(result);
             pcurlam->nlayers++;
           }
           break;
@@ -437,6 +438,15 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
   }
 }
 
+Laminate *current_laminate(ParseResult *result){
+  Laminate *rv = result->laminates;
+  if (result->tu > 0) {
+    rv += result->tu - 1;
+  }
+  return rv;
+}
+
+
 Laminate parse_t(Sv8 line, int32_t lineno)
 {
   Laminate rv = {0};
@@ -458,7 +468,7 @@ Laminate parse_t(Sv8 line, int32_t lineno)
 
 Sv8 parse_m(Sv8 line, int32_t lineno, ParseResult *result)
 {
-  Laminate *pcurlam = result->laminates + result->tu - 1;
+  Laminate *pcurlam = current_laminate(result);
   result->ok = false;
   // This function is only called when *line* starts with 'm:'.
   // So discard that.
@@ -484,7 +494,7 @@ Sv8 parse_m(Sv8 line, int32_t lineno, ParseResult *result)
 
 Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
 {
-  Laminate *pcurlam = result->laminates + result->tu - 1;
+  Laminate *pcurlam = current_laminate(result);
   Lamina rv = {0};
   rv.magic = LAYR;
   debug("line %d: “%s”", lineno, sv8cstring(line));
