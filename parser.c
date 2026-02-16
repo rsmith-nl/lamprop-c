@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-16T00:51:40+0100
+// Last modified: 2026-02-16T20:47:07+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -106,6 +106,9 @@ ParseResult allocate(Sv8 contents, Arena *permanent, bool info)
   }
   // Worst case assumption: all laminates are mirrored.
   rv.l *= 2;
+  // Add space for generics.
+  rv.f += 3;
+  rv.r += 3;
   // Allocate memory
   rv.resins = arena_new(permanent, Resin, rv.f);
   rv.fibers = arena_new(permanent, Fiber, rv.f);
