@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-03T19:20:39+0200
-// Last modified: 2026-02-16T00:32:37+0100
+// Last modified: 2026-02-16T22:21:20+0100
 
 #include "core.h"
 #include "logging.h"
@@ -45,9 +45,8 @@ int main(int argc, char *argv[])
     for (int32_t j = 0; j < file_result.tu; j++) {
       Laminate *pl = file_result.laminates + j;
       if (!finish_laminate(pl)) {
-        pl->magic = 0; // disable the laminate.
+        continue; // skip the laminate.
       }
-      // TODO: print laminates and properties....
       switch (opt.output) {
         case TEXT:
           text_out(pl, opt.eng, opt.matrix, opt.fea);

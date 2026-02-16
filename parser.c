@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-16T20:47:07+0100
+// Last modified: 2026-02-16T22:34:43+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -366,7 +366,6 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
           // pcurresin defined here?
           Resin *pcurresin = 0;
           for (int32_t k = 0; k < result->ru; k++) {
-            debug("result->resins[k].name “%s”", sv8cstring(result->resins[k].name));
             if (sv8equals(result->resins[k].name, resin_name)) {
               unknown_resin = false;
               pcurresin = result->resins + k;
@@ -408,6 +407,7 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
           Lamina lmn = parse_l(ccut.head, lineno, result);
           if (lmn.ok) {
             // Store the lamina
+            debug("storing lamina on line %d", lineno);
             result->laminas[result->lu++] = lmn;
             pcurlam = current_laminate(result);
             pcurlam->nlayers++;
@@ -499,7 +499,6 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
 {
   Laminate *pcurlam = current_laminate(result);
   Lamina rv = {0};
-  rv.magic = LAYR;
   debug("line %d: “%s”", lineno, sv8cstring(line));
   // This function is only called when *line* starts with 'l:'.
   // So discard that.
@@ -523,36 +522,37 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
   }
   Sv8Double vf = sv8tod(angle.tail);
   Sv8 next = angle.tail;
+  double vfval = 0.01;
   if (vf.ok) {
     // found optional vf.
     debug("optional fiber volume fraction %g found on line %d", vf.result, lineno);
-    rv.vf = vf.result;
+    vfval = vf.result;
     next = vf.tail;
   } else {
-    rv.vf = pcurlam->vf;
+    vfval = pcurlam->vf;
   }
   Sv8 fiber_name = sv8strip(next);
+  Fiber f = {0};
   if (fiber_name.len != 0) {
     // Look up the fiber name
-    Fiber *pf = 0;
     for (int32_t k = 0; k < result->fu; k++) {
       //debug("compare to “%s”", sv8cstring(result->fibers[k].name));
       if (sv8equals(result->fibers[k].name, fiber_name)) {
-        pf = result->fibers + k;
+        f = result->fibers[k];
+        f.ok = true;
         debug("found fiber name “%s” on line %d", sv8cstring(fiber_name), lineno);
-        // Copy fiber into the lamina.
-        rv.f = *pf;
-        rv.ok = true;
         break;
       }
     }
-    if (pf==0) {
+    if (f.ok==false) {
       warn("fiber “%s” on line %d does not exist; skipping lamina",
           sv8cstring(fiber_name), lineno);
       rv.ok = false;
+      return rv;
     }
   } else {
     debug("no fiber name found on line %d", lineno);
   }
+  rv = init_lamina(f, pcurlam->r, area_weight.result, angle.result, vfval);
   return rv;
 }
