@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:37 +0200
-// Last modified: 2025-08-16T23:17:53+0200
+// Last modified: 2026-02-17T22:56:21+0100
 
 #include "setup.h"
 #include "logging.h"
@@ -116,7 +116,7 @@ Options setup(int argc, char *argv[])
         rv.fea = true;
         break;
       case 'L':
-        printf("lamprop version: %s\n", VERSION);
+        printf("lamprop-c version: %s\n", VERSION);
         printf(license);
         exit(0);
         break;
