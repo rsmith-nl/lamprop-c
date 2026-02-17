@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-17T22:46:21+0100
+// Last modified: 2026-02-17T22:58:57+0100
 
 #include "core.h"
 #include "version.h"
@@ -55,7 +55,7 @@ void html_out(Laminate *pl, bool eng, bool mat, bool fea)
       puts("</tr>");
     } else if (la->symm) {
       puts("<tr>");
-      puts("<td  align=\"left\" colspan=\"5\">&horbar;symmetry&horbar;</td>");
+      puts("<td  align=\"left\" colspan=\"5\">&horbar; symmetry line &horbar;</td>");
       puts("</tr>");
     }
     puts("<tr>");
