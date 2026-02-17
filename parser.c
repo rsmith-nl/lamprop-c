@@ -86,12 +86,24 @@ ParseResult allocate(Sv8 contents, Arena *permanent, bool info)
     Sv8 stripped = sv8strip(ccut.head);
     if (stripped.data[1] == ':') {  // It is a command
       switch (stripped.data[0]) {
-        case 'f': rv.f++; break;
-        case 'r': rv.r++; break;
-        case 't': rv.t++; break;
-        case 'l': rv.l++; break; // Comments are connected to lamina.
-        case 'c': comments++; break;
-        case 's': rv.s++; break;
+        case 'f':
+          rv.f++;
+          break;
+        case 'r':
+          rv.r++;
+          break;
+        case 't':
+          rv.t++;
+          break;
+        case 'l':
+          rv.l++;
+          break; // Comments are connected to lamina.
+        case 'c':
+          comments++;
+          break;
+        case 's':
+          rv.s++;
+          break;
       }
     }
     ccut = sv8cut(ccut.tail, '\n');
@@ -420,7 +432,9 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
             // Add comment if appliccable.
             if (comment.data && comment.len) {
               lmn.comment = comment;
-              comment = (Sv8){0, 0};
+              comment = (Sv8) {
+                0, 0
+              };
             }
             // Store the lamina
             debug("storing lamina on line %d", lineno);
@@ -437,7 +451,9 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
           } else {
             state = 's';
             // Remove comment, if any.
-            comment = (Sv8){0, 0};
+            comment = (Sv8) {
+              0, 0
+            };
             // TODO: implement mirroring.
             if (info) {
               fprintf(stderr, "found s-line on line %d\n", lineno);
@@ -453,7 +469,8 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
   }
 }
 
-Laminate *current_laminate(ParseResult *result){
+Laminate *current_laminate(ParseResult *result)
+{
   Laminate *rv = result->laminates;
   if (result->tu > 0) {
     rv += result->tu - 1;
@@ -500,7 +517,9 @@ Sv8 parse_m(Sv8 line, int32_t lineno, ParseResult *result)
   Sv8 resin_name = sv8strip(vf.tail);
   if (resin_name.len == 0) {
     error("no resin name found on m-line %d", lineno);
-    return (Sv8){0};
+    return (Sv8) {
+      0
+    };
   }
   debug("resin named “%s” found on line %d", sv8cstring(resin_name), lineno);
   result->ok = false;
@@ -558,7 +577,7 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
     }
     if (f.ok==false) {
       warn("fiber “%s” on line %d does not exist; skipping lamina",
-          sv8cstring(fiber_name), lineno);
+           sv8cstring(fiber_name), lineno);
       return rv;
     }
   } else {
