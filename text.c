@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2026-02-17T01:09:34+0100
+// Last modified: 2026-02-17T22:07:42+0100
 
 #include "core.h"
 #include "version.h"
@@ -35,6 +35,8 @@ void text_out(Laminate *pl, bool eng, bool mat, bool fea)
     if (la->comment.data && la->comment.len) {
       fwrite(la->comment.data, 1, la->comment.len, stdout);
       putc('\n', stdout);
+    } else if (la->symm) {
+      puts("----- symmetry line -----");
     }
     printf("%3d %6g %5g %4.3g ", k+1, la->fiber_weight, 180*la->angle/M_PI, 100*la->vf);
     printf("%s\n", sv8cstring(la->f.name));

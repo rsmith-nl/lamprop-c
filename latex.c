@@ -5,7 +5,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-17T01:16:29+0100
+// Last modified: 2026-02-17T22:42:53+0100
 
 #include "core.h"
 #include "stringview.h"
@@ -48,6 +48,8 @@ void latex_out(Laminate *pl, bool eng, bool mat, bool fea)
     Lamina *la = pl->layers + k;
     if (la->comment.data && la->comment.len) {
       printf("      \\multicolumn{5}{l}{%s}\\\\\n", sv8cstring(la->comment));
+    } else if (la->symm) {
+      puts("      \\multicolumn{5}{l}{\\rule[0.5ex]{10mm}{1pt}symmetry line\\rule[0.5ex]{10mm}{1pt}}\\\\");
     }
     printf("      %3d & %6g & %5g & %4.3g & ", k+1, la->fiber_weight,
            180*la->angle/M_PI, 100*la->vf);

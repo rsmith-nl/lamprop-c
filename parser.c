@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-17T00:59:08+0100
+// Last modified: 2026-02-17T22:51:22+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -451,13 +451,21 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
           } else {
             state = 's';
             // Remove comment, if any.
-            comment = (Sv8) {
-              0, 0
-            };
-            // TODO: implement mirroring.
+            comment = (Sv8) {0};
             if (info) {
               fprintf(stderr, "found s-line on line %d\n", lineno);
             }
+            // Mirror the lamina.
+            Laminate *pcurlam = current_laminate(result);
+            for (int32_t j = pcurlam->nlayers, k = result->lu - 1; j>0 ; j--, k--) {
+              result->laminas[result->lu] = result->laminas[k];
+              if (j == pcurlam->nlayers) {
+                result->laminas[result->lu].symm = true;
+              }
+              result->laminas[result->lu].comment = (Sv8) {0};
+              result->lu++;
+            }
+            pcurlam->nlayers *= 2;
           }
           break;
         default:
