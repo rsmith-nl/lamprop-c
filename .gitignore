@@ -1,4 +1,6 @@
 *.o
 lamprop
+lamprop-debug
 lamprop.exe
+lamprop-debug.exe
 !resources/libwinsane.o

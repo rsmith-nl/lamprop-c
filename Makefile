@@ -8,10 +8,10 @@ VPATCH   = 17
 #CC = gcc
 
 # For debugging builds.
-#CFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
-#                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
-#                -fsanitize=address,undefined
-#LFLAGS = -pipe -fsanitize=address,undefined
+DCFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
+                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
+                -fsanitize=address,undefined
+DLFLAGS = -pipe -fsanitize=address,undefined
 
 # For release builds.
 CFLAGS = -Os -pipe -std=c11 -ffast-math -march=native
@@ -35,15 +35,18 @@ SRCS += matrix.c text.c latex.c html.c utils.c
 
 ##### No editing necessary beyond this point
 
-all: $(BASENAME)  ## Compile the program. (default)
+all: $(BASENAME) $(BASENAME)-debug  ## Compile the program. (default)
 
 # This makefile uses a unit build.
 $(BASENAME): $(SRCS) version.h
 	$(CC) $(CFLAGS) $(LFLAGS) $(LDIRS) -o $(BASENAME) $(SRCS) $(LIBS)
 
+$(BASENAME)-debug: $(SRCS) version.h
+	$(CC) $(DCFLAGS) $(DLFLAGS) $(LDIRS) -o $(BASENAME)-debug $(SRCS) $(LIBS)
+
 .PHONY: clean
 clean:  ## Remove all generated files.
-	rm -f $(BASENAME) *~ core gmon.out $(TARFILE) backup-*
+	rm -f $(BASENAME) $(BASENAME)-debug *~ core gmon.out $(TARFILE) backup-*
 
 install: $(BASENAME)  ## Install the program.
 	install -d $(BINDIR)
