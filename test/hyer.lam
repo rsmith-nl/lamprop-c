@@ -41,12 +41,10 @@ This is an attempt to make a laminate the has good extensional and shear
 moduli. If you add more layers, and make the angles between the layers
 smaller, the laminate will exhibit better quasi isotropic properties.
 m: 0.50 Hyer's resin
-c: first
+c: plain 0/90
 l: 100  0 Hyer's carbon fiber
-c: second
 l: 100 90 Hyer's carbon fiber
-c: third
+c: plain +/-45
 l: 100  45 Hyer's carbon fiber
-c: fourth
 l: 100 -45 Hyer's carbon fiber
 s:
