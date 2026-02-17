@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-17T22:51:22+0100
+// Last modified: 2026-02-17T23:56:39+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -456,7 +456,7 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
               fprintf(stderr, "found s-line on line %d\n", lineno);
             }
             // Mirror the lamina.
-            Laminate *pcurlam = current_laminate(result);
+            pcurlam = current_laminate(result);
             for (int32_t j = pcurlam->nlayers, k = result->lu - 1; j>0 ; j--, k--) {
               result->laminas[result->lu] = result->laminas[k];
               if (j == pcurlam->nlayers) {
