@@ -8,15 +8,15 @@ VPATCH   = 17
 #CC = gcc
 
 # For debugging builds.
-CFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
-                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
-                -fsanitize=address,undefined
-LFLAGS = -pipe -fsanitize=address,undefined
+#CFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
+#                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
+#                -fsanitize=address,undefined
+#LFLAGS = -pipe -fsanitize=address,undefined
 
 # For release builds.
-#CFLAGS = -Os -pipe -std=c11 -ffast-math -march=native
-#CFLAGS += -DNDEBUG=1
-#LFLAGS = -pipe -flto
+CFLAGS = -Os -pipe -std=c11 -ffast-math -march=native
+CFLAGS += -DNDEBUG=1
+LFLAGS = -pipe -flto
 
 # Other libraries to link against
 LIBS += -lm
