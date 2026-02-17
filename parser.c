@@ -451,7 +451,9 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
           } else {
             state = 's';
             // Remove comment, if any.
-            comment = (Sv8) {0};
+            comment = (Sv8) {
+              0
+            };
             if (info) {
               fprintf(stderr, "found s-line on line %d\n", lineno);
             }
@@ -462,7 +464,9 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
               if (j == pcurlam->nlayers) {
                 result->laminas[result->lu].symm = true;
               }
-              result->laminas[result->lu].comment = (Sv8) {0};
+              result->laminas[result->lu].comment = (Sv8) {
+                0
+              };
               result->lu++;
             }
             pcurlam->nlayers *= 2;
