@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:49:24 +0200
-// Last modified: 2026-02-15T12:18:52+0100
+// Last modified: 2026-02-17T21:39:23+0100
 
 #pragma once
 
@@ -64,7 +64,7 @@
   fprintf(stderr, "\n"); \
   fflush(stderr)
 #else
-#define warn(...) \
+#define info(...) \
   fprintf(stderr, NM"INFO: "); \
   fprintf(stderr, __VA_ARGS__); \
   fprintf(stderr, "\n"); \
