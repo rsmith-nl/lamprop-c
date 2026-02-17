@@ -5,7 +5,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-04T20:15:26+0100
+// Last modified: 2026-02-17T01:16:29+0100
 
 #include "core.h"
 #include "stringview.h"
@@ -46,6 +46,9 @@ void latex_out(Laminate *pl, bool eng, bool mat, bool fea)
   puts("      \\midrule");
   for (int32_t k = 0; k < pl->nlayers; k++) {
     Lamina *la = pl->layers + k;
+    if (la->comment.data && la->comment.len) {
+      printf("      \\multicolumn{5}{l}{%s}\\\\\n", sv8cstring(la->comment));
+    }
     printf("      %3d & %6g & %5g & %4.3g & ", k+1, la->fiber_weight,
            180*la->angle/M_PI, 100*la->vf);
     printf("%s\\\\\n", sv8cstring(la->f.name));
