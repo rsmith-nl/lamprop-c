@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-17T01:49:56+0100
+// Last modified: 2026-02-17T01:52:48+0100
 
 #include "core.h"
 #include "version.h"
@@ -51,7 +51,7 @@ void html_out(Laminate *pl, bool eng, bool mat, bool fea)
     Lamina *la = pl->layers + k;
     if (la->comment.data && la->comment.len) {
       puts("<tr>");
-      printf("<td colspan=\"5\">%s</td>\n", sv8cstring(la->comment));
+      printf("<td  align=\"left\" colspan=\"5\">%s</td>\n", sv8cstring(la->comment));
       puts("</tr>");
     }
     puts("<tr>");
