@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-16T22:34:43+0100
+// Last modified: 2026-02-17T00:59:08+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -315,6 +315,7 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
   // Restart from the beginning.
   Sv8Cut ccut = sv8cut(contents, '\n');
   int32_t lineno = 1;
+  Sv8 comment = {0};
   while (ccut.ok == true) {
     if (ccut.head.data[1] == ':') {
       switch (ccut.head.data[0]) {
@@ -389,6 +390,17 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
             }
           }
           break;
+        case 'c':
+          if (state != 'm' && state != 'l') {
+            warn("unexpected c:-line on line %d; will be ignored", lineno);
+            break;
+          }
+          state = 'l';
+          // Save comment for addition to next lamina.
+          Sv8Cut cmtsplit = sv8lsplit(ccut.head);
+          comment = cmtsplit.tail;
+          debug("storing comment “%s” on line %d", sv8cstring(comment), lineno);
+          break;
         case 'l':
           if (state == 'k') {
             warn("skipping l-line on %d", lineno);
@@ -403,9 +415,13 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
             break;
           }
           state = 'l';
-          // TODO: parse_l should set the state if an error occurs...
           Lamina lmn = parse_l(ccut.head, lineno, result);
           if (lmn.ok) {
+            // Add comment if appliccable.
+            if (comment.data && comment.len) {
+              lmn.comment = comment;
+              comment = (Sv8){0, 0};
+            }
             // Store the lamina
             debug("storing lamina on line %d", lineno);
             result->laminas[result->lu++] = lmn;
@@ -420,13 +436,9 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
             warn("unexpected s:-line on line %d; will be ignored", lineno);
           } else {
             state = 's';
-            //Lamina *begin = pcurlam->layers;
-            //Lamina *end = begin + (pcurlam->nlayers -1);
+            // Remove comment, if any.
+            comment = (Sv8){0, 0};
             // TODO: implement mirroring.
-            //for (Lamina *p = end; p >= begin; p--) {
-            //  *arena_new(&rv.laminaa, Lamina, 1) = *p;
-            //  pcurlam->nlayers++;
-            //}
             if (info) {
               fprintf(stderr, "found s-line on line %d\n", lineno);
             }
@@ -498,7 +510,7 @@ Sv8 parse_m(Sv8 line, int32_t lineno, ParseResult *result)
 Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
 {
   Laminate *pcurlam = current_laminate(result);
-  Lamina rv = {0};
+  Lamina rv = {0}; // This sets rv.ok to false...
   debug("line %d: “%s”", lineno, sv8cstring(line));
   // This function is only called when *line* starts with 'l:'.
   // So discard that.
@@ -547,7 +559,6 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
     if (f.ok==false) {
       warn("fiber “%s” on line %d does not exist; skipping lamina",
           sv8cstring(fiber_name), lineno);
-      rv.ok = false;
       return rv;
     }
   } else {
