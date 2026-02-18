@@ -5,11 +5,10 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-09-01T00:23:05+0200
+// Last modified: 2026-02-18T18:53:33+0100
 
 #include "stringview.h"
 
-#include <assert.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -17,7 +16,7 @@
 
 static bool _isspace(char c)
 {
-  if (c==' '||c=='\t'|c=='\r'|c=='\n'||c=='\v'||c=='\f') {
+  if (c==' '||c=='\t'||c=='\r'||c=='\n'||c=='\v'||c=='\f') {
     return true;
   }
   return false;
@@ -147,7 +146,7 @@ Sv8Int sv8toi(Sv8 s)
   while (beg<end && !stop) {
     char c = *beg++;
     switch (state) {
-      case 0:   // Atart state.
+      case 0:   // Start state.
         if (c=='+') {
           state = 1;
         } else if (c=='-') {
@@ -276,18 +275,9 @@ Sv8Double sv8tod(Sv8 s)
           return rv;
         }
         break;
-      case 3:   // After the decimal point.
+      case 3:   // Decimal digits
         if (c>='0' && c<='9') {
-          state = 4;
-          fpower *= 10;
-          fractional = 10*fractional + c - '0';
-        } else {
-          stop = true;
-        }
-        break;
-      case 4:   // Decimal digits.
-        if (c>='0' && c<='9') {
-          state = 4;
+          state = 3;
           fpower *= 10;
           fractional = 10*fractional + c - '0';
         } else if (c=='e' || c=='E') {
