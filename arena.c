@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2023-04-23T22:08:02+0200
-// Last modified: 2026-02-04T20:06:58+0100
+// Last modified: 2026-02-18T19:04:40+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -72,7 +72,7 @@ void arena_destroy(Arena *arena)
   assert(arena!=0);
   int rv;
 #ifdef _WIN32
-  rv = VirtualFree(arena->begin, 0, MEM_RELEASE|MEM_DECOMMIT);
+  rv = VirtualFree(arena->begin, 0, MEM_RELEASE);
   if (rv == 0) {
     rv = -1;
   }
