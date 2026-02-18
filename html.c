@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-02-17T22:58:57+0100
+// Last modified: 2026-02-18T18:48:11+0100
 
 #include "core.h"
 #include "version.h"
@@ -13,6 +13,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -175,8 +176,8 @@ static void pr(int n, double mat[n][n], int row)
     } else if (isnan(num)) {
       sbuf_appends(&b, "NaN");
     } else if (isinf(num)) {
-      char inf[4] = {0xE2, 0x88, 0x9E, 0};
-      sbuf_appends(&b, inf);
+      uint8_t inf[4] = {0xE2, 0x88, 0x9E, 0};
+      sbuf_appends(&b, (void*)inf);
     } else {
       sbuf_printf(&b, "%-10.4g", num);
     }
