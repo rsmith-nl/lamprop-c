@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2023-04-23T22:08:02+0200
-// Last modified: 2026-02-18T19:04:40+0100
+// Last modified: 2026-02-18T19:15:43+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -39,7 +39,6 @@ Arena arena_create(ptrdiff_t length)
   if (arena.begin == MAP_FAILED) {
     error("arena allocation of size %td failed\n", length);
   }
-  info("arena; %td bytes allocated", length);
   arena.current_offset = 0;
   arena.length = length;
   return arena;
