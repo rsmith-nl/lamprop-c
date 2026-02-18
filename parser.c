@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-17T23:56:39+0100
+// Last modified: 2026-02-19T00:23:35+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -31,32 +31,30 @@ static const Fiber generic_fibers[3] = {
 
 // Read the file into the permanent arena. Return a stringview to the
 // contents.
-static Sv8 read_file(char *path, Arena *permanent, bool info);
+static Sv8 read_file(char *path, Arena *permanent);
 // Scan the file contents, allocate space for entities.
-static ParseResult allocate(Sv8 contents, Arena *permanent, bool info);
-static void fibers_and_resins(Sv8 contents, ParseResult *result, bool info);
-static void laminates(Sv8 contents, ParseResult *result, bool info);
+static ParseResult allocate(Sv8 contents, Arena *permanent);
+static void fibers_and_resins(Sv8 contents, ParseResult *result);
+static void laminates(Sv8 contents, ParseResult *result);
 
-ParseResult parse_file(char *path, Arena *permanent, bool info)
+ParseResult parse_file(char *path, Arena *permanent)
 {
-  Sv8 contents = read_file(path, permanent, info);
-  ParseResult rv = allocate(contents, permanent, info);
-  fibers_and_resins(contents, &rv, info);
-  laminates(contents, &rv, info);
+  Sv8 contents = read_file(path, permanent);
+  ParseResult rv = allocate(contents, permanent);
+  fibers_and_resins(contents, &rv);
+  laminates(contents, &rv);
   return rv;
 }
 
-Sv8 read_file(char *path, Arena *permanent, bool info)
+Sv8 read_file(char *path, Arena *permanent)
 {
   assert(path!=0);
   assert(permanent!=0);
   Sv8 contents = {0};
   FILE *inputfile = fopen(path, "r");
   if (inputfile==0) {
+    info("could not open file %s\n", path);
     return contents;
-    if (info) {
-      fprintf(stderr, "INFO: could not open file %s\n", path);
-    }
   }
   fseek(inputfile, 0L, SEEK_END);
   ptrdiff_t size = ftell(inputfile);
@@ -65,15 +63,13 @@ Sv8 read_file(char *path, Arena *permanent, bool info)
   contents.len = size;
   ptrdiff_t rv = fread(contents.data, sizeof(char), size, inputfile);
   fclose(inputfile);
-  if (rv != size && info) {
-    fprintf(stderr,
-            "INFO: file “%s” has size %td bytes, but only %td bytes read.\n",
-            path, size, rv);
+  if (rv != size) {
+    info("file “%s” has size %td bytes, but only %td bytes read.\n", path, size, rv);
   }
   return contents;
 }
 
-ParseResult allocate(Sv8 contents, Arena *permanent, bool info)
+ParseResult allocate(Sv8 contents, Arena *permanent)
 {
   assert(permanent!=0);
   ParseResult rv = {0};
@@ -108,14 +104,12 @@ ParseResult allocate(Sv8 contents, Arena *permanent, bool info)
     }
     ccut = sv8cut(ccut.tail, '\n');
   }
-  if (info) {
-    info("found %d fibers", rv.f);
-    info("found %d resins", rv.r);
-    info("found %d laminates", rv.t);
-    info("found %d lamina", rv.l);
-    info("found %d comments", comments);
-    info("found %d symmetry lines", rv.s);
-  }
+  info("found %d fibers", rv.f);
+  info("found %d resins", rv.r);
+  info("found %d laminates", rv.t);
+  info("found %d lamina", rv.l);
+  info("found %d comments", comments);
+  info("found %d symmetry lines", rv.s);
   // Worst case assumption: all laminates are mirrored.
   rv.l *= 2;
   // Add space for generics.
@@ -126,9 +120,7 @@ ParseResult allocate(Sv8 contents, Arena *permanent, bool info)
   rv.fibers = arena_new(permanent, Fiber, rv.f);
   rv.laminas = arena_new(permanent, Lamina, rv.l);
   rv.laminates = arena_new(permanent, Laminate, rv.t);
-  if (info) {
-    info("succesfully allocated memory.");
-  }
+  info("succesfully allocated memory.");
   rv.ok = true;
   return rv;
 }
@@ -136,7 +128,7 @@ ParseResult allocate(Sv8 contents, Arena *permanent, bool info)
 static Resin parse_resin(Sv8 line);
 static Fiber parse_fiber(Sv8 line);
 
-void fibers_and_resins(Sv8 contents, ParseResult *result, bool info)
+void fibers_and_resins(Sv8 contents, ParseResult *result)
 {
   assert(result!=0);
   assert(result->resins!=0);
@@ -160,14 +152,12 @@ void fibers_and_resins(Sv8 contents, ParseResult *result, bool info)
           f = parse_fiber(stripped);
           if (f.ok) {
             bool skip_fiber = false;
-            if (info) {
-              info("found fiber “%s” on line %d", sv8cstring(f.name), lineno);
-            }
+            info("found fiber “%s” on line %d", sv8cstring(f.name), lineno);
             // Reject redefinitions of fiber names.
             for (int32_t k = 0; k < result->fu; k++) {
               if (sv8equals(result->fibers[k].name, f.name)) {
                 skip_fiber = true;
-                warn("a fiber named “%s” already exists; will be skipped", sv8cstring(f.name));
+                warning("a fiber named “%s” already exists; will be skipped", sv8cstring(f.name));
               }
             }
             if (!skip_fiber) {
@@ -175,21 +165,19 @@ void fibers_and_resins(Sv8 contents, ParseResult *result, bool info)
               result->fibers[result->fu++] = f;
             }
           } else {
-            warn("error reading fiber on line %d...", lineno);
+            warning("could not read fiber on line %d...", lineno);
           }
           break;
         case 'r':
           r = parse_resin(stripped);
           if (r.ok) {
             bool skip_resin = false;
-            if (info) {
-              info("found resin “%s” on line %d", sv8cstring(r.name), lineno);
-            }
+            info("found resin “%s” on line %d", sv8cstring(r.name), lineno);
             // Reject redefinition of resin names.
             for (int32_t k = 0; k < result->ru; k++) {
               if (sv8equals(result->resins[k].name, f.name)) {
                 skip_resin = true;
-                warn("a resin named “%s” already exists; will be skipped", sv8cstring(f.name));
+                warning("a resin named “%s” already exists; will be skipped", sv8cstring(f.name));
               }
             }
             if (!skip_resin) {
@@ -197,7 +185,7 @@ void fibers_and_resins(Sv8 contents, ParseResult *result, bool info)
               result->resins[result->ru++] = r;
             }
           } else {
-            warn("error reading resin on line %d...", lineno);
+            warning("could not read resin on line %d...", lineno);
           }
           break;
         default:
@@ -319,7 +307,7 @@ static Laminate parse_t(Sv8 line, int32_t lineno);
 static Sv8 parse_m(Sv8 line, int32_t lineno, ParseResult *result);
 static Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result);
 
-void laminates(Sv8 contents, ParseResult *result, bool info)
+void laminates(Sv8 contents, ParseResult *result)
 {
   char state = ' ';
   // valid states: ' ' = start, 'k' = skip invalid laminate, 't' = start laminate,
@@ -343,7 +331,7 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
               if (sv8equals(result->laminates[k].name, lm.name)) {
                 skip_lm = true;
                 state = 'k'; // sKip m, l and s-lines.
-                warn("a laminate named “%s” already exists on line %d, it will be skipped",
+                warning("a laminate named “%s” already exists on line %d, it will be skipped",
                      sv8cstring(lm.name), lineno);
               }
             }
@@ -352,20 +340,17 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
               lm.layers = result->laminas+result->lu;
               // Copy the laminate into the laminate arena.
               result->laminates[result->tu++] = lm;
-              if (info) {
-                fprintf(stderr, "found laminate named “%s” on line %d\n",
-                        sv8cstring(lm.name), lineno);
-              }
+              info("found laminate named “%s” on line %d\n", sv8cstring(lm.name), lineno);
             }
           }
           break;
         case 'm':
           if (state == 'k') {
-            warn("skipping m-line on line %d", lineno);
+            warning("skipping m-line on line %d", lineno);
             break;
           }
           if (state != 't') {
-            warn("unexpected m:-line on line %d; will be ignored", lineno);
+            warning("unexpected m:-line on line %d; will be ignored", lineno);
             break;
           }
           state = 'm';
@@ -387,8 +372,8 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
           }
           Laminate *pcurlam = current_laminate(result);
           if (unknown_resin) {
-            warn("resin “%s” does not exist on line %d", sv8cstring(resin_name), lineno);
-            warn("skipping laminate “%s”", sv8cstring(pcurlam->name));
+            warning("resin “%s” does not exist on line %d", sv8cstring(resin_name), lineno);
+            warning("skipping laminate “%s”", sv8cstring(pcurlam->name));
             // Delete laminate from arena.
             memset(result->laminates + --result->tu, 0, sizeof(Laminate));
             state='k';
@@ -396,34 +381,31 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
             // Now that we know the resin, store it and the vf in the
             // laminate.
             pcurlam->r = *pcurresin;
-            if (info) {
-              fprintf(stderr, "using resin “%s” on line %d\n",
-                      sv8cstring(pcurlam->r.name), lineno);
-            }
+            info("using resin “%s” on line %d\n", sv8cstring(pcurlam->r.name), lineno);
           }
           break;
         case 'c':
           if (state != 'm' && state != 'l') {
-            warn("unexpected c:-line on line %d; will be ignored", lineno);
+            warning("unexpected c:-line on line %d; will be ignored", lineno);
             break;
           }
           state = 'l';
           // Save comment for addition to next lamina.
           Sv8Cut cmtsplit = sv8lsplit(ccut.head);
           comment = cmtsplit.tail;
-          debug("storing comment “%s” on line %d", sv8cstring(comment), lineno);
+          //debug("storing comment “%s” on line %d", sv8cstring(comment), lineno);
           break;
         case 'l':
           if (state == 'k') {
-            warn("skipping l-line on %d", lineno);
+            warning("skipping l-line on %d", lineno);
             break;
           }
           if (state == 's') {
-            warn("l-line after an s-line on line %d; skipping", lineno);
+            warning("l-line after an s-line on line %d; skipping", lineno);
             break;
           }
           if (state != 'm' && state != 'l') {
-            warn("unexpected l:-line on line %d; will be ignored", lineno);
+            warning("unexpected l:-line on line %d; will be ignored", lineno);
             break;
           }
           state = 'l';
@@ -445,18 +427,16 @@ void laminates(Sv8 contents, ParseResult *result, bool info)
           break;
         case 's':
           if (state == 'k') {
-            warn("skipping s-line on %d", lineno);
+            warning("skipping s-line on %d", lineno);
           } else if (state != 'l') {
-            warn("unexpected s:-line on line %d; will be ignored", lineno);
+            warning("unexpected s:-line on line %d; will be ignored", lineno);
           } else {
             state = 's';
             // Remove comment, if any.
             comment = (Sv8) {
               0
             };
-            if (info) {
-              fprintf(stderr, "found s-line on line %d\n", lineno);
-            }
+            info("found s-line on line %d\n", lineno);
             // Mirror the lamina.
             pcurlam = current_laminate(result);
             for (int32_t j = pcurlam->nlayers, k = result->lu - 1; j>0 ; j--, k--) {
@@ -502,7 +482,7 @@ Laminate parse_t(Sv8 line, int32_t lineno)
   rv.name = sv8strip(cut.tail);
   rv.ok = true;
   if (rv.name.len==0) {
-    error("laminate without a name found on line %d", lineno);
+    warning("laminate without a name on line %d will be ignored", lineno);
     rv.ok = false;
   } else {
     debug("laminate name “%s” found on line %d", sv8cstring(rv.name), lineno);
@@ -523,12 +503,12 @@ Sv8 parse_m(Sv8 line, int32_t lineno, ParseResult *result)
     pcurlam->vf = vf.result;
     debug("fiber volume fraction “%f” found on line %d", vf.result, lineno);
   } else {
-    error("no fiber volume faction found on m-line %d", lineno);
+    warning("m-line without fiber volume faction will be ignored on line %d", lineno);
   }
   // vf.tail should now contain the name of the resin.
   Sv8 resin_name = sv8strip(vf.tail);
   if (resin_name.len == 0) {
-    error("no resin name found on m-line %d", lineno);
+    warning("m-line without resin name on line %d will be ignored", lineno);
     return (Sv8) {
       0
     };
@@ -552,7 +532,7 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
     rv.fiber_weight = area_weight.result;
     debug("lamina area weight %g g/m2 found on line %d", area_weight.result, lineno);
   } else {
-    error("reading lamina area weight failed on line %d", lineno);
+    warning("reading lamina area weight failed on line %d", lineno);
     return rv;
   }
   Sv8Double angle = sv8tod(area_weight.tail);
@@ -560,7 +540,7 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
     rv.angle = angle.result;
     debug("lamina angle =  %g° on line %d", rv.angle, lineno);
   } else {
-    error("reading lamina angle failed on line %d", lineno);
+    warning("reading lamina angle failed on line %d", lineno);
     return rv;
   }
   Sv8Double vf = sv8tod(angle.tail);
@@ -588,7 +568,7 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
       }
     }
     if (f.ok==false) {
-      warn("fiber “%s” on line %d does not exist; skipping lamina",
+      warning("fiber “%s” on line %d does not exist; skipping lamina",
            sv8cstring(fiber_name), lineno);
       return rv;
     }

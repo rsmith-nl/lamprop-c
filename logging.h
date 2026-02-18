@@ -1,72 +1,48 @@
 // file: logging.h
 // vim:fileencoding=utf-8:ft=c:tabstop=2
 //
-// Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
+// Copyright © 2026 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
-// Created: 2025-08-04 00:49:24 +0200
-// Last modified: 2026-02-17T21:39:23+0100
+// Created: 2024-08-31 23:25:54 +0200
+// Last modified: 2026-02-18T23:36:35+0100
 
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>  // for abort
+enum {
+  LOG_NOTSET = 0,
+  LOG_CRITICAL = 10,
+  LOG_ERROR = 20,
+  LOG_WARNING = 30,
+  LOG_INFO = 40,
+  LOG_DEBUG = 50
+};
 
-#define NM "#lamprop-c "
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#undef error
-#ifndef NDEBUG
-#define error(...) \
-  fprintf(stderr, NM"ERROR %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n"); \
-  fflush(stderr); \
-  abort()
-#else
-#define error(...) \
-  fprintf(stderr, NM"ERROR: "); \
-  fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n"); \
-  fflush(stderr); \
-  abort()
-#endif  // NDEBUG
+// Call this function before any of the other logging calls below.
+// The “name” is prepended to each log message.
+// Every mess with a “level” equal or higher than the given value is printed.
+// If “level” is 0, the logging level is set to LOG_WARNING.
+extern void logging_configure(char *name, int level);
 
-#undef debug
-#ifndef NDEBUG
-#define debug(...) \
-  fprintf(stderr, NM"DEBUG %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n"); \
-  fflush(stderr)
-#else
-#define debug(...) (void)0
-#endif  // NDEBUG
+// Debug message. For developer infomation.
+extern void debug(char *fmt, ...);
 
-#undef warn
-#ifndef NDEBUG
-#define warn(...)                                            \
-  fprintf(stderr, NM"WARNING %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n"); \
-  fflush(stderr)
-#else
-#define warn(...) \
-  fprintf(stderr, NM"WARNING: "); \
-  fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n"); \
-  fflush(stderr)
-#endif  // NDEBUG
+// Informational message.
+extern void info(char *fmt, ...);
 
-#undef info
-#ifndef NDEBUG
-#define info(...) \
-  fprintf(stderr, NM"INFO %s, line %i: ", __FILE__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n"); \
-  fflush(stderr)
-#else
-#define info(...) \
-  fprintf(stderr, NM"INFO: "); \
-  fprintf(stderr, __VA_ARGS__); \
-  fprintf(stderr, "\n"); \
-  fflush(stderr)
-#endif  // NDEBUG
+// An indication that something unexpected happened.
+extern void warning(char *fmt, ...);
+
+// Due to a more serious problem, the software has not been able to perform some function.
+extern void error(char *fmt, ...);
+
+// A problem so serious that the program cannot continue and will be aborted.
+extern void critical(char *fmt, ...);
+
+
+#ifdef __cplusplus
+}
+#endif

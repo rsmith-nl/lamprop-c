@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:37 +0200
-// Last modified: 2026-02-17T22:56:21+0100
+// Last modified: 2026-02-19T00:15:08+0100
 
 #include "setup.h"
 #include "logging.h"
@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <strings.h>
 
 const char license[] =
   "Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>. All rights reserved.\n"
@@ -40,7 +41,7 @@ const char license[] =
   "SUCH DAMAGE.\n";
 
 const char help[] =
-  "usage: lamprop [-h] [-i | -l | -H] [-e] [-m] [-f] [-L | -v]\n"
+  "usage: lamprop [-h] [-l | -H] [-e] [-m] [-f] [-L | -v] [--log=(debug|info|warn|error|crit)]\n"
   "               [file ...]\n"
   "\n"
   "Calculate the elastic properties of a fibrous composite laminate. See the manual (lamprop-manual.pdf)\n"
@@ -51,14 +52,14 @@ const char help[] =
   "\n"
   "options:\n"
   "  -h, --help            show this help message and exit\n"
-  "  -i, --info            show information about source file (the default is not to)\n"
   "  -l, --latex           generate LaTeX output (the default is plain text)\n"
   "  -H, --html            generate HTML output\n"
   "  -e, --eng             output only the engineering properties\n"
   "  -m, --mat             output only the ABD matrix and stiffness tensor\n"
   "  -f, --fea             output only material data for FEA\n"
   "  -L, --license         print the license\n"
-  "  -v, --version         show program's version number and exit\n";
+  "  -v, --version         show program's version number and exit\n"
+  "  --log                 logging level debug,info,(default) warn,error,crit\n";
 
 Options setup(int argc, char *argv[])
 {
@@ -70,19 +71,21 @@ Options setup(int argc, char *argv[])
 #endif
   Options rv = {0};
   int32_t choice;
+  static struct option long_options[] = {
+    {"help", no_argument, 0, 'h'},
+    {"info", no_argument, 0, 'i'},
+    {"latex", no_argument, 0, 'l'},
+    {"html", no_argument, 0, 'H'},
+    {"eng", no_argument, 0, 'e'},
+    {"mat", no_argument, 0, 'm'},
+    {"fea", no_argument, 0, 'f'},
+    {"license", no_argument, 0, 'L'},
+    {"version", no_argument, 0, 'v'},
+    {"log", required_argument, 0, 1000},
+    {0,0,0,0}
+  };
+  logging_configure("lamprop-c", LOG_WARNING);
   while (1) {
-    static struct option long_options[] = {
-      {"help", no_argument, 0, 'h'},
-      {"info", no_argument, 0, 'i'},
-      {"latex", no_argument, 0, 'l'},
-      {"html", no_argument, 0, 'H'},
-      {"eng", no_argument, 0, 'e'},
-      {"mat", no_argument, 0, 'm'},
-      {"fea", no_argument, 0, 'f'},
-      {"license", no_argument, 0, 'L'},
-      {"version", no_argument, 0, 'v'},
-      {0,0,0,0}
-    };
     int32_t option_index = 0;
     choice = getopt_long(argc, argv, "hilHemfLv", long_options, &option_index);
     if (choice == -1) {
@@ -123,6 +126,17 @@ Options setup(int argc, char *argv[])
       case 'v':
         printf(VERSION "\n");
         exit(0);
+        break;
+      case 1000:
+        if (strcasecmp(optarg, "debug")==0) {
+          logging_configure(0, LOG_DEBUG);
+        } else if (strcasecmp(optarg, "info")==0) {
+          logging_configure(0, LOG_INFO);
+        } else if (strcasecmp(optarg, "error")==0) {
+          logging_configure(0, LOG_ERROR);
+        } else if (strcasecmp(optarg, "crit")==0) {
+          logging_configure(0, LOG_CRITICAL);
+        }
         break;
     }
   }

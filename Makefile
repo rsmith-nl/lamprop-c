@@ -2,7 +2,7 @@
 BASENAME = lamprop
 VMAJOR   = 2026
 VMINOR   = 02
-VPATCH   = 18
+VPATCH   = 19
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
@@ -31,7 +31,7 @@ DISTFILES = Makefile
 
 # Source files.
 SRCS = lamprop.c stringview.c sbuf.c parser.c arena.c setup.c core.c
-SRCS += matrix.c text.c latex.c html.c utils.c
+SRCS += matrix.c text.c latex.c html.c utils.c logging.c
 
 ##### No editing necessary beyond this point
 

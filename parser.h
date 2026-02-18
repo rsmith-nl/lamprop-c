@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 15:53:32 +0200
-// Last modified: 2026-02-15T20:29:36+0100
+// Last modified: 2026-02-18T23:18:46+0100
 
 #pragma once
 
@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 // parser.c
-extern ParseResult parse_file(char *path, Arena *permanent, bool info);
+extern ParseResult parse_file(char *path, Arena *permanent);
 
 #ifdef __cplusplus
 }
