@@ -8,10 +8,10 @@ VPATCH   = 17
 #CC = gcc
 
 # The next lines are for building debugging libraries.
-#CFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
-#                -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
-#                -fsanitize=address,undefined
-#LFLAGS = -pipe -fsanitize=address,undefined
+DCFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
+                -Wmissing-field-initializers -Wpointer-arith
+DCFLAGS += -D_POSIX_SOURCE
+DLFLAGS = -pipe
 
 # The next lines are for release builds.
 CFLAGS = -Os -pipe -std=c11 -ffast-math -march=native
@@ -28,11 +28,14 @@ SRCS += matrix.c text.c latex.c html.c utils.c
 
 ##### No editing necessary beyond this point
 
-all: $(BASENAME).exe  ## Compile the program. (default)
+all: $(BASENAME).exe $(BASENAME)-debug.exe  ## Compile the program. (default)
 
 # This makefile uses a unit build.
 $(BASENAME).exe: $(SRCS) version.h
 	$(CC) $(CFLAGS) $(LFLAGS) $(LDIRS) -o $(BASENAME) $(SRCS) $(LIBS)
+
+$(BASENAME)-debug.exe: $(SRCS) version.h
+	$(CC) $(DCFLAGS) $(DLFLAGS) $(LDIRS) -o $(BASENAME)-debug $(SRCS) $(LIBS)
 
 version.h: Makefile.win32
 	echo '#define VERSION "'${VMAJOR}"."${VMINOR}"."${VPATCH}'"' >version.h
@@ -43,4 +46,4 @@ test: $(BASENAME).exe  ## Run a test
 
 .PHONY: clean
 clean:  ## Remove all generated files.
-	rm -f $(BASENAME).exe *~ core gmon.out $(TARFILE) version.h backup-*
+	rm -f $(BASENAME).exe $(BASENAME)-debug.exe  *~ core gmon.out $(TARFILE) version.h backup-*
