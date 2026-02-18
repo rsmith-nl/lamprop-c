@@ -7,7 +7,7 @@ VPATCH   = 18
 # w64devkit uses gcc as cc.
 
 # The next lines are for building debugging libraries.
-DCFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
+DCFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes \
                 -Wmissing-field-initializers -Wpointer-arith
 DCFLAGS += -D_POSIX_SOURCE
 DLFLAGS = -pipe
