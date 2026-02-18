@@ -4,8 +4,7 @@ VMAJOR   = 2026
 VMINOR   = 02
 VPATCH   = 17
 
-# Define the C compiler to be used, if not cc.
-#CC = gcc
+# w64devkit uses gcc as cc.
 
 # The next lines are for building debugging libraries.
 DCFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
