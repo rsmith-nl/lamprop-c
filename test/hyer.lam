@@ -24,6 +24,7 @@ t: [0/90]s laminate
 This is a standard symmetric cross-ply laminate. It has fine extensional
 moduli in the fiber directions, but a very low shear modulus.
 m: 0.5 Hyer's resin
+c: 200 g/m2 plain weave
 l: 100  0 Hyer's carbon fiber
 l: 100 90 Hyer's carbon fiber
 s:
