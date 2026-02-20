@@ -3,7 +3,7 @@
 %
 % Copyright © 2018,2020 R.F. Smith <rsmith@xs4all.nl>. All rights reserved.
 % Created: 2018-05-13 23:48:04 +0200
-% Last modified: 2026-02-20T17:14:20+0100
+% Last modified: 2026-02-20T23:27:07+0100
 
 \newcommand{\twodigits}[1]{\ifnum#1<10 0\number#1\else\number#1\fi}
 \newcommand{\TheDate}{\number\year-\twodigits\month-\twodigits\day}
@@ -30,7 +30,7 @@
 \usepackage[italic]{mathastext}
 
 % Hyperref moet als laatste geladen worden,
-\usepackage[bookmarks,pdfborder={0 0 0},colorlinks=true]{hyperref}
+\usepackage[bookmarks,pdfborder={0 0 0},colorlinks=true,citecolor=blue]{hyperref}
 % met uitzondering van uitbreidingen erop.
 \usepackage{memhfixc}
 
@@ -321,10 +321,10 @@ for example:
 
 \chapter{The lamprop file format} % {{{2
 
-The file format is very simple. Functional lines have either \texttt{f},
-\texttt{r}, \texttt{t}, \texttt{m}, \texttt{l}, \texttt{c} or \texttt{s} as
+The file format is very simple. Functional lines have either \textbf{f},
+\textbf{r}, \textbf{t}, \textbf{m}, \textbf{l}, \textbf{c} or \textbf{s} as
 the first non white space character. This character must immediately be
-followed by a colon \texttt{:}. All other lines are seen as comments and
+followed by a colon \textbf{:}. All other lines are seen as comments and
 disregarded.
 The information on the functional lines varies per type.
 The different items on each lines should be separated by whitespace.
@@ -333,7 +333,7 @@ This program assumes specific metric units. The units used below are important
 because the program internally calculates the thickness of layers (in mm)
 based on the volume fractions and densities of the fibers and resins.
 
-The \textbf{\texttt{f:}}-line contains a definition of a fiber. The parser
+The \textbf{f:}-line contains a definition of a fiber. The parser
 converts this into an instance of a \texttt{Fiber} object The line must
 contain the following values, separated by white space:
 \begin{description}
@@ -363,7 +363,7 @@ provided by Tsai overestimates $E_2$.
 So the factor $\xi$ was reduced from 2 to 1.5 conform
 \citet{Giner:2014}
 
-The \textbf{\texttt{r:}}-line contains a definition of a resin. Like with the
+The \textbf{r:}-line contains a definition of a resin. Like with the
 fibers, this becomes an instance of a \texttt{Resin} object in the code. The
 resin line must contain the following values, separated by white space.
 \begin{description}
@@ -379,38 +379,38 @@ resin line must contain the following values, separated by white space.
 An example of a generic thermoset resin is shown below.\\
 \texttt{3800 0.36 40e-6 1.165 generic}
 
-The \textbf{\texttt{t:}} line starts a new laminate. It only contains the name which
+The \textbf{t:} line starts a new laminate. It only contains the name which
 identifies the laminate. This name must be unique within the current input
 files. It may contain spaces.
 
-The \textbf{\texttt{m:}} line chooses a resin for the laminate. It must appear after
-a \texttt{t:} line, and before the \texttt{l:} lines. It must contain the
-following values, separated by white space:
+The \textbf{m:} line chooses a resin for the laminate. It must appear
+\emph{after} a \textbf{t:} line, and \emph{before} the \textbf{l:} lines. It
+must contain the following values, separated by white space:
 \begin{description}
     \item[$vf$] The fiber volume fraction. This should be a number between
         0 and 1 or between 1 up to and including 100. In the latter case it
         is interpreted as a percentage.
     \item[$name$] The name of the resin to use. This must have been previously
-        declared with an \texttt{r:}-line.
+        declared with an \textbf{r:}-line.
 \end{description}
 
-A \textbf{\texttt{c:}} line describes a comment. The comment should appear before an
-\texttt{l:} line and applies to that lamina.
+A \textbf{c:} line describes a comment. The comment should appear before an
+\textbf{l:} line and applies to that lamina.
 
-The \textbf{\texttt{l:}} line defines a single layer (lamina) in the laminate. It must be
-preceded by a \texttt{t:} and a \texttt{m:} line. It must contain the following values,
+The \textbf{l:} line defines a single layer (lamina) in the laminate. It must be
+preceded by a \textbf{t:} and a \textbf{m:} line. It must contain the following values,
 separated by white space (optional items in brackets):
 \begin{description}
     \item[$weight$] The area weight in \si{g/m^2} of the dry fibers.
     \item[$angle$] The angle upwards from the x-axis under which the fibers are oriented.
     \item[($vf$)] Optionally the layer can have a different fiber volume fraction.
     \item[$name$] The name of the fiber used in this layer. This fiber must have been
-        declared previously with an \texttt{f:} line.
+        declared previously with an \textbf{f:} line.
 \end{description}
 
-The last line in a laminate definition can be an \textbf{\texttt{s:}} line, which stands
+The last line in a laminate definition can be an \textbf{s:} line, which stands
 for ``symmetry''. This signifies that all the lamina before it are to be added
-again in reverse order, making a symmetric laminate stack. A \texttt{s:} line in any
+again in reverse order, making a symmetric laminate stack. A \textbf{s:} line in any
 other position is an error.
 
 An example is given below.
@@ -433,15 +433,19 @@ l: 100 90 Hyer's carbon fiber
 s:
 \end{lstlisting}
 
+At startup, \texttt{lamprop} reserves a 32 MiB block of virtual memory using
+\texttt{mmap} (POSIX) or \texttt{VirtualAlloc} (ms-windows).
+Only memory that is actually \emph{used} is allocated.
 The author has personally used laminates with up to 250 layers.
-This uses about 1\% of the memory allocated by the program.
-Calculating the properties of that laminate took approximately
+This uses about 1\% of the reserved memory.
+So in normal practice, memory is not a bottleneck of this program.
+Calculating the properties of that 250-layer laminate took approximately
 \SI{0.005}{s} on a machine with an Intel Core2 Q9300 running FreeBSD.
 
-Interspersed between the \texttt{l:} lines (and before the \texttt{s:} line)
-there can be \texttt{c:} lines.
+Interspersed between the \textbf{l:} lines (and before the \textbf{s:} line)
+there can be \textbf{c:} lines.
 These are comments about the lay-up, that will be inserted into the output.
-Their use is to signify that the \texttt{l:} lines following a comment are
+Their use is to signify that the \textbf{l:} lines following a comment are
 part of a subassembly such as a woven fabric or a non-crimp fabric.
 
 For example:
@@ -469,23 +473,23 @@ fibers, $\nu_{12}$ is estimated 0.33 unless known and $\alpha_1$ is estimated
       & [\si{MPa}] & [-] & [\si{K^{-1}}] & [\si{g/cm^3}]\\
     \midrule
       Tenax HTA & 238000 & 0.20 & -0.1e-6 & 1.76 & carbon\\
-Tenax HTS & 240000 & 0.20 & -0.1e-6 & 1.77 & carbon\\
-Tenax STS40 & 240000 & 0.20 & -0.12e-6 & 1.78 & carbon\\
-Torayca T300 & 230000 & 0.27 & -0.41e-6 & 1.76 & carbon\\
-Torayca T700SC & 230000 & 0.27 & -0.38e-6 & 1.80 & carbon\\
-pyrofil TR30S & 235000 & 0.20 & -0.5e-6 & 1.79 & carbon\\
-sigrafil CT24-5.0-270/E100 & 270000 & 0.25 & -0.12e-6 & 1.79 & carbon\\
-K63712 & 640000 & 0.234 & -1.47e-6 & 2.12 & carbon\\
-K63A12 & 790000 & 0.23 & -1.2e-6 & 2.15 & carbon\\
-Torayca T800S & 294000 & 0.27 & -0.60e-6 & 1.76 & carbon\\
-K13C2U & 900000 & 0.234 & -1.47e-6 & 2.20 & carbon\\
-M35J & 339000 & 0.27 & -0.73e-6 & 1.75 & carbon\\
-M46J & 436000 & 0.234 & -0.9e-6 & 1.84 & carbon\\
-PX35UD & 242000 & 0.27 & -0.6e-6 & 1.81 & carbon\\
-Granoc XN-80-60S & 780000 & 0.27 & -1.5e-6 & 2.17 & carbon\\
-Granoc XN-90-60S & 860000 & 0.27 & -1.5e-6 & 2.19 & carbon\\
-e-glass & 73000 & 0.33 & 5.3e-6 & 2.60 & glass\\
-ecr-glass & 81000 & 0.33 & 5e-6 & 2.62 & glass\\
+      Tenax HTS & 240000 & 0.20 & -0.1e-6 & 1.77 & carbon\\
+      Tenax STS40 & 240000 & 0.20 & -0.12e-6 & 1.78 & carbon\\
+      Torayca T300 & 230000 & 0.27 & -0.41e-6 & 1.76 & carbon\\
+      Torayca T700SC & 230000 & 0.27 & -0.38e-6 & 1.80 & carbon\\
+      pyrofil TR30S & 235000 & 0.20 & -0.5e-6 & 1.79 & carbon\\
+      sigrafil CT24-5.0-270/E100 & 270000 & 0.25 & -0.12e-6 & 1.79 & carbon\\
+      K63712 & 640000 & 0.234 & -1.47e-6 & 2.12 & carbon\\
+      K63A12 & 790000 & 0.23 & -1.2e-6 & 2.15 & carbon\\
+      Torayca T800S & 294000 & 0.27 & -0.60e-6 & 1.76 & carbon\\
+      K13C2U & 900000 & 0.234 & -1.47e-6 & 2.20 & carbon\\
+      M35J & 339000 & 0.27 & -0.73e-6 & 1.75 & carbon\\
+      M46J & 436000 & 0.234 & -0.9e-6 & 1.84 & carbon\\
+      PX35UD & 242000 & 0.27 & -0.6e-6 & 1.81 & carbon\\
+      Granoc XN-80-60S & 780000 & 0.27 & -1.5e-6 & 2.17 & carbon\\
+      Granoc XN-90-60S & 860000 & 0.27 & -1.5e-6 & 2.19 & carbon\\
+      e-glass & 73000 & 0.33 & 5.3e-6 & 2.60 & glass\\
+      ecr-glass & 81000 & 0.33 & 5e-6 & 2.62 & gl;ass\\
   \end{tabular}
 \end{table}
 
@@ -727,10 +731,10 @@ middle of the stack. So the following laminate is symmetric:
 \end{enumerate}
 
 This is often shortened to “[0/45/90/-45]s”. The area weights of the layers
-should also be symmetric.
+should also be identical.
 
 A balanced laminate is a laminate where for every layer at an angle on
-\emph{n}\textdegree{} there is also a layer at \emph{-n}\textdegree.
+\emph{n}\textdegree{} there is also a layer with the same area weight at \emph{-n}\textdegree.
 It is often added that for every 0\textdegree{} layer there should also be an
 equally sized 90\textdegree{} layer, but the author disagrees. For beam-like
 parts it is often desirable to have the majority of the fibers in the
@@ -739,6 +743,7 @@ parts it is often desirable to have the majority of the fibers in the
 Classical laminate theory strictly speaking is only valid for stacks of
 unidirectional layers. For woven fabrics and random oriented fiber products
 approximations are used.
+
 
 \section{Representing woven fabrics}
 
@@ -781,9 +786,10 @@ Even stronger, the author does not believe that a general theory of laminate
 strength based on constituent properties is feasible due to the many different
 possible failure modes and the factors outside of the fiber and resin
 properties that influence the laminate.  Examples of the latter are the void
-content, the degree of cure of the resin and errors in cutting or placing the
-fibers. These are determined by type of production process used and the
-craftsmanship of the people involved.
+content, the degree of cure of the resin, the strength of the adhesion between
+matrix and fibers and errors in cutting or placing the fibers.
+These are determined by the type of production process used and the craftsmanship
+of the people involved.
 
 However, the following guidelines have served the author well over the years.
 
