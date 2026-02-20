@@ -45,4 +45,4 @@ test: $(BASENAME).exe  ## Run a test
 
 .PHONY: clean
 clean:  ## Remove all generated files.
-	rm -f $(BASENAME).exe $(BASENAME)-debug.exe  *~ core gmon.out $(TARFILE) version.h backup-*
+	rm -f $(BASENAME).exe $(BASENAME)-debug.exe  *~ core gmon.out $(TARFILE) backup-*
