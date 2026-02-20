@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-08-28 23:49:02 +0200
-// Last modified: 2026-02-03T22:06:17+0100
+// Last modified: 2026-02-20T23:04:03+0100
 
 #include "sbuf.h"
 #include <assert.h>
@@ -33,7 +33,9 @@ void sbuf_append(Sbuf *buf, const char *str, const ptrdiff_t len)
 
 inline void sbuf_appends(Sbuf *buf, const char *str)
 {
-  sbuf_append(buf, str, strlen(str));
+  assert(buf!=0);
+  ptrdiff_t remaining = SBUF_MAX - buf->used - 1;
+  sbuf_append(buf, str, strnlen(str, remaining));
 }
 
 void sbuf_printf(Sbuf *buf, const char *fmt, ...)
