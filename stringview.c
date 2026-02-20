@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2026-02-18T18:53:33+0100
+// Last modified: 2026-02-20T12:12:57+0100
 
 #include "stringview.h"
 
@@ -32,6 +32,25 @@ Sv8 sv8lstrip(Sv8 s)
   while (s.len && _isspace(*s.data)) {
     s.data++, s.len--;
   }
+  return s;
+}
+
+Sv8 sv8lskip(Sv8 s, int32_t num)
+{
+  if (num >= s.len) {
+    return s;
+  }
+  s.data += num;
+  s.len -= num;
+  return s;
+}
+
+Sv8 sv8rskip(Sv8 s, int32_t num)
+{
+  if (num >= s.len) {
+    return s;
+  }
+  s.len -= num;
   return s;
 }
 

@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2025-08-31T23:48:44+0200
+// Last modified: 2026-02-20T12:13:12+0100
 
 // Inspired by: https://nullprogram.com/blog/2023/10/08/
 
@@ -54,6 +54,12 @@ extern bool sv8equals(Sv8 a, Sv8 b);
 
 // Remove whitespace from the left of a string.
 extern Sv8 sv8lstrip(Sv8 s);
+
+// Strip num characters from the left of the string.
+extern Sv8 sv8lskip(Sv8 s, int32_t num);
+
+// Strip num characters from the right of the string.
+extern Sv8 sv8rskip(Sv8 s, int32_t num);
 
 // Remove whitespace from the right of a string.
 extern Sv8 sv8rstrip(Sv8 s);
