@@ -27,7 +27,9 @@ SRCS += matrix.c text.c latex.c html.c utils.c logging.c
 
 ##### No editing necessary beyond this point
 
-all: $(BASENAME).exe $(BASENAME)-debug.exe  ## Compile the program. (default)
+all: $(BASENAME).exe  ## Compile the program. (default)
+
+debug: $(BASENAME)-debug.exe  ## Compile a debug version of the program.
 
 # This makefile uses a unit build.
 $(BASENAME).exe: $(SRCS) version.h
