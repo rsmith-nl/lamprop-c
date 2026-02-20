@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2023-04-23T22:08:02+0200
-// Last modified: 2026-02-19T00:17:43+0100
+// Last modified: 2026-02-20T12:40:40+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -37,7 +37,7 @@ Arena arena_create(ptrdiff_t length)
   arena.begin = mmap(0, length, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 #endif
   if (arena.begin == MAP_FAILED) {
-    critical("arena allocation of size %td failed\n", length);
+    critical("arena allocation of size %td failed", length);
   }
   arena.current_offset = 0;
   arena.length = length;
@@ -58,7 +58,7 @@ void *arena_alloc(Arena *arena, ptrdiff_t size, ptrdiff_t count, ptrdiff_t align
   ptrdiff_t padding = -arena->current_offset & (align - 1);
   ptrdiff_t remaining = arena->length - arena->current_offset - padding;
   if (count > remaining/size) {
-    critical("arena %p exhausted; %td items of %td bytes requested, %td available\n",
+    critical("arena %p exhausted; %td items of %td bytes requested, %td available",
           (void *)arena, count, size, remaining/size);
   }
   void *rv = arena->begin + arena->current_offset + padding;
@@ -79,7 +79,7 @@ void arena_destroy(Arena *arena)
   rv = munmap(arena->begin, arena->length);
 #endif
   if (rv == -1) {
-    error("destroying arena %p failed\n", (void *)arena);
+    error("destroying arena %p failed", (void *)arena);
   }
   Arena empty = {0};
   *arena = empty;
