@@ -3,7 +3,7 @@
 %
 % Copyright © 2018,2020 R.F. Smith <rsmith@xs4all.nl>. All rights reserved.
 % Created: 2018-05-13 23:48:04 +0200
-% Last modified: 2026-02-19T22:18:10+0100
+% Last modified: 2026-02-20T17:14:20+0100
 
 \newcommand{\twodigits}[1]{\ifnum#1<10 0\number#1\else\number#1\fi}
 \newcommand{\TheDate}{\number\year-\twodigits\month-\twodigits\day}
@@ -326,12 +326,14 @@ The file format is very simple. Functional lines have either \texttt{f},
 the first non white space character. This character must immediately be
 followed by a colon \texttt{:}. All other lines are seen as comments and
 disregarded.
+The information on the functional lines varies per type.
+The different items on each lines should be separated by whitespace.
 
 This program assumes specific metric units. The units used below are important
 because the program internally calculates the thickness of layers (in mm)
 based on the volume fractions and densities of the fibers and resins.
 
-The \texttt{f:}-line line contains a definition of a fiber. The parser
+The \textbf{\texttt{f:}}-line contains a definition of a fiber. The parser
 converts this into an instance of a \texttt{Fiber} object The line must
 contain the following values, separated by white space:
 \begin{description}
@@ -361,7 +363,7 @@ provided by Tsai overestimates $E_2$.
 So the factor $\xi$ was reduced from 2 to 1.5 conform
 \citet{Giner:2014}
 
-The \texttt{r:}-line line contains a definition of a resin. Like with the
+The \textbf{\texttt{r:}}-line contains a definition of a resin. Like with the
 fibers, this becomes an instance of a \texttt{Resin} object in the code. The
 resin line must contain the following values, separated by white space.
 \begin{description}
@@ -377,11 +379,11 @@ resin line must contain the following values, separated by white space.
 An example of a generic thermoset resin is shown below.\\
 \texttt{3800 0.36 40e-6 1.165 generic}
 
-The \texttt{t:} line starts a new laminate. It only contains the name which
+The \textbf{\texttt{t:}} line starts a new laminate. It only contains the name which
 identifies the laminate. This name must be unique within the current input
 files. It may contain spaces.
 
-The \texttt{m:} line chooses a resin for the laminate. It must appear after
+The \textbf{\texttt{m:}} line chooses a resin for the laminate. It must appear after
 a \texttt{t:} line, and before the \texttt{l:} lines. It must contain the
 following values, separated by white space:
 \begin{description}
@@ -392,10 +394,10 @@ following values, separated by white space:
         declared with an \texttt{r:}-line.
 \end{description}
 
-A \texttt{c:} line describes a comment. The comment should appear before an
+A \textbf{\texttt{c:}} line describes a comment. The comment should appear before an
 \texttt{l:} line and applies to that lamina.
 
-The \texttt{l:} line defines a single layer (lamina) in the laminate. It must be
+The \textbf{\texttt{l:}} line defines a single layer (lamina) in the laminate. It must be
 preceded by a \texttt{t:} and a \texttt{m:} line. It must contain the following values,
 separated by white space (optional items in brackets):
 \begin{description}
@@ -406,9 +408,9 @@ separated by white space (optional items in brackets):
         declared previously with an \texttt{f:} line.
 \end{description}
 
-The last line in a laminate definition can be an \texttt{s:} line, which stands
+The last line in a laminate definition can be an \textbf{\texttt{s:}} line, which stands
 for ``symmetry''. This signifies that all the lamina before it are to be added
-again in reverse order, making a symmetric laminate stack. An \texttt{s:} line in any
+again in reverse order, making a symmetric laminate stack. A \texttt{s:} line in any
 other position is an error.
 
 An example is given below.
@@ -431,18 +433,8 @@ l: 100 90 Hyer's carbon fiber
 s:
 \end{lstlisting}
 
-The program has the following storage limits:
-\begin{itemize}
-  \item 1000 resins
-  \item 1000 fibers
-  \item 25000 lamina
-  \item 100 laminates
-\end{itemize}
-
-By using the \texttt{-i} option, you can see how many of that space has been
-used.
-
 The author has personally used laminates with up to 250 layers.
+This uses about 1\% of the memory allocated by the program.
 Calculating the properties of that laminate took approximately
 \SI{0.005}{s} on a machine with an Intel Core2 Q9300 running FreeBSD.
 
@@ -453,82 +445,11 @@ Their use is to signify that the \texttt{l:} lines following a comment are
 part of a subassembly such as a woven fabric or a non-crimp fabric.
 
 For example:
-\begin{lstlisting}[style=plain]
-    E1      ν12     α1      ρ       name
-f:  70000   0.33    5e-6        2.54    e-glas
-
-    Em      ν       α       ρ       name
-r:  3600    0.36    60e-6   1.145   atlac-430
-
-t: atlac430-combi
-m: 0.22 atlac-430
-c: CSM 450
-l: 150  0 e-glas
-l: 150  60 e-glas
-l: 150  -60 e-glas
-c: UNIE640
-l: 600  0 0.50 e-glas
-l:  40 90 0.50 e-glas
-c: -- symmetric --
-s:
-\end{lstlisting}
+\lstinputlisting[style=plain]{data/atlac430.lam}
 
 This will yield the output shown in \trefpi{tab:atlac430-combi}.
 
-\begin{table}[!ht]
-  \caption{\label{tab:atlac430-combi}properties of atlac430-combi}
-  \centering\footnotesize{\rule{0pt}{10pt}
-  \tiny generated by lamprop-c version 2026.02.19\\[3pt]}
-    \begin{tabular}[t]{rcrrl}
-      \multicolumn{5}{c}{\small\textbf{Laminate stacking}}\\[0.1em]
-      \toprule %% \usepackage{booktabs}
-      Layer & Weight & Angle & vf & Fiber type\\
-            & [g/m$^2$] & [$\circ$] & [\%]\\
-      \midrule
-      \multicolumn{5}{l}{CSM 450}\\
-        1 &    150 &     0 &   22 & e-glas\\
-        2 &    150 &    60 &   22 & e-glas\\
-        3 &    150 &   -60 &   22 & e-glas\\
-      \multicolumn{5}{l}{UNIE640}\\
-        4 &    600 &     0 &   50 & e-glas\\
-        5 &     40 &    90 &   50 & e-glas\\
-      \multicolumn{5}{l}{\rule[0.5ex]{10mm}{1pt}symmetry line\rule[0.5ex]{10mm}{1pt}}\\
-        6 &     40 &    90 &   50 & e-glas\\
-        7 &    600 &     0 &   50 & e-glas\\
-        8 &    150 &   -60 &   22 & e-glas\\
-        9 &    150 &    60 &   22 & e-glas\\
-       10 &    150 &     0 &   22 & e-glas\\
-      \bottomrule
-    \end{tabular}\hspace{0.02\textwidth}
-    \begin{tabular}[t]{rrlrrl}
-      \multicolumn{6}{c}{\small\textbf{Physical properties}}\\[0.1em]
-      \toprule
-      Property & Value & Dimension\\
-      \midrule
-      $\mathrm{v_f}$ & 32.8 &\%\\
-      $\mathrm{w_f}$ & 52.0 &\%\\
-      thickness & 2.62 & mm\\
-      density & 1.60 & g/cm$^3$\\
-      weight & 4195 & g/m$^2$\\
-      resin & 2015 & g/m$^2$\\
-      \midrule
-      \multicolumn{6}{c}{\small\textbf{Engineering properties}}\\[0.1em]
-      \multicolumn{3}{c}{\small\textbf{In-plane}} & 
-      \multicolumn{3}{c}{\small\textbf{3D stiffness tensor}}\\[0.1em]
-      $\mathrm{E_x}$ & 19544 & MPa & $\mathrm{E_x}$ & 19549 & MPa\\
-      $\mathrm{E_y}$ & 10958 & MPa & $\mathrm{E_y}$ & 10968 & MPa\\
-      $\mathrm{E_z}$ & 7004 & MPa & $\mathrm{E_z}$ & 8344 & MPa\\
-      $\mathrm{G_{xy}}$ & 3758 & MPa & $\mathrm{G_{xy}}$ & 3759 & MPa\\
-      $\mathrm{G_{xz}}$ & 2538 & MPa & $\mathrm{G_{xz}}$ & 2736 & MPa\\
-      $\mathrm{G_{yz}}$ & 2437 & MPa & $\mathrm{G_{yz}}$ & 2632 & MPa\\
-      $\mathrm{\nu_{xy}}$ & 0.32072 &- & $\mathrm{\nu_{xy}}$ & 0.32126 &-\\
-      $\mathrm{\nu_{yx}}$ & 0.17982 &- & $\mathrm{\nu_{xz}}$ & 0.3748 &-\\
-      $\mathrm{\alpha_x}$ & 9.854e-06 & K$^{-1}$ & $\mathrm{\nu_{yz}}$ & 0.44627 &-\\
-      $\mathrm{\alpha_y}$ & 1.924e-05 & K$^{-1}$\\
-      \bottomrule
-    \end{tabular}
-\end{table}
-
+\input{data/atlac430.tex}
 
 \section{Material data} % {{{2
 
@@ -591,31 +512,11 @@ Several resins are shown in \tref{tb:resins}. For resins, $\nu$ is estimated
 
 The command \texttt{lamrop -h} produces the following overview of the options.
 
-\begin{lstlisting}[style=plain]
-usage: lamprop [-h] [-l | -H] [-e] [-m] [-f] [-L | -v] [--log=(debug|info|warn|error|crit)]
-               [file ...]
-
-Calculate the elastic properties of a fibrous composite laminate. See the
-manual (lamprop-manual.pdf) for more in-depth information.
-
-positional arguments:
-  file                  one or more files to process
-
-options:
-  -h, --help            show this help message and exit
-  -l, --latex           generate LaTeX output (the default is plain text)
-  -H, --html            generate HTML output
-  -e, --eng             output only the engineering properties
-  -m, --mat             output only the ABD matrix and stiffness tensor
-  -f, --fea             output only material data for FEA
-  -L, --license         print the license
-  -v, --version         show program's version number and exit
-  --log                 logging level debug,info,(default)warn,error,crit
-\end{lstlisting}
+\lstinputlisting[style=plain]{data/help-output.txt}
 
 Running \texttt{lamprop} from the command line produces text output by
 default. Output in \LaTeX{} or \textsc{html} format can be requested with the
-appropriate arguments. As of 4.0, \textsc{rtf} output (for inclusion in word
+appropriate arguments. \textsc{rtf} output (for inclusion in word
 processor documents) has been removed. Since most word processors can read
 \textsc{html}, use that instead.
 

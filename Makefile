@@ -42,6 +42,8 @@ debug: $(BASENAME)-debug ## Compile a debug version of the program.
 # This makefile uses a unit build.
 $(BASENAME): $(SRCS) version.h
 	$(CC) $(CFLAGS) $(LFLAGS) $(LDIRS) -o $(BASENAME) $(SRCS) $(LIBS)
+	./$(BASENAME) -h >doc/data/help-output.txt
+	./$(BASENAME) -le doc/data/atlac430.lam >doc/data/atlac430.tex
 
 $(BASENAME)-debug: $(SRCS) version.h
 	$(CC) $(DCFLAGS) $(DLFLAGS) $(LDIRS) -o $(BASENAME)-debug $(SRCS) $(LIBS)
