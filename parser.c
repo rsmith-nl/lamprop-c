@@ -329,7 +329,7 @@ void laminates(Sv8 contents, ParseResult *result)
                 skip_lm = true;
                 state = 'k'; // sKip m, l and s-lines.
                 warning("a laminate named “%s” already exists on line %d, it will be skipped",
-                     sv8cstring(lm.name), lineno);
+                        sv8cstring(lm.name), lineno);
               }
             }
             if (!skip_lm) {
@@ -556,7 +556,7 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
     }
     if (f.ok==false) {
       warning("fiber “%s” on line %d does not exist; skipping lamina",
-           sv8cstring(fiber_name), lineno);
+              sv8cstring(fiber_name), lineno);
       return rv;
     }
   } else {
