@@ -2,7 +2,7 @@
 BASENAME = lamprop
 VMAJOR   = 2026
 VMINOR   = 02
-VPATCH   = 19
+VPATCH   = 20
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc

@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-19T00:23:35+0100
+// Last modified: 2026-02-20T12:35:00+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -53,7 +53,7 @@ Sv8 read_file(char *path, Arena *permanent)
   Sv8 contents = {0};
   FILE *inputfile = fopen(path, "r");
   if (inputfile==0) {
-    info("could not open file %s\n", path);
+    info("could not open file %s", path);
     return contents;
   }
   fseek(inputfile, 0L, SEEK_END);
@@ -64,7 +64,7 @@ Sv8 read_file(char *path, Arena *permanent)
   ptrdiff_t rv = fread(contents.data, sizeof(char), size, inputfile);
   fclose(inputfile);
   if (rv != size) {
-    info("file “%s” has size %td bytes, but only %td bytes read.\n", path, size, rv);
+    info("file “%s” has size %td bytes, but only %td bytes read.", path, size, rv);
   }
   return contents;
 }
@@ -146,10 +146,11 @@ void fibers_and_resins(Sv8 contents, ParseResult *result)
     Fiber f = {0};
     Resin r = {0};
     Sv8 stripped = sv8strip(ccut.head);
+    Sv8 parse_input = sv8lskip(stripped, 2);
     if (stripped.data[1] == ':') {
       switch (stripped.data[0]) {
         case 'f':
-          f = parse_fiber(stripped);
+          f = parse_fiber(parse_input);
           if (f.ok) {
             bool skip_fiber = false;
             info("found fiber “%s” on line %d", sv8cstring(f.name), lineno);
@@ -169,7 +170,7 @@ void fibers_and_resins(Sv8 contents, ParseResult *result)
           }
           break;
         case 'r':
-          r = parse_resin(stripped);
+          r = parse_resin(parse_input);
           if (r.ok) {
             bool skip_resin = false;
             info("found resin “%s” on line %d", sv8cstring(r.name), lineno);
@@ -201,15 +202,12 @@ Resin parse_resin(Sv8 line)
 {
   Resin rv = {0};
   rv.magic = RESN;
-  // This function is only called when *line* starts with 'r:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the Young's modulus after whitespace.
-  Sv8Double E = sv8tod(cut.tail);
+  // line starts with the Young's modulus after possible whitespace.
+  Sv8Double E = sv8tod(line);
   if (E.ok) {
     rv.E = E.result;
     rv.ok = true;
-    //debug("E = %g\n", E.result);
+    //debug("E = %g", E.result);
   } else {
     return rv; // empty
   }
@@ -218,7 +216,7 @@ Resin parse_resin(Sv8 line)
   if (ν.ok) {
     rv.ν = ν.result;
     rv.ok = true;
-    //debug("ν = %g\n", ν.result);
+    //debug("ν = %g", ν.result);
   } else {
     rv.ok = false;
     return rv;
@@ -228,7 +226,7 @@ Resin parse_resin(Sv8 line)
   if (α.ok) {
     rv.α = α.result;
     rv.ok = true;
-    //debug("α = %g\n", α.result);
+    //debug("α = %g", α.result);
   } else {
     rv.ok = false;
     return rv;
@@ -238,14 +236,14 @@ Resin parse_resin(Sv8 line)
   if (ρ.ok) {
     rv.ρ = ρ.result;
     rv.ok = true;
-    //debug("ρ = %g\n", ρ.result);
+    //debug("ρ = %g", ρ.result);
   } else {
     rv.ok = false;
     return rv;
   }
   // ρ.tail now starts with the name after whitespace.
   rv.name = sv8strip(ρ.tail);
-  //debug("rv.name.len = %ld\n", rv.name.len);
+  //debug("rv.name.len = %ld", rv.name.len);
   rv.ok = true;
   return rv;
 }
@@ -254,15 +252,12 @@ Fiber parse_fiber(Sv8 line)
 {
   Fiber rv = {0};
   rv.magic = FIBR;
-  // This function is only called when *line* starts with 'f:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the Young's modulus after whitespace.
-  Sv8Double E1 = sv8tod(cut.tail);
+  // line starts with the Young's modulus after possible whitespace.
+  Sv8Double E1 = sv8tod(line);
   if (E1.ok) {
     rv.E1 = E1.result;
     rv.ok = true;
-    //debug("E1 = %g\n", E1.result);
+    //debug("E1 = %g", E1.result);
   } else {
     return rv; // empty
   }
@@ -271,7 +266,7 @@ Fiber parse_fiber(Sv8 line)
   if (ν12.ok) {
     rv.ν12 = ν12.result;
     rv.ok = true;
-    //debug("ν12 = %g\n", ν12.result);
+    //debug("ν12 = %g", ν12.result);
   } else {
     rv.ok = false;
     return rv;
@@ -281,7 +276,7 @@ Fiber parse_fiber(Sv8 line)
   if (α1.ok) {
     rv.α1 = α1.result;
     rv.ok = true;
-    //debug("α1 = %g\n", α1.result);
+    //debug("α1 = %g", α1.result);
   } else {
     rv.ok = false;
     return rv;
@@ -291,7 +286,7 @@ Fiber parse_fiber(Sv8 line)
   if (ρ.ok) {
     rv.ρ = ρ.result;
     rv.ok = true;
-    //debug("ρ = %g\n", ρ.result);
+    //debug("ρ = %g", ρ.result);
   } else {
     rv.ok = false;
     return rv;
@@ -317,13 +312,15 @@ void laminates(Sv8 contents, ParseResult *result)
   int32_t lineno = 1;
   Sv8 comment = {0};
   while (ccut.ok == true) {
-    if (ccut.head.data[1] == ':') {
-      switch (ccut.head.data[0]) {
+    Sv8 stripped = sv8strip(ccut.head);
+    Sv8 parse_input = sv8lskip(stripped, 2);
+    if (stripped.data[1] == ':') {
+      switch (stripped.data[0]) {
         case 't':
           // This resets the state machine.
           state = 't';
           // This laminate structure is empty exept for the name.
-          Laminate lm = parse_t(ccut.head, lineno);
+          Laminate lm = parse_t(parse_input, lineno);
           if (lm.ok) {
             // Check for existing laminate with the same name.
             bool skip_lm = false;
@@ -340,7 +337,7 @@ void laminates(Sv8 contents, ParseResult *result)
               lm.layers = result->laminas+result->lu;
               // Copy the laminate into the laminate arena.
               result->laminates[result->tu++] = lm;
-              info("found laminate named “%s” on line %d\n", sv8cstring(lm.name), lineno);
+              info("found laminate named “%s” on line %d", sv8cstring(lm.name), lineno);
             }
           }
           break;
@@ -354,7 +351,7 @@ void laminates(Sv8 contents, ParseResult *result)
             break;
           }
           state = 'm';
-          Sv8 resin_name = parse_m(ccut.head, lineno, result);
+          Sv8 resin_name = parse_m(parse_input, lineno, result);
           if (resin_name.data == 0) {
             //warn("could not parse m-line on line %d", lineno);
             state = 'k';
@@ -381,7 +378,7 @@ void laminates(Sv8 contents, ParseResult *result)
             // Now that we know the resin, store it and the vf in the
             // laminate.
             pcurlam->r = *pcurresin;
-            info("using resin “%s” on line %d\n", sv8cstring(pcurlam->r.name), lineno);
+            info("using resin “%s” on line %d", sv8cstring(pcurlam->r.name), lineno);
           }
           break;
         case 'c':
@@ -391,8 +388,7 @@ void laminates(Sv8 contents, ParseResult *result)
           }
           state = 'l';
           // Save comment for addition to next lamina.
-          Sv8Cut cmtsplit = sv8lsplit(ccut.head);
-          comment = cmtsplit.tail;
+          comment = sv8strip(parse_input);
           //debug("storing comment “%s” on line %d", sv8cstring(comment), lineno);
           break;
         case 'l':
@@ -409,7 +405,7 @@ void laminates(Sv8 contents, ParseResult *result)
             break;
           }
           state = 'l';
-          Lamina lmn = parse_l(ccut.head, lineno, result);
+          Lamina lmn = parse_l(parse_input, lineno, result);
           if (lmn.ok) {
             // Add comment if appliccable.
             if (comment.data && comment.len) {
@@ -436,7 +432,7 @@ void laminates(Sv8 contents, ParseResult *result)
             comment = (Sv8) {
               0
             };
-            info("found s-line on line %d\n", lineno);
+            info("found s-line on line %d", lineno);
             // Mirror the lamina.
             pcurlam = current_laminate(result);
             for (int32_t j = pcurlam->nlayers, k = result->lu - 1; j>0 ; j--, k--) {
@@ -475,11 +471,8 @@ Laminate parse_t(Sv8 line, int32_t lineno)
 {
   Laminate rv = {0};
   rv.magic = LMNT;
-  // This function is only called when *line* starts with 't:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the name after whitespace.
-  rv.name = sv8strip(cut.tail);
+  // line starts with the name after possible whitespace.
+  rv.name = sv8strip(line);
   rv.ok = true;
   if (rv.name.len==0) {
     warning("laminate without a name on line %d will be ignored", lineno);
@@ -494,11 +487,8 @@ Sv8 parse_m(Sv8 line, int32_t lineno, ParseResult *result)
 {
   Laminate *pcurlam = current_laminate(result);
   result->ok = false;
-  // This function is only called when *line* starts with 'm:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the fiber volume fraction after whitespace.
-  Sv8Double vf = sv8tod(cut.tail);
+  // line starts with the fiber volume fraction after possible whitespace.
+  Sv8Double vf = sv8tod(line);
   if (vf.ok) {
     pcurlam->vf = vf.result;
     debug("fiber volume fraction “%f” found on line %d", vf.result, lineno);
@@ -523,11 +513,8 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
   Laminate *pcurlam = current_laminate(result);
   Lamina rv = {0}; // This sets rv.ok to false...
   debug("line %d: “%s”", lineno, sv8cstring(line));
-  // This function is only called when *line* starts with 'l:'.
-  // So discard that.
-  Sv8Cut cut = sv8lsplit(line);
-  // cut.tail now starts with the fiber area weight after whitespace.
-  Sv8Double area_weight = sv8tod(cut.tail);
+  // line starts with the fiber area weight after possible whitespace.
+  Sv8Double area_weight = sv8tod(line);
   if (area_weight.ok) {
     rv.fiber_weight = area_weight.result;
     debug("lamina area weight %g g/m2 found on line %d", area_weight.result, lineno);
