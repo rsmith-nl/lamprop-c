@@ -2,6 +2,8 @@
 Calculating elastic properties of composite laminates
 =====================================================
 
+.. Note:: This is the C version of this program. There is also a `Python version <https://github.com/rsmith-nl/lamprop/>`_
+
 The purpose of this program is to calculate some properties of
 fiber-reinforced composite laminates. It calculates
 - engineering properties like Ex, Ey, Gxy
@@ -91,3 +93,25 @@ can use an autocommand in your ``vimrc``;
 
     autocmd BufNewFile,BufRead *.lam set filetype=lamprop
 
+History
+=======
+
+The original version of ``lamprop`` was written in C around 2006.
+
+In 2011, I ported the program to Python since I had become more proficient in
+it than I was in C.
+
+Around 2023 I came across the `blog <https://nullprogram.com/index/>`_ of Chris Wellons.
+The techniques he shows for `arena allocation`_ and `string handling`_ *transformed*
+C for me. Memory allocation and string handling are now almost effortless.
+
+Furthermore, I got the request to make ``lamprop`` available for colleagues.
+And the IT department at my employer does not want to support anything that
+(like Python) requires a separate runtime.
+
+So starting in 2025 I ported the Python version back to C (C11 to be more
+specific), using the techniques I learned from Chris Wellons. That is what is
+contained in this repository.
+
+.. _arena allocation: https://nullprogram.com/blog/2023/09/27/
+.. _string handling: https://nullprogram.com/blog/2023/01/18/#implementation-highlights
