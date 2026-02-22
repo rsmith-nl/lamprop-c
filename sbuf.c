@@ -5,10 +5,11 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-08-28 23:49:02 +0200
-// Last modified: 2026-02-20T23:04:03+0100
+// Last modified: 2026-02-22T11:28:54+0100
 
 #include "sbuf.h"
 #include <assert.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdarg.h>
@@ -21,7 +22,7 @@ void sbuf_append(Sbuf *buf, const char *str, const ptrdiff_t len)
     return;
   }
   ptrdiff_t alen = strnlen(str, len);
-  ptrdiff_t remaining = SBUF_MAX - buf->used - 1;
+  ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
   if (len < remaining) {
     memcpy(buf->data+buf->used, str, alen);
     buf->used += alen;
@@ -34,7 +35,10 @@ void sbuf_append(Sbuf *buf, const char *str, const ptrdiff_t len)
 inline void sbuf_appends(Sbuf *buf, const char *str)
 {
   assert(buf!=0);
-  ptrdiff_t remaining = SBUF_MAX - buf->used - 1;
+  if (buf->error == true) {
+    return;
+  }
+  ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
   sbuf_append(buf, str, strnlen(str, remaining));
 }
 
@@ -45,7 +49,7 @@ void sbuf_printf(Sbuf *buf, const char *fmt, ...)
   if (buf->error == true) {
     return;
   }
-  ptrdiff_t remaining = SBUF_MAX - buf->used - 1;
+  ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
   va_list ap;
   va_start(ap, fmt);
   ptrdiff_t used = vsnprintf(buf->data+buf->used, remaining, fmt, ap);
@@ -62,7 +66,7 @@ void sbuf_printf(Sbuf *buf, const char *fmt, ...)
 ptrdiff_t sbuf_remaining(Sbuf *buf)
 {
   assert(buf!=0);
-  ptrdiff_t remaining = SBUF_MAX - buf->used - 1;
+  ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
   return remaining;
 }
 
@@ -77,7 +81,7 @@ void sbuf_fputs(Sbuf *buf, FILE* stream)
 void sbuf_reset(Sbuf *buf)
 {
   assert(buf!=0);
-  memset(buf->data, 0, SBUF_MAX);
+  memset(buf->data, 0, SBUF_SIZE);
   buf->used = 0;
   buf->error = false;
 }
