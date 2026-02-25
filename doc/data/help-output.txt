@@ -1,3 +1,4 @@
+lamprop-c version 2026.02.20
 usage: lamprop [-h] [-l | -H] [-e] [-m] [-f] [-L | -v] [--log=(debug|info|warn|error|crit)]
                [file ...]
 

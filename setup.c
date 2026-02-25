@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:37 +0200
-// Last modified: 2026-02-19T00:15:08+0100
+// Last modified: 2026-02-25T21:04:12+0100
 
 #include "setup.h"
 #include "logging.h"
@@ -15,6 +15,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <strings.h>
+
+const char *name = "lamprop-c";
 
 const char license[] =
   "Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>. All rights reserved.\n"
@@ -92,7 +94,8 @@ Options setup(int argc, char *argv[])
       break;
     }
     switch (choice) {
-      case 'h':
+   case 'h':
+        printf("%s version %s\n", name, VERSION);
         printf(help);
         exit(0);
         break;
@@ -124,7 +127,7 @@ Options setup(int argc, char *argv[])
         exit(0);
         break;
       case 'v':
-        printf(VERSION "\n");
+        printf("%s version %s\n", name, VERSION);
         exit(0);
         break;
       case 1000:
