@@ -21,7 +21,7 @@ LFLAGS = -pipe -flto
 # Other libraries to link against
 LIBS += -lm
 
-PREFIX = ${HOME}/.local
+PREFIX = /usr/local
 BINDIR = $(PREFIX)/bin
 MANDIR = $(PREFIX)/man/man1
 DOCSDIR= $(PREFIX)/share/doc/$(BASENAME)
