@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2026-02-20T12:13:12+0100
+// Last modified: 2026-02-27T20:37:14+0100
 
 // Inspired by: https://nullprogram.com/blog/2023/10/08/
 
@@ -51,6 +51,15 @@ extern "C" {
 
 // Test two strings for equality of length and content.
 extern bool sv8equals(Sv8 a, Sv8 b);
+
+// Return true if s starts with t.
+extern bool sv8startswith(Sv8 s, Sv8 t);
+
+// Return true if s ends with e.
+extern bool sv8endswith(Sv8 s, Sv8 e);
+
+// Return true if s contains with c.
+extern bool sv8contains(Sv8 s, Sv8 c);
 
 // Remove whitespace from the left of a string.
 extern Sv8 sv8lstrip(Sv8 s);

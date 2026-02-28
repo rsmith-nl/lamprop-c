@@ -5,12 +5,13 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2026-02-20T12:12:57+0100
+// Last modified: 2026-02-28T22:15:06+0100
 
 #include "stringview.h"
 
 #include <math.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -26,6 +27,60 @@ bool sv8equals(Sv8 a, Sv8 b)
 {
   return (a.len == b.len) && (!a.len || !memcmp(a.data, b.data, a.len));
 }
+
+bool sv8startswith(Sv8 s, Sv8 t)
+{
+  if (s.len == 0 || t.len == 0 || t.len > s.len) {
+    return false;
+  }
+  int32_t j = 0;
+  while (t.data[j] == s.data[j]) {
+    if (j == t.len - 1) {
+      return true;
+    }
+    j++;
+  }
+  return false;
+}
+
+bool sv8endswith(Sv8 s, Sv8 e)
+{
+  if (s.len == 0 || e.len == 0 || e.len > s.len) {
+    return false;
+  }
+  char *ptr = s.data + (s.len - e.len);
+  int32_t j = 0;
+  while (ptr[j] == e.data[j]) {
+    if (j == e.len - 1) {
+      return true;
+    }
+    j++;
+  }
+  return false;
+}
+
+bool sv8contains(Sv8 s, Sv8 c)
+{
+  if (s.len == 0 || c.len == 0 || c.len > s.len) {
+    return false;
+  }
+  for (int32_t j = 0; j < (s.len - c.len); j++) {
+    if (s.data[j] == c.data[0]) {
+      // Check from end first
+      int32_t matchcount = 0;
+      for (int32_t k = c.len-1; k >= 0; k--) {
+        if (s.data[j+k] == c.data[k]) {
+          matchcount++;
+        }
+      }
+      if (matchcount == c.len) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 
 Sv8 sv8lstrip(Sv8 s)
 {
@@ -240,7 +295,7 @@ Sv8Double sv8tod(Sv8 s)
   //   Fun-With-State-Machines-Incrementally-Parsing-Numb
   Sv8Double rv = {0};
   int32_t state = 0;
-  int32_t whole = 0, fractional = 0, fpower = 1, exponent = 0;
+  int64_t whole = 0, fractional = 0, fpower = 1, exponent = 0;
   bool stop = false;
   bool neg_num = false, neg_exp = false;
   s = sv8lstrip(s);
