@@ -1,10 +1,13 @@
 // file: logging.c
 // vim:fileencoding=utf-8:ft=c:tabstop=2
+// This is free and unencumbered software released into the public domain.
 //
-// Copyright © 2026 R.F. Smith <rsmith@xs4all.nl>
-// SPDX-License-Identifier: MIT
+// Author: R.F. Smith <rsmith@xs4all.nl>
+// SPDX-License-Identifier: Unlicense
 // Created: 2024-08-31 23:26:12 +0200
-// Last modified: 2026-02-18T23:40:46+0100
+// Last modified: 2026-02-28T20:57:49+0100
+
+#include "logging.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -15,17 +18,15 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-#include "logging.h"
-
 static char log_name[256] = {0};
-static char *prefix = "#%s %s: ";
+static const char *prefix = "#%s %s: ";
 static int log_level = LOG_WARNING;
 
 void logging_configure(char *name, int level)
 {
   assert(level>=0);
   if (name) {
-    memcpy(log_name, name, 255);
+    strncpy(log_name, name, 255);
   }
   if (level>0) {
     log_level = level;

@@ -1,10 +1,11 @@
 // file: logging.h
 // vim:fileencoding=utf-8:ft=c:tabstop=2
+// This is free and unencumbered software released into the public domain.
 //
-// Copyright © 2026 R.F. Smith <rsmith@xs4all.nl>
-// SPDX-License-Identifier: MIT
+// Author: R.F. Smith <rsmith@xs4all.nl>
+// SPDX-License-Identifier: Unlicense
 // Created: 2024-08-31 23:25:54 +0200
-// Last modified: 2026-02-18T23:36:35+0100
+// Last modified: 2026-02-22T00:09:03+0100
 
 #pragma once
 
@@ -23,7 +24,7 @@ extern "C" {
 
 // Call this function before any of the other logging calls below.
 // The “name” is prepended to each log message.
-// Every mess with a “level” equal or higher than the given value is printed.
+// Every message with a “level” equal or lower than the given value is printed.
 // If “level” is 0, the logging level is set to LOG_WARNING.
 extern void logging_configure(char *name, int level);
 
@@ -41,7 +42,6 @@ extern void error(char *fmt, ...);
 
 // A problem so serious that the program cannot continue and will be aborted.
 extern void critical(char *fmt, ...);
-
 
 #ifdef __cplusplus
 }
