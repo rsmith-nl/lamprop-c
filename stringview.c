@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2026-02-28T22:15:06+0100
+// Last modified: 2026-03-01T19:42:56+0100
 
 #include "stringview.h"
 
@@ -81,11 +81,29 @@ bool sv8contains(Sv8 s, Sv8 c)
   return false;
 }
 
-
 Sv8 sv8lstrip(Sv8 s)
 {
   while (s.len && _isspace(*s.data)) {
     s.data++, s.len--;
+  }
+  return s;
+}
+
+Sv8 sv8rstrip(Sv8 s)
+{
+  while (s.len && (_isspace(s.data[s.len-1]) || s.data[s.len-1]==0)) {
+    s.len--;
+  }
+  return s;
+}
+
+Sv8 sv8strip(Sv8 s)
+{
+  while (s.len && _isspace(*s.data)) {
+    s.data++, s.len--;
+  }
+  while (s.len && (_isspace(s.data[s.len-1]) || s.data[s.len-1]==0)) {
+    s.len--;
   }
   return s;
 }
@@ -106,25 +124,6 @@ Sv8 sv8rskip(Sv8 s, int32_t num)
     return s;
   }
   s.len -= num;
-  return s;
-}
-
-Sv8 sv8rstrip(Sv8 s)
-{
-  while (s.len && (_isspace(s.data[s.len-1]) || s.data[s.len-1]==0)) {
-    s.len--;
-  }
-  return s;
-}
-
-Sv8 sv8strip(Sv8 s)
-{
-  while (s.len && _isspace(*s.data)) {
-    s.data++, s.len--;
-  }
-  while (s.len && (_isspace(s.data[s.len-1]) || s.data[s.len-1]==0)) {
-    s.len--;
-  }
   return s;
 }
 
@@ -151,6 +150,26 @@ ptrdiff_t sv8count(Sv8 s, char f)
     }
   }
   return rv;
+}
+
+ptrdiff_t sv8lindex(Sv8 s, char c)
+{
+  for (int32_t j = 0; j < s.len; j++) {
+    if (s.data[j] == c) {
+      return j;
+    };
+  }
+  return -1;
+}
+
+ptrdiff_t sv8rindex(Sv8 s, char c)
+{
+  for (int32_t j = s.len-1; j >= 0; j--) {
+    if (s.data[j] == c) {
+      return j;
+    };
+  }
+  return -1;
 }
 
 Sv8 sv8span(char *beg, char *end)

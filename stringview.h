@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2026-02-27T20:37:14+0100
+// Last modified: 2026-03-01T19:42:28+0100
 
 // Inspired by: https://nullprogram.com/blog/2023/10/08/
 
@@ -58,23 +58,23 @@ extern bool sv8startswith(Sv8 s, Sv8 t);
 // Return true if s ends with e.
 extern bool sv8endswith(Sv8 s, Sv8 e);
 
-// Return true if s contains with c.
+// Return true if s contained within c.
 extern bool sv8contains(Sv8 s, Sv8 c);
 
 // Remove whitespace from the left of a string.
 extern Sv8 sv8lstrip(Sv8 s);
-
-// Strip num characters from the left of the string.
-extern Sv8 sv8lskip(Sv8 s, int32_t num);
-
-// Strip num characters from the right of the string.
-extern Sv8 sv8rskip(Sv8 s, int32_t num);
 
 // Remove whitespace from the right of a string.
 extern Sv8 sv8rstrip(Sv8 s);
 
 // Remove whitespace from both ends of the string.
 extern Sv8 sv8strip(Sv8 s);
+
+// Strip num characters from the left of the string.
+extern Sv8 sv8lskip(Sv8 s, int32_t num);
+
+// Strip num characters from the right of the string.
+extern Sv8 sv8rskip(Sv8 s, int32_t num);
 
 // Return the offset of the string f in the string s.
 // If not found, return -1.
@@ -83,11 +83,17 @@ extern ptrdiff_t sv8find(Sv8 s, Sv8 f);
 // Return the amount of occurrances of the character f in string s.
 extern ptrdiff_t sv8count(Sv8 s, char f);
 
-// Return the Sv8 that stretched from beg to end.
-extern Sv8 sv8span(char *beg, char *end);
+// Return the index of the first instance of c starting from the left, or -1.
+extern ptrdiff_t sv8lindex(Sv8 s, char c);
+
+// Return the index of the first instance of c starting from the left, or -1.
+extern ptrdiff_t sv8rindex(Sv8 s, char c);
 
 // Cut the string s at the character c.
 extern Sv8Cut sv8cut(Sv8 s, char c);
+
+// Return the Sv8 that stretched from beg to end.
+extern Sv8 sv8span(char *beg, char *end);
 
 // Cut the string at the first whitespace from the left.
 extern Sv8Cut sv8lsplit(Sv8 s);
