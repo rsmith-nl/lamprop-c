@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2026-03-01T19:42:56+0100
+// Last modified: 2026-03-01T23:00:34+0100
 
 #include "stringview.h"
 
@@ -64,7 +64,7 @@ bool sv8contains(Sv8 s, Sv8 c)
   if (s.len == 0 || c.len == 0 || c.len > s.len) {
     return false;
   }
-  for (int32_t j = 0; j < (s.len - c.len); j++) {
+  for (int32_t j = 0; j <= (s.len - c.len); j++) {
     if (s.data[j] == c.data[0]) {
       // Check from end first
       int32_t matchcount = 0;
