@@ -3,7 +3,7 @@
 #
 # Copyright © 2018 R.F. Smith <rsmith@xs4all.nl>
 # Created: 2018-05-15T01:05:44+0200
-# Last modified: 2022-01-30T12:34:22+0100
+# Last modified: 2026-03-01T13:45:37+0100
 .SUFFIXES:
 .PHONY: clean
 
@@ -13,7 +13,7 @@ LMKARGS:=-bibtex -pdfxe -silent -file-line-error -halt-on-error
 
 all:  ${DOCPDF}
 
-${DOCPDF}: ${DOCSRC} lman.bib
+${DOCPDF}: ${DOCSRC} lman.bib data/atlac430.tex data/help-output.txt
 	-latexmk ${LMKARGS} ${DOCSRC} 2>&1
 
 clean::

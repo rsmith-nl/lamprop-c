@@ -1,9 +1,9 @@
 % file: lamprop-manual.tex
 % vim:fileencoding=utf-8:fdm=marker:ft=tex:spelllang=en
 %
-% Copyright © 2018,2020 R.F. Smith <rsmith@xs4all.nl>. All rights reserved.
-% Created: 2018-05-13 23:48:04 +0200
-% Last modified: 2026-02-20T23:27:07+0100
+% Copyright © 2026 R.F. Smith <rsmith@xs4all.nl>. All rights reserved.
+% Created: 2026-02-01T19:52:00+01:00
+% Last modified: 2026-03-01T13:59:09+0100
 
 \newcommand{\twodigits}[1]{\ifnum#1<10 0\number#1\else\number#1\fi}
 \newcommand{\TheDate}{\number\year-\twodigits\month-\twodigits\day}
@@ -319,6 +319,25 @@ for example:
 \verb| & "C:\users\John Doe\lamprop\lamprop.exe" -h|
 .
 
+Note that this program uses \textsc{posix}-style options. Short
+options starting with “\texttt{-}” and long options starting with “\texttt{--}”.
+
+\section{Using the command-line program} % {{{2
+
+The command \texttt{lamrop -h} produces the following overview of the options.
+
+\lstinputlisting[style=plain]{data/help-output.txt}
+
+Running \texttt{lamprop} from the command line produces text output by
+default. Output in \LaTeX{} or \textsc{html} format can be requested with the
+appropriate arguments. \textsc{rtf} output (for inclusion in word
+processor documents) has been removed. Since most word processors can read
+\textsc{html}, use that instead.
+
+By default, it produces all possible output, in text format.
+Often we are only interested in the engineering properties.
+In that case, use the \texttt{-e} option.
+
 \chapter{The lamprop file format} % {{{2
 
 The file format is very simple. Functional lines have either \textbf{f},
@@ -512,18 +531,6 @@ Several resins are shown in \tref{tb:resins}. For resins, $\nu$ is estimated
   \end{tabular}
 \end{table}
 
-\section{Using the command-line program} % {{{2
-
-The command \texttt{lamrop -h} produces the following overview of the options.
-
-\lstinputlisting[style=plain]{data/help-output.txt}
-
-Running \texttt{lamprop} from the command line produces text output by
-default. Output in \LaTeX{} or \textsc{html} format can be requested with the
-appropriate arguments. \textsc{rtf} output (for inclusion in word
-processor documents) has been removed. Since most word processors can read
-\textsc{html}, use that instead.
-
 \section{Meaning of the ABD, H and C matrices} % {{{2
 
 The stiffness or ABD matrix are what converts
@@ -558,7 +565,7 @@ $j$ are 1, 2 or 6): $A_{ij}$ is in \si{N/mm}. $B_{ij}$ is in \si{Nmm/mm}
 The stress resultants $N$ are units of force per unit of width (\si{N/mm}).
 Moment resultants $m$ are in units of torque per unit of width (\si{Nmm/mm}
 = \si{N}). Both strains $\epsilon$ and $\kappa$ are dimensionless.
-The ABD and H matrix equations in \tref{tab:quasi-isotropic-mat} basically show the
+The ABD and H matrix equations in \tref{tab:quasi-isotropic-mat-2} basically show the
 behavior of a square piece of laminate small enough that the stress and strain
 resultants can be considered constant over its dimensions.
 
