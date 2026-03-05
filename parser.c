@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-02-20T12:35:00+0100
+// Last modified: 2026-03-05T01:04:05+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -57,11 +57,14 @@ Sv8 read_file(char *path, Arena *permanent)
     return contents;
   }
   fseek(inputfile, 0L, SEEK_END);
-  ptrdiff_t size = ftell(inputfile);
+  // Make space for extra newline.
+  ptrdiff_t size = ftell(inputfile) + 1;
   rewind(inputfile);
   contents.data = arena_new(permanent, char, size);
   contents.len = size;
   ptrdiff_t rv = fread(contents.data, sizeof(char), size, inputfile);
+  // Append extra newline.
+  contents.data[rv++] = '\n';
   fclose(inputfile);
   if (rv != size) {
     info("file “%s” has size %td bytes, but only %td bytes read.", path, size, rv);
