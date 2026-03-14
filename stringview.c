@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2026-03-01T23:00:34+0100
+// Last modified: 2026-03-14T04:13:23+0100
 
 #include "stringview.h"
 
@@ -194,6 +194,21 @@ Sv8Cut sv8cut(Sv8 s, char c)
   r.head = sv8span(beg, cut);
   r.tail = sv8span(cut+r.ok, end);
   return r;
+}
+
+Sv8Cut sv8cuts(Sv8 s, Sv8 v)
+{
+  Sv8Cut rv = {0};
+  ptrdiff_t ix = sv8find(s, v);
+  if (ix==-1) {
+    return rv;
+  }
+  rv.head = s;
+  rv.head.len = ix;
+  rv.tail.data = s.data + ix + v.len;
+  rv.tail.len = s.len - ix - v.len;
+  rv.ok = true;
+  return rv;
 }
 
 Sv8Cut sv8lsplit(Sv8 s)

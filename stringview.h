@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2026-03-01T19:42:28+0100
+// Last modified: 2026-03-14T04:13:39+0100
 
 // Inspired by: https://nullprogram.com/blog/2023/10/08/
 
@@ -91,6 +91,9 @@ extern ptrdiff_t sv8rindex(Sv8 s, char c);
 
 // Cut the string s at the character c.
 extern Sv8Cut sv8cut(Sv8 s, char c);
+
+// Cut the string s at the stringview v.
+extern Sv8Cut sv8cuts(Sv8 s, Sv8 v);
 
 // Return the Sv8 that stretched from beg to end.
 extern Sv8 sv8span(char *beg, char *end);
