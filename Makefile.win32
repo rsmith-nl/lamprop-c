@@ -2,7 +2,7 @@
 BASENAME = lamprop
 VMAJOR   = 2026
 VMINOR   = 03
-VPATCH   = 05
+VPATCH   = 17
 
 # w64devkit uses gcc as cc.
 

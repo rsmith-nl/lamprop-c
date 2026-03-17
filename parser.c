@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-03-05T01:04:05+0100
+// Last modified: 2026-03-17T18:47:09+0100
 
 #include "arena.h"
 #include "logging.h"
@@ -14,7 +14,8 @@
 
 #include <assert.h>
 #include <stdint.h>
-#include <stdio.h>  // for fopen
+#include <stdio.h>  // for fopen.
+#include <stdlib.h> // for exit.
 #include <string.h> // for memset(3), memcpy(3)
 
 static const Resin generic_resins[3] = {
@@ -53,8 +54,8 @@ Sv8 read_file(char *path, Arena *permanent)
   Sv8 contents = {0};
   FILE *inputfile = fopen(path, "r");
   if (inputfile==0) {
-    info("could not open file %s", path);
-    return contents;
+    error("could not open file %s", path);
+    exit(EXIT_FAILURE);
   }
   fseek(inputfile, 0L, SEEK_END);
   // Make space for extra newline.
