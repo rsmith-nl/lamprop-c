@@ -62,7 +62,7 @@ install: $(BASENAME)  ## Install the program.
 uninstall:  ## Uninstall the program.
 	rm -f $(BINDIR)/$(BASENAME)
 
-version.h:
+version.h: mkver.sh
 	./mkver.sh >version.h
 
 .PHONY: style
