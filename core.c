@@ -189,7 +189,7 @@ Lamina init_lamina(Fiber f, Resin r, double area_weight, double angle, double vf
 
 void tbar(double out[6][6], double angle)
 {
-  assert(out!=0);
+  assert(out != 0);
   double c = cos(angle), s = sin(angle);
   double Tbar[6][6] = {
     {c * c, s * s, 0, 0, 0, c * s},
@@ -199,14 +199,14 @@ void tbar(double out[6][6], double angle)
     {0, 0, 0, s, c, 0},
     {-2 * c * s, 2 * c * s, 0, 0, 0, c * c - s * s}
   };
-  memcpy(out, Tbar, 6*6*sizeof(double));
+  memcpy(out, Tbar, 6 * 6 * sizeof(double));
 }
 
 
 bool finish_laminate(Laminate *pl)
 {
-  assert(pl!=0);
-  if (pl->magic!=LMNT) {
+  assert(pl != 0);
+  if (pl->magic != LMNT) {
     return false;
   }
   if (pl->nlayers <= 0) {
@@ -255,8 +255,8 @@ bool finish_laminate(Laminate *pl)
   double S[6][6] = {0};
   mat_inv6(C, S);
   // Store matrices.
-  memcpy(pl->C, C, 6*6*sizeof(double));
-  memcpy(pl->S, S, 6*6*sizeof(double));
+  memcpy(pl->C, C, 6 * 6 * sizeof(double));
+  memcpy(pl->S, S, 6 * 6 * sizeof(double));
   // Calculate ABD and H matrices
   double ABD[6][6] = {0};
   double H[2][2] = {0};
@@ -317,7 +317,7 @@ bool finish_laminate(Laminate *pl)
              pl->layers[j].Q̅66 * pl->layers[j].αxy) * pl->layers[j].thickness;
     // Calculate H matrix (derived from Barbero:2018, p. 181)
     // Note: division by 4 moved to end because of accuracy!
-    double sb = 5 * (pl->layers[j].thickness - 4 * lz3[j] / (thickness*thickness)) / 4;
+    double sb = 5 * (pl->layers[j].thickness - 4 * lz3[j] / (thickness * thickness)) / 4;
     H[0][0] += pl->layers[j].Q̅s44 * sb;
     H[0][1] += pl->layers[j].Q̅s45 * sb;
     H[1][0] += pl->layers[j].Q̅s45 * sb;
@@ -329,16 +329,16 @@ bool finish_laminate(Laminate *pl)
   mat_clean6(ABD);
   mat_clean2(H);
   // Store matrices.
-  memcpy(pl->ABD, ABD, 6*6*sizeof(double));
-  memcpy(pl->H, H, 2*2*sizeof(double));
+  memcpy(pl->ABD, ABD, 6 * 6 * sizeof(double));
+  memcpy(pl->H, H, 2 * 2 * sizeof(double));
   // Calculate inverted matrices
   double abd[6][6] = {0};
   double h[2][2] = {0};
   mat_inv6(ABD, abd);
   mat_inv2(H, h);
   // Store inverted matrices.
-  memcpy(pl->abd, abd, 6*6*sizeof(double));
-  memcpy(pl->h, h, 2*2*sizeof(double));
+  memcpy(pl->abd, abd, 6 * 6 * sizeof(double));
+  memcpy(pl->h, h, 2 * 2 * sizeof(double));
   // Calculate the engineering properties.
   // Nettles:1994, p. 34 e.v.
   double dABD = mat_det6(ABD);
@@ -346,13 +346,13 @@ bool finish_laminate(Laminate *pl)
   double dt1 = 0, dt2 = 0, dt3 = 0, dt4 = 0, dt5 = 0;
   mat_delete(ABD, tmp, 0, 0);
   dt1 = mat_det5(tmp);
-  pl->Ex = dABD/(dt1 * thickness);
+  pl->Ex = dABD / (dt1 * thickness);
   mat_delete(ABD, tmp, 1, 1);
   dt2 = mat_det5(tmp);
-  pl->Ey = dABD/(dt2 * thickness);
+  pl->Ey = dABD / (dt2 * thickness);
   mat_delete(ABD, tmp, 2, 2);
   dt3 = mat_det5(tmp);
-  pl->Gxy = dABD/(dt3 * thickness);
+  pl->Gxy = dABD / (dt3 * thickness);
   mat_delete(ABD, tmp, 0, 1);
   dt4 = mat_det5(tmp);
   mat_delete(ABD, tmp, 1, 0);
@@ -384,7 +384,7 @@ bool finish_laminate(Laminate *pl)
 
 bool isortho(double src[6][6])
 {
-  assert(src!=0);
+  assert(src != 0);
   int32_t r[24] = {0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5};
   int32_t c[24] = {3, 4, 5, 3, 4, 5, 3, 4, 5, 0, 1, 2, 4, 5, 0, 1, 2, 3, 5, 0, 1, 2, 3, 4};
   int32_t count = 0;
@@ -401,8 +401,8 @@ bool isortho(double src[6][6])
 
 void toabaqusi(double src[6][6], double dest[6][6])
 {
-  assert(src!=0);
-  assert(dest!=0);
+  assert(src != 0);
+  assert(dest != 0);
   for (int32_t r = 0; r < 6; r++) {
     for (int32_t c = 0; c < 6; c++) {
       dest[r][c] = src[r][c] * 1e6;

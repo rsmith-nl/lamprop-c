@@ -17,7 +17,7 @@
 
 static bool _isspace(char c)
 {
-  if (c==' '||c=='\t'||c=='\r'||c=='\n'||c=='\v'||c=='\f') {
+  if (c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f') {
     return true;
   }
   return false;
@@ -68,8 +68,8 @@ bool sv8contains(Sv8 s, Sv8 c)
     if (s.data[j] == c.data[0]) {
       // Check from end first
       int32_t matchcount = 0;
-      for (int32_t k = c.len-1; k >= 0; k--) {
-        if (s.data[j+k] == c.data[k]) {
+      for (int32_t k = c.len - 1; k >= 0; k--) {
+        if (s.data[j + k] == c.data[k]) {
           matchcount++;
         }
       }
@@ -91,7 +91,7 @@ Sv8 sv8lstrip(Sv8 s)
 
 Sv8 sv8rstrip(Sv8 s)
 {
-  while (s.len && (_isspace(s.data[s.len-1]) || s.data[s.len-1]==0)) {
+  while (s.len && (_isspace(s.data[s.len - 1]) || s.data[s.len - 1] == 0)) {
     s.len--;
   }
   return s;
@@ -102,7 +102,7 @@ Sv8 sv8strip(Sv8 s)
   while (s.len && _isspace(*s.data)) {
     s.data++, s.len--;
   }
-  while (s.len && (_isspace(s.data[s.len-1]) || s.data[s.len-1]==0)) {
+  while (s.len && (_isspace(s.data[s.len - 1]) || s.data[s.len - 1] == 0)) {
     s.len--;
   }
   return s;
@@ -134,7 +134,7 @@ ptrdiff_t sv8find(Sv8 s, Sv8 f)
   }
   ptrdiff_t maxoff = s.len - f.len;
   for (ptrdiff_t off = 0; off <= maxoff ; off++) {
-    if (memcmp(s.data+off, f.data, f.len) == 0) {
+    if (memcmp(s.data + off, f.data, f.len) == 0) {
       return off;
     }
   }
@@ -164,7 +164,7 @@ ptrdiff_t sv8lindex(Sv8 s, char c)
 
 ptrdiff_t sv8rindex(Sv8 s, char c)
 {
-  for (int32_t j = s.len-1; j >= 0; j--) {
+  for (int32_t j = s.len - 1; j >= 0; j--) {
     if (s.data[j] == c) {
       return j;
     };
@@ -176,7 +176,7 @@ Sv8 sv8span(char *beg, char *end)
 {
   Sv8 r = {0};
   r.data = beg;
-  r.len  = beg ? end-beg : 0;
+  r.len  = beg ? end - beg : 0;
   return r;
 }
 
@@ -189,10 +189,10 @@ Sv8Cut sv8cut(Sv8 s, char c)
   char *beg = s.data;
   char *end = s.data + s.len;
   char *cut = beg;
-  for (; cut<end && *cut!=c; cut++) {}
+  for (; cut < end && *cut != c; cut++) {}
   r.ok   = cut < end;
   r.head = sv8span(beg, cut);
-  r.tail = sv8span(cut+r.ok, end);
+  r.tail = sv8span(cut + r.ok, end);
   return r;
 }
 
@@ -200,7 +200,7 @@ Sv8Cut sv8cuts(Sv8 s, Sv8 v)
 {
   Sv8Cut rv = {0};
   ptrdiff_t ix = sv8find(s, v);
-  if (ix==-1) {
+  if (ix == -1) {
     return rv;
   }
   rv.head = s;
@@ -221,13 +221,13 @@ Sv8Cut sv8lsplit(Sv8 s)
   char *end = s.data + s.len;
   char *cut = beg;
   char *startws = 0, *endws = 0;
-  while (cut<end) {
+  while (cut < end) {
     if (_isspace(*cut)) { // whitespace
-      if (startws==0) {
+      if (startws == 0) {
         startws = cut;
       }
     } else { // not whitespace
-      if (startws!=0) {
+      if (startws != 0) {
         endws = cut;
         break;
       }
@@ -251,18 +251,18 @@ Sv8Int sv8toi(Sv8 s)
   int32_t state = 0, number = 0;
   bool negative = false;
   bool stop = false;
-  while (beg<end && !stop) {
+  while (beg < end && !stop) {
     char c = *beg++;
     switch (state) {
       case 0:   // Start state.
-        if (c=='+') {
+        if (c == '+') {
           state = 1;
-        } else if (c=='-') {
+        } else if (c == '-') {
           negative = true;
           state = 1;
-        } else if (c=='0') {
+        } else if (c == '0') {
           state = 2;
-        } else if (c>='1' && c <='9') {
+        } else if (c >= '1' && c <= '9') {
           state = 3;
           number = c - '0';
         } else {
@@ -270,9 +270,9 @@ Sv8Int sv8toi(Sv8 s)
         }
         break;
       case 1:   // After a leading + or -.
-        if (c=='0') {
+        if (c == '0') {
           state = 2;
-        } else if (c>='1' && c <='9') {
+        } else if (c >= '1' && c <= '9') {
           state = 3;
           number = c - '0';
         } else {
@@ -280,9 +280,9 @@ Sv8Int sv8toi(Sv8 s)
         }
         break;
       case 2:   // Skip leading zeros.
-        if (c=='0') {
+        if (c == '0') {
           state = 2;
-        } else if (c>='1' && c <='9') {
+        } else if (c >= '1' && c <= '9') {
           state = 3;
           number = c - '0';
         } else {
@@ -291,19 +291,19 @@ Sv8Int sv8toi(Sv8 s)
         }
         break;
       case 3:   // Process digits.
-        if (c>='0' && c <='9') {
+        if (c >= '0' && c <= '9') {
           state = 3;
-          if ((1<<30)/number < 10) { // will overflow.
+          if ((1 << 30) / number < 10) { // will overflow.
             goto fail2;
           }
-          number = number*10 + c - '0';
+          number = number * 10 + c - '0';
         } else {
           stop = true; // non-numeric character
         }
         break;
     } // switch
   } // while
-  if (stop==true) {
+  if (stop == true) {
     beg--;
   }
   rv.result = number;
@@ -335,20 +335,20 @@ Sv8Double sv8tod(Sv8 s)
   s = sv8lstrip(s);
   char *beg = s.data;
   char *end = s.data + s.len;
-  while (beg<end && !stop) {
+  while (beg < end && !stop) {
     char c = *beg++;
     switch (state) {
       case 0:   // start state.
-        if (c=='0') {
+        if (c == '0') {
           state = 2;
-        } else if (c=='-') {
+        } else if (c == '-') {
           state = 1;
           neg_num = true;
-        } else if (c=='+') {
+        } else if (c == '+') {
           state = 1;
-        } else if (c=='0') {
+        } else if (c == '0') {
           state = 2;
-        } else if (c>='1' && c<='9') {
+        } else if (c >= '1' && c <= '9') {
           state = 8;
           whole = c - '0';
         } else {
@@ -356,9 +356,9 @@ Sv8Double sv8tod(Sv8 s)
         }
         break;
       case 1:   // After a leading + or -.
-        if (c=='0') {
+        if (c == '0') {
           state = 2;
-        } else if (c>='1' && c<='9') {
+        } else if (c >= '1' && c <= '9') {
           state = 8;
           whole = c - '0';
         } else {
@@ -366,29 +366,29 @@ Sv8Double sv8tod(Sv8 s)
         }
         break;
       case 2:   // Skip leading zeroes.
-        if (c=='.') {
+        if (c == '.') {
           state = 3;
-        } else if (c=='e' || c=='E') {
+        } else if (c == 'e' || c == 'E') {
           state = 5;
-        } else if (c=='0') {
+        } else if (c == '0') {
           state = 2;
-        } else if (c>='1' && c<='9') {
+        } else if (c >= '1' && c <= '9') {
           state = 8;
           whole = c - '0';
         } else {
           // return 0.
-          rv.result = neg_num?-0.0:0.0;
+          rv.result = neg_num ? -0.0 : 0.0;
           rv.ok = true;
-          rv.tail = sv8span(beg-1, end);
+          rv.tail = sv8span(beg - 1, end);
           return rv;
         }
         break;
       case 3:   // Decimal digits
-        if (c>='0' && c<='9') {
+        if (c >= '0' && c <= '9') {
           state = 3;
           fpower *= 10;
-          fractional = 10*fractional + c - '0';
-        } else if (c=='e' || c=='E') {
+          fractional = 10 * fractional + c - '0';
+        } else if (c == 'e' || c == 'E') {
           state = 5;
         } else {
           stop = true;
@@ -397,12 +397,12 @@ Sv8Double sv8tod(Sv8 s)
       case 5:   // Found ‘e’ or ‘E’.
         if (c == '0') {
           state = 9;
-        } else if (c>='1' && c<='9') {
+        } else if (c >= '1' && c <= '9') {
           state = 7;
-          exponent = 10*exponent + c - '0';
-        } else if (c=='+') {
+          exponent = 10 * exponent + c - '0';
+        } else if (c == '+') {
           state = 6;
-        } else if (c=='-') {
+        } else if (c == '-') {
           state = 6;
           neg_exp = true;
         } else {
@@ -412,28 +412,28 @@ Sv8Double sv8tod(Sv8 s)
       case 6:   // Found + or - in exponent.
         if (c == '0') {
           state = 9;
-        } else if (c>='1' && c<='9') {
+        } else if (c >= '1' && c <= '9') {
           state = 7;
-          exponent = 10*exponent + c - '0';
+          exponent = 10 * exponent + c - '0';
         } else {
           goto fail1; // not a number after [eE][+-]
         }
         break;
       case 7:   // Parse exponent digits.
-        if (c>='0' && c<='9') {
+        if (c >= '0' && c <= '9') {
           state = 7;
-          exponent = 10*exponent + c - '0';
+          exponent = 10 * exponent + c - '0';
         } else {
           stop = true;
         }
         break;
       case 8:   // Process digits before the decimal point.
-        if (c=='.') {
+        if (c == '.') {
           state = 3;
-        } else if (c>='0' && c<='9') {
+        } else if (c >= '0' && c <= '9') {
           state = 8;
-          whole = 10*whole + c - '0';
-        } else if (c=='e' || c=='E') {
+          whole = 10 * whole + c - '0';
+        } else if (c == 'e' || c == 'E') {
           state = 5;
         } else {
           stop = true; // in this case it is a whole number.
@@ -442,9 +442,9 @@ Sv8Double sv8tod(Sv8 s)
       case 9:   // Skip 0 digits in exponent.
         if (c == '0') {
           state = 9;
-        } else if (c>='1' && c<='9') {
+        } else if (c >= '1' && c <= '9') {
           state = 7;
-          exponent = 10*exponent + c - '0';
+          exponent = 10 * exponent + c - '0';
         } else {
           goto fail1; // not a number after leading 0 in exponent.
         }
@@ -456,11 +456,11 @@ Sv8Double sv8tod(Sv8 s)
   } else if (neg_exp == true) {
     exponent *= -1;
   }
-  if (stop==true) {
+  if (stop == true) {
     beg--;
   }
   rv.ok = true;
-  rv.result = (double)whole + ((double)fractional)/fpower;
+  rv.result = (double)whole + ((double)fractional) / fpower;
   if (neg_num) {
     rv.result *= -1.0;
   }
@@ -492,6 +492,6 @@ char *sv8cstring(Sv8 s)
 {
   static char buf[CSBSZ];
   memset(buf, 0, CSBSZ);
-  memcpy(buf, s.data, s.len<CSBSZ?s.len:(CSBSZ-1));
+  memcpy(buf, s.data, s.len < CSBSZ ? s.len : (CSBSZ - 1));
   return buf;
 }

@@ -11,7 +11,7 @@
 
 double frexp10(double arg, int *exp)
 {
-  assert(exp!=0);
+  assert(exp != 0);
   *exp = (arg == 0) ? 0 : (int)floor(log10(fabs(arg)));
   return arg * pow(10, -(*exp));
 }

@@ -24,10 +24,10 @@ extern void text_fea(Laminate *pl);
 
 void latex_out(Laminate *pl, bool eng, bool mat, bool fea)
 {
-  assert(pl!=0);
+  assert(pl != 0);
   // Escape underscores in the name.
-  char texlname[pl->name.len*2];
-  memset(texlname, 0, pl->name.len*2);
+  char texlname[pl->name.len * 2];
+  memset(texlname, 0, pl->name.len * 2);
   for (int32_t j = 0, k = 0; j < pl->name.len; j++, k++) {
     if (pl->name.data[j] == '_') {
       texlname[k++] = '\\';
@@ -51,8 +51,8 @@ void latex_out(Laminate *pl, bool eng, bool mat, bool fea)
     } else if (la->symm) {
       puts("      \\multicolumn{5}{l}{\\rule[0.5ex]{10mm}{1pt}symmetry line\\rule[0.5ex]{10mm}{1pt}}\\\\");
     }
-    printf("      %3d & %6g & %5g & %4.3g & ", k+1, la->fiber_weight,
-           180*la->angle/M_PI, 100*la->vf);
+    printf("      %3d & %6g & %5g & %4.3g & ", k + 1, la->fiber_weight,
+           180 * la->angle / M_PI, 100 * la->vf);
     printf("%s\\\\\n", sv8cstring(la->f.name));
   }
   puts("      \\bottomrule");
@@ -62,8 +62,8 @@ void latex_out(Laminate *pl, bool eng, bool mat, bool fea)
   puts("      \\toprule");
   puts("      Property & Value & Dimension\\\\");
   puts("      \\midrule");
-  printf("      $\\mathrm{v_f}$ & %4.1f &\\%%\\\\\n", 100*pl->vf);
-  printf("      $\\mathrm{w_f}$ & %4.1f &\\%%\\\\\n", 100*pl->wf);
+  printf("      $\\mathrm{v_f}$ & %4.1f &\\%%\\\\\n", 100 * pl->vf);
+  printf("      $\\mathrm{w_f}$ & %4.1f &\\%%\\\\\n", 100 * pl->wf);
   printf("      thickness & %.2f & mm\\\\\n", pl->thickness);
   printf("      density & %4.2f & g/cm$^3$\\\\\n", pl->ρ);
   printf("      weight & %.0f & g/m$^2$\\\\\n", pl->fiber_weight + pl->resin_weight);

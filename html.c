@@ -23,7 +23,7 @@ extern void text_fea(Laminate *pl);
 
 void html_out(Laminate *pl, bool eng, bool mat, bool fea)
 {
-  assert(pl!=0);
+  assert(pl != 0);
   puts("<!DOCTYPE html>");
   puts("<html lang=\"en-US\">");
   puts("<head><meta charset=\"UTF-8\">"
@@ -60,10 +60,10 @@ void html_out(Laminate *pl, bool eng, bool mat, bool fea)
       puts("</tr>");
     }
     puts("<tr>");
-    printf("<td>%3d</td><td>%6g</td><td>%5g</td>", k+1, la->fiber_weight,
-           180*la->angle/M_PI);
+    printf("<td>%3d</td><td>%6g</td><td>%5g</td>", k + 1, la->fiber_weight,
+           180 * la->angle / M_PI);
     printf("<td>%4.3g</td><td align=\"left\">%s</td>\n",
-           100*la->vf, sv8cstring(la->f.name));
+           100 * la->vf, sv8cstring(la->f.name));
     puts("</tr>");
   }
   puts("</tbody>");
@@ -77,9 +77,9 @@ void html_out(Laminate *pl, bool eng, bool mat, bool fea)
   puts("</thead>");
   puts("<tbody align=\"right\">");
   printf("<tr><td>v<sub>f</sub></td><td>%4.1f</td><td align=\"left\">%%</td></tr>\n",
-         100*pl->vf);
+         100 * pl->vf);
   printf("<tr><td>w<sub>f</sub></td><td>%4.1f</td><td align=\"left\">%%</td></tr>\n",
-         100*pl->wf);
+         100 * pl->wf);
   printf("<tr><td>thickness</td><td>%.2f</td><td align=\"left\">mm</td></tr>\n",
          pl->thickness);
   printf("<tr><td>density</td><td>%4.2f</td><td align=\"left\">g/cm&sup3;</td></tr>\n",
@@ -181,7 +181,7 @@ static void pr(int n, double mat[n][n], int row)
     } else {
       sbuf_printf(&b, "%-10.4g", num);
     }
-    if (j<(n-1)) {
+    if (j < (n - 1)) {
       sbuf_appends(&b, "</td><td>");
     }
   }
@@ -293,7 +293,7 @@ void matrices(Laminate *pl)
   puts("<tr>");
   puts(fstr2[0]);
   puts("<td rowspan=\"6\">=</td>");
-  pr(6,pl-> C, 0),
+  pr(6, pl-> C, 0),
   puts("<td rowspan=\"6\">&times;</td>");
   puts(dstr2[0]);
   puts("</tr>");

@@ -24,11 +24,11 @@ static int log_level = LOG_WARNING;
 
 void logging_configure(char *name, int level)
 {
-  assert(level>=0);
+  assert(level >= 0);
   if (name) {
     strncpy(log_name, name, 255);
   }
-  if (level>0) {
+  if (level > 0) {
     log_level = level;
   }
 }

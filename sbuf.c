@@ -16,15 +16,15 @@
 
 void sbuf_append(Sbuf *buf, const char *str, const ptrdiff_t len)
 {
-  assert(buf!=0);
-  assert(str!=0);
+  assert(buf != 0);
+  assert(str != 0);
   if (buf->error == true) {
     return;
   }
   ptrdiff_t alen = strnlen(str, len);
   ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
   if (len < remaining) {
-    memcpy(buf->data+buf->used, str, alen);
+    memcpy(buf->data + buf->used, str, alen);
     buf->used += alen;
     buf->error = false;
   } else {
@@ -34,7 +34,7 @@ void sbuf_append(Sbuf *buf, const char *str, const ptrdiff_t len)
 
 inline void sbuf_appends(Sbuf *buf, const char *str)
 {
-  assert(buf!=0);
+  assert(buf != 0);
   if (buf->error == true) {
     return;
   }
@@ -44,18 +44,18 @@ inline void sbuf_appends(Sbuf *buf, const char *str)
 
 void sbuf_printf(Sbuf *buf, const char *fmt, ...)
 {
-  assert(buf!=0);
-  assert(fmt!=0);
+  assert(buf != 0);
+  assert(fmt != 0);
   if (buf->error == true) {
     return;
   }
   ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
   va_list ap;
   va_start(ap, fmt);
-  ptrdiff_t used = vsnprintf(buf->data+buf->used, remaining, fmt, ap);
+  ptrdiff_t used = vsnprintf(buf->data + buf->used, remaining, fmt, ap);
   va_end(ap);
   if (used > remaining) { // discard
-    memset(buf->data+buf->used, 0, remaining);
+    memset(buf->data + buf->used, 0, remaining);
     buf->error = true;
   } else {
     buf->error = false;
@@ -65,22 +65,22 @@ void sbuf_printf(Sbuf *buf, const char *fmt, ...)
 
 ptrdiff_t sbuf_remaining(Sbuf *buf)
 {
-  assert(buf!=0);
+  assert(buf != 0);
   ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
   return remaining;
 }
 
 void sbuf_fputs(Sbuf *buf, FILE* stream)
 {
-  assert(buf!=0);
-  assert(stream!=0);
+  assert(buf != 0);
+  assert(stream != 0);
   fputs(buf->data, stream);
   fflush(stream);
 }
 
 void sbuf_reset(Sbuf *buf)
 {
-  assert(buf!=0);
+  assert(buf != 0);
   memset(buf->data, 0, SBUF_SIZE);
   buf->used = 0;
   buf->error = false;

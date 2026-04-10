@@ -82,7 +82,7 @@ Options setup(int argc, char *argv[])
     {"license", no_argument, 0, 'L'},
     {"version", no_argument, 0, 'v'},
     {"log", required_argument, 0, 1000},
-    {0,0,0,0}
+    {0, 0, 0, 0}
   };
   logging_configure("lamprop-c", LOG_WARNING);
   while (1) {
@@ -92,7 +92,7 @@ Options setup(int argc, char *argv[])
       break;
     }
     switch (choice) {
-   case 'h':
+      case 'h':
         puts("lamprop-c version "VERSION);
         printf(help);
         exit(0);
@@ -101,12 +101,12 @@ Options setup(int argc, char *argv[])
         rv.info = true;
         break;
       case 'l':
-        if (rv.output==0) {
+        if (rv.output == 0) {
           rv.output = LATEX;
         }
         break;
       case 'H':
-        if (rv.output==0) {
+        if (rv.output == 0) {
           rv.output = HTML;
         }
         break;
@@ -129,13 +129,13 @@ Options setup(int argc, char *argv[])
         exit(0);
         break;
       case 1000:
-        if (strcasecmp(optarg, "debug")==0) {
+        if (strcasecmp(optarg, "debug") == 0) {
           logging_configure(0, LOG_DEBUG);
-        } else if (strcasecmp(optarg, "info")==0) {
+        } else if (strcasecmp(optarg, "info") == 0) {
           logging_configure(0, LOG_INFO);
-        } else if (strcasecmp(optarg, "error")==0) {
+        } else if (strcasecmp(optarg, "error") == 0) {
           logging_configure(0, LOG_ERROR);
-        } else if (strcasecmp(optarg, "crit")==0) {
+        } else if (strcasecmp(optarg, "crit") == 0) {
           logging_configure(0, LOG_CRITICAL);
         }
         break;
@@ -145,7 +145,7 @@ Options setup(int argc, char *argv[])
   rv.argc = argc - optind;
   rv.argv = argv + optind;
   // If none of the output options are given, set all of them
-  if (rv.eng==false && rv.matrix == false && rv.fea == false) {
+  if (rv.eng == false && rv.matrix == false && rv.fea == false) {
     rv.eng = true;
     rv.matrix = true;
     rv.fea = true;

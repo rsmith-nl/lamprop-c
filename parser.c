@@ -49,11 +49,11 @@ ParseResult parse_file(char *path, Arena *permanent)
 
 Sv8 read_file(char *path, Arena *permanent)
 {
-  assert(path!=0);
-  assert(permanent!=0);
+  assert(path != 0);
+  assert(permanent != 0);
   Sv8 contents = {0};
   FILE *inputfile = fopen(path, "r");
-  if (inputfile==0) {
+  if (inputfile == 0) {
     error("could not open file %s", path);
     exit(EXIT_FAILURE);
   }
@@ -75,7 +75,7 @@ Sv8 read_file(char *path, Arena *permanent)
 
 ParseResult allocate(Sv8 contents, Arena *permanent)
 {
-  assert(permanent!=0);
+  assert(permanent != 0);
   ParseResult rv = {0};
   if (contents.data == 0 && contents.len == 0) {
     return rv; // shortcut om empty input.
@@ -134,15 +134,15 @@ static Fiber parse_fiber(Sv8 line);
 
 void fibers_and_resins(Sv8 contents, ParseResult *result)
 {
-  assert(result!=0);
-  assert(result->resins!=0);
-  assert(result->fibers!=0);
+  assert(result != 0);
+  assert(result->resins != 0);
+  assert(result->fibers != 0);
   result->ok = true;
   // Add generic resins
-  memcpy(result->resins, generic_resins, 3*sizeof(Resin));
+  memcpy(result->resins, generic_resins, 3 * sizeof(Resin));
   result->ru += 3;
   // Add generic resins
-  memcpy(result->fibers, generic_fibers, 3*sizeof(Fiber));
+  memcpy(result->fibers, generic_fibers, 3 * sizeof(Fiber));
   result->fu += 3;
   int32_t lineno = 1;
   Sv8Cut ccut = sv8cut(contents, '\n');
@@ -338,7 +338,7 @@ void laminates(Sv8 contents, ParseResult *result)
             }
             if (!skip_lm) {
               // Store the pointer to the next free lamina in the laminate.
-              lm.layers = result->laminas+result->lu;
+              lm.layers = result->laminas + result->lu;
               // Copy the laminate into the laminate arena.
               result->laminates[result->tu++] = lm;
               info("found laminate named “%s” on line %d", sv8cstring(lm.name), lineno);
@@ -377,7 +377,7 @@ void laminates(Sv8 contents, ParseResult *result)
             warning("skipping laminate “%s”", sv8cstring(pcurlam->name));
             // Delete laminate from arena.
             memset(result->laminates + --result->tu, 0, sizeof(Laminate));
-            state='k';
+            state = 'k';
           } else {
             // Now that we know the resin, store it and the vf in the
             // laminate.
@@ -439,7 +439,7 @@ void laminates(Sv8 contents, ParseResult *result)
             info("found s-line on line %d", lineno);
             // Mirror the lamina.
             pcurlam = current_laminate(result);
-            for (int32_t j = pcurlam->nlayers, k = result->lu - 1; j>0 ; j--, k--) {
+            for (int32_t j = pcurlam->nlayers, k = result->lu - 1; j > 0 ; j--, k--) {
               result->laminas[result->lu] = result->laminas[k];
               if (j == pcurlam->nlayers) {
                 result->laminas[result->lu].symm = true;
@@ -478,7 +478,7 @@ Laminate parse_t(Sv8 line, int32_t lineno)
   // line starts with the name after possible whitespace.
   rv.name = sv8strip(line);
   rv.ok = true;
-  if (rv.name.len==0) {
+  if (rv.name.len == 0) {
     warning("laminate without a name on line %d will be ignored", lineno);
     rv.ok = false;
   } else {
@@ -558,7 +558,7 @@ Lamina parse_l(Sv8 line, int32_t lineno, ParseResult *result)
         break;
       }
     }
-    if (f.ok==false) {
+    if (f.ok == false) {
       warning("fiber “%s” on line %d does not exist; skipping lamina",
               sv8cstring(fiber_name), lineno);
       return rv;

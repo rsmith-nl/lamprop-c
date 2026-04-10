@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
       }
 #ifndef NDEBUG
       if (pl->magic == LMNT) {
-        debug("- laminate %d is a valid laminate", j+1);
+        debug("- laminate %d is a valid laminate", j + 1);
         int32_t valid_la = 0;
         for (int32_t k = 0; k < pl->nlayers; k++) {
           Lamina *pa = pl->layers + k;
