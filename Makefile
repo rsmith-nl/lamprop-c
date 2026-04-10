@@ -50,7 +50,7 @@ $(BASENAME)-debug: $(SRCS) version.h
 
 .PHONY: clean
 clean:  ## Remove all generated files.
-	rm -f $(BASENAME) $(BASENAME)-debug *~ core gmon.out $(TARFILE) backup-*
+	rm -f $(BASENAME) $(BASENAME)-debug *~ version.h core gmon.out $(TARFILE) backup-*
 
 install: $(BASENAME)  ## Install the program.
 	install -d $(BINDIR)
@@ -62,8 +62,8 @@ install: $(BASENAME)  ## Install the program.
 uninstall:  ## Uninstall the program.
 	rm -f $(BINDIR)/$(BASENAME)
 
-version.h: Makefile
-	echo '#define VERSION "'${VMAJOR}"."${VMINOR}"."${VPATCH}'"' >version.h
+version.h:
+	./mkver.sh >version.h
 
 .PHONY: style
 style:  ## Reformat source code using astyle.
@@ -83,6 +83,14 @@ tags: $(SRCS) *.h  ## Update tags file
 .PHONY: test
 test: $(BASENAME)  ## Run a test
 	./lamprop test/hyer.lam
+
+.PHONY: release
+RELDATE:=$(VMAJOR).$(VMINOR).$(VPATCH)
+release: $(BASENAME).exe
+	mkdir releases/$(BASENAME)-c-w64-$(RELDATE)
+	cp $(BASENAME).exe README.rst releases/$(BASENAME)-c-w64-$(RELDATE)/
+	rm -f releases/*.zip
+	cd releases/ && zip -qr $(BASENAME)-c-w64-$(RELDATE).zip $(BASENAME)-c-w64-$(RELDATE)/
 
 .PHONY: help
 help:  ## List available commands
