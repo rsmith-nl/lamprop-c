@@ -7,7 +7,8 @@ RELEASE=`git tag -l |tail -n 1 | tr -d '\n'`
 
 echo "#define VERSION \""${RELEASE}"\""
 
-echo -n "#define LONG_VERSION \""${BASENAME}" version "${RELEASE}
-awk '/refs\/heads\/main/ {print " (commit "substr($1,1,7)")\""}' .git/info/refs
+echo -n "#define LONG_VERSION \""${BASENAME}" version "${RELEASE}" (commit "
+git log -n 1 --pretty=%h|tr -d '\n'
+echo ")\""
 
 echo "#define RELEASE_NAME \""${BASENAME}"-w64-"${RELEASE}"\""
