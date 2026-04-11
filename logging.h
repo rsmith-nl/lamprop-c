@@ -5,9 +5,11 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2024-08-31 23:25:54 +0200
-// Last modified: 2026-02-22T00:09:03+0100
+// Last modified: 2026-03-07T18:01:59+0100
 
 #pragma once
+
+// Requirement: ISO/IEC 9899:1999 (“ISO C99”).
 
 enum {
   LOG_NOTSET = 0,
