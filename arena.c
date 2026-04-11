@@ -28,7 +28,7 @@ Arena arena_create(ptrdiff_t length)
     length = ARENA_DEFAULT;
   }
 #ifdef _WIN32
-  arena.begin = VirtualAlloc(0, length, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+  arena.begin = VirtualAlloc(0, length, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
   if (arena.begin == 0) {
     arena.begin = MAP_FAILED;
   }
@@ -46,20 +46,20 @@ Arena arena_create(ptrdiff_t length)
 
 ptrdiff_t arena_remaining(Arena *arena)
 {
-  assert(arena!=0);
+  assert(arena != 0);
   return arena->length - arena->current_offset;
 }
 
 void *arena_alloc(Arena *arena, ptrdiff_t size, ptrdiff_t count, ptrdiff_t align)
 {
-  assert(arena!=0);
-  assert(size>0);
-  assert(count>0);
+  assert(arena != 0);
+  assert(size > 0);
+  assert(count > 0);
   ptrdiff_t padding = -arena->current_offset & (align - 1);
   ptrdiff_t remaining = arena->length - arena->current_offset - padding;
-  if (count > remaining/size) {
+  if (count > remaining / size) {
     fprintf(stderr, "arena %p exhausted; %td items of %td bytes requested, %td available\n",
-          (void *)arena, count, size, remaining/size);
+            (void *)arena, count, size, remaining / size);
     abort();
   }
   void *rv = arena->begin + arena->current_offset + padding;
@@ -69,7 +69,7 @@ void *arena_alloc(Arena *arena, ptrdiff_t size, ptrdiff_t count, ptrdiff_t align
 
 void arena_destroy(Arena *arena)
 {
-  assert(arena!=0);
+  assert(arena != 0);
   int rv;
 #ifdef _WIN32
   rv = VirtualFree(arena->begin, 0, MEM_RELEASE);
@@ -88,7 +88,7 @@ void arena_destroy(Arena *arena)
 
 void arena_empty(Arena *arena)
 {
-  assert(arena!=0);
+  assert(arena != 0);
   // Clear all the used memory.
   memset(arena->begin, 0, arena->current_offset);
   // Reset the use counter.
