@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-04-07 22:53:56 +0200
-// Last modified: 2026-03-14T04:13:23+0100
+// Last modified: 2026-03-15T22:49:46+0100
 
 #include "stringview.h"
 
@@ -248,7 +248,8 @@ Sv8Int sv8toi(Sv8 s)
   s = sv8lstrip(s);
   char *beg = s.data;
   char *end = s.data + s.len;
-  int32_t state = 0, number = 0;
+  int32_t state = 0;
+  int64_t number = 0;
   bool negative = false;
   bool stop = false;
   while (beg < end && !stop) {
@@ -293,8 +294,8 @@ Sv8Int sv8toi(Sv8 s)
       case 3:   // Process digits.
         if (c >= '0' && c <= '9') {
           state = 3;
-          if ((1 << 30) / number < 10) { // will overflow.
-            goto fail2;
+          if (INT64_MAX / number < 10) { // will overflow.
+            goto fail3;
           }
           number = number * 10 + c - '0';
         } else {
@@ -312,7 +313,12 @@ Sv8Int sv8toi(Sv8 s)
   }
   rv.tail = sv8span(beg, end);
   rv.ok = true;
+  if (rv.result > INT32_MIN && rv.result < INT32_MAX) {
+    rv.is32bits = true;
+  }
   return rv;
+fail3:
+  rv.overflow = true;
 fail2:
   rv.ok = false;
   rv.result = 0;
