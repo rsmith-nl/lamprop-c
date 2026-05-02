@@ -122,7 +122,7 @@ extern void sbuf_appendd(Sbuf *buf, double f)
     // Format as dddd.dddddd, with 6 decimal places.
     // Format integer part
     int value = (int)f;
-    int frac = (int)round((f - (double)value)*1e6);
+    int frac = (int)round((f - (double)value) * 1e6);
     char intbuf[11] = {0};
     int index = sizeof(intbuf) - 2;
     do {
@@ -130,8 +130,8 @@ extern void sbuf_appendd(Sbuf *buf, double f)
       intbuf[index--] = ORD0 + result.rem;
       value = result.quot;
     } while (value > 0 && index > 0);
-    strcpy(tbuf+bufused, intbuf+index+1);
-    bufused += strlen(intbuf+index+1);
+    strcpy(tbuf + bufused, intbuf + index + 1);
+    bufused += strlen(intbuf + index + 1);
     if (frac == 0) {
       sbuf_appends(buf, tbuf);
       return;
@@ -147,17 +147,16 @@ extern void sbuf_appendd(Sbuf *buf, double f)
       div_t result = div(frac, 10);
       fracbuf[index--] = ORD0 + result.rem;
       frac = result.quot;
-    } while (frac> 0 && index > 0);
+    } while (frac > 0 && index > 0);
     // Remove trailing 0 decimals
     int ridx = sizeof(fracbuf) - 3;
     while (fracbuf[ridx] == '0') {
       fracbuf[ridx--] = 0;
     }
-    strcpy(tbuf+bufused, fracbuf+index+1);
+    strcpy(tbuf + bufused, fracbuf + index + 1);
     sbuf_appends(buf, tbuf);
     return;
   }
-
   int decimal = (int)floor(am);
   tbuf[bufused++] = ORD0 + decimal;
   am = (am - decimal) * 10.0;
