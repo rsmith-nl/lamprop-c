@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-04 00:11:34 +0200
-// Last modified: 2026-03-17T18:47:09+0100
+// Last modified: 2026-05-07T20:29:37+0200
 
 #include "arena.h"
 #include "logging.h"
@@ -25,7 +25,7 @@ static const Resin generic_resins[3] = {
 };
 
 static const Fiber generic_fibers[3] = {
-  {FIBR, 73000.0, 0.33, 5.3e-6, 2.60, SV8("generic-e-glas"), true},
+  {FIBR, 73000.0, 0.22, 5.3e-6, 2.60, SV8("generic-e-glass"), true},
   {FIBR, 230000.0, 0.27, -0.38e-6, 1.80, SV8("generic-carbon"), true},
   {FIBR, 124000.0, 0.36, -4.9e-6, 1.44, SV8("generic-aramid49"), true},
 };
