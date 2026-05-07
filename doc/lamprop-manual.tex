@@ -3,7 +3,7 @@
 %
 % Copyright © 2026 R.F. Smith <rsmith@xs4all.nl>. All rights reserved.
 % Created: 2026-02-01T19:52:00+01:00
-% Last modified: 2026-03-01T13:59:09+0100
+% Last modified: 2026-05-07T20:41:38+0200
 
 \newcommand{\twodigits}[1]{\ifnum#1<10 0\number#1\else\number#1\fi}
 \newcommand{\TheDate}{\number\year-\twodigits\month-\twodigits\day}
@@ -508,7 +508,7 @@ fibers, $\nu_{12}$ is estimated 0.33 unless known and $\alpha_1$ is estimated
       Granoc XN-80-60S & 780000 & 0.27 & -1.5e-6 & 2.17 & carbon\\
       Granoc XN-90-60S & 860000 & 0.27 & -1.5e-6 & 2.19 & carbon\\
       e-glass & 73000 & 0.33 & 5.3e-6 & 2.60 & glass\\
-      ecr-glass & 81000 & 0.33 & 5e-6 & 2.62 & gl;ass\\
+      ecr-glass & 81000 & 0.33 & 5e-6 & 2.62 & glass\\
   \end{tabular}
 \end{table}
 
@@ -530,6 +530,41 @@ Several resins are shown in \tref{tb:resins}. For resins, $\nu$ is estimated
       atlac 430 & 3600 & 0.36 & 55e-6 & 1.145 & vinylester\\
   \end{tabular}
 \end{table}
+
+\section{Generic materials}
+
+Lamprop has a number of built-in generic materials.
+Built-in means that you can use them in laminates without having to define
+them.
+The generic fibers are shown in \trefpi{tb:generic-fibers}.
+The generic resins are shown in \trefpi{tb:generic-resins}.
+
+\begin{table}[!htbp]
+  \centering
+  \caption{\label{tb:generic-fibers}Generic fibers}
+  \begin{tabular}{lrrrr}% l,c,r
+      Name & $E_1$ & $\nu_{12}$ & $\alpha_1$ & $\rho$\\
+      & [\si{MPa}] & [-] & [\si{K^{-1}}] & [\si{g/cm^3}]\\
+    \midrule
+      generic-e-glass & 73000 & 0.22 & 5.3e-6 & 2.60\\
+      generic-carbon & 230000 & 0.27 & -0.38e-6 & 1.80\\
+      generic-aramid49 & 124000 & 0.36 & -4.9e-6 & 1.44\\
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+  \centering
+  \caption{\label{tb:generic-resins}Generic resins}
+  \begin{tabular}{lrrrr}% l,c,r
+      Name & $E$ & $\nu$ & $\alpha$ & $\rho$\\
+      & [\si{MPa}] & [-] & [\si{K^{-1}}] & [\si{g/cm^3}]\\
+    \midrule
+      generic-epoxy & 2900 & 0.29 & 40e-6 & 1.15\\
+      generic-polyester & 4000 & 0.36 & 40e-6 & 1.20\\
+      generic-vinylester & 3500 & 0.36 & 51.5e-6 & 1.10\\
+  \end{tabular}
+\end{table}
+
 
 \section{Meaning of the ABD, H and C matrices} % {{{2
 
