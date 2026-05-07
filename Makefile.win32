@@ -1,8 +1,8 @@
 # Package name and version: BASENAME-VMAJOR.VMINOR.VPATCH.tar.gz
 BASENAME = lamprop
 VMAJOR   = 2026
-VMINOR   = 03
-VPATCH   = 17
+VMINOR   = 05
+VPATCH   = 07
 
 # w64devkit uses gcc as cc.
 

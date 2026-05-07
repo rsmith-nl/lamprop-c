@@ -1,8 +1,8 @@
 # Package name and version: BASENAME-VMAJOR.VMINOR.VPATCH.tar.gz
 BASENAME = lamprop
 VMAJOR   = 2026
-VMINOR   = 03
-VPATCH   = 17
+VMINOR   = 05
+VPATCH   = 07
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
@@ -86,7 +86,7 @@ test: $(BASENAME)  ## Run a test
 RELDATE:=$(VMAJOR).$(VMINOR).$(VPATCH)
 release: $(BASENAME).exe
 	mkdir releases/$(BASENAME)-c-w64-$(RELDATE)
-	cp $(BASENAME).exe README.rst releases/$(BASENAME)-c-w64-$(RELDATE)/
+	cp $(BASENAME).exe README.rst doc/lamprop-manual.pdf releases/$(BASENAME)-c-w64-$(RELDATE)/
 	rm -f releases/*.zip
 	cd releases/ && zip -qr $(BASENAME)-c-w64-$(RELDATE).zip $(BASENAME)-c-w64-$(RELDATE)/
 
