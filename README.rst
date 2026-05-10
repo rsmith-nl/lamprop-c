@@ -25,8 +25,14 @@ plain text output.
 The program and its file format are documented by a manual. This can be found
 in the ``doc`` subdirectory.
 
+
+No AI policy
+============
+
+This program is written by a human and for humans.
+
 Writing a program such as this requires domain expertise and judgement.
-Therefore “AI” / LLM-generated contributions and rewrites are not welcome.
+Therefore “AI” / LLM-generated rewrites and additions are not welcome.
 
 
 Requirements
