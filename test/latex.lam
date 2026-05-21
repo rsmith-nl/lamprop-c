@@ -1,0 +1,29 @@
+Fiber definition
+    E1      ν12     α1          ρ       name
+f:  240000  0.20    -0.12e-6    1.78    Tenax_STS40
+f:  270000  0.20    -0.12e-6    1.79    sigrafil_CT24-5.0-270/E100
+f:  73000   0.33    5.3e-6      2.60    e-glas
+f:  81000   0.33    5e-6        2.62    ecr-glas
+
+Matrix definition
+    Em      ν       α       ρ       name
+r:  4100    0.36    40e-6   1.2     distitron_3501LS1
+r:  3600    0.36    65e-6   1.08    crestapol_1260
+
+
+t: test_1
+m: 0.50 distitron_3501LS1
+l: 100  0 e-glas
+l: 100 90 e-glas
+
+t: test{2}
+m: 0.30 crestapol_1260
+l: 150  0 Tenax_STS40
+l: 150  60 Tenax_STS40
+l: 150  -60 Tenax_STS40
+
+t: test[3]
+m: 0.30 crestapol_1260
+l: 150  0 sigrafil_CT24-5.0-270/E100
+l: 150  60 sigrafil_CT24-5.0-270/E100
+l: 150  -60 sigrafil_CT24-5.0-270/E100
