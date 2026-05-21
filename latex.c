@@ -5,7 +5,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-05-21T22:39:47+0200
+// Last modified: 2026-05-21T23:16:00+0200
 
 #include "core.h"
 #include "stringview.h"
@@ -22,7 +22,7 @@
 static void engprop(Laminate *pl);
 static void matrices(Laminate *pl);
 extern void text_fea(Laminate *pl);
-static void ltxclean(Sv8 str, char replace, char *outbuf, size_t outlen);
+static void ltxclean(Sv8 str, char replace, char *outbuf, ptrdiff_t outlen);
 
 void latex_out(Laminate *pl, bool eng, bool mat, bool fea)
 {
@@ -186,9 +186,12 @@ void matrices(Laminate *pl)
   puts("  }");
 }
 
-static void ltxclean(Sv8 str, char replace, char *outbuf, size_t outlen)
+void ltxclean(Sv8 str, char replace, char *outbuf, ptrdiff_t outlen)
 {
-  size_t len = str.len<outlen?str.len:outlen;
+  assert(replace != 0);
+  assert(outbuf);
+  assert(outlen > 0);
+  ptrdiff_t len = str.len<outlen?str.len:outlen;
   memset(outbuf, 0, outlen);
   for (int j = 0; j < len; j++) {
     switch (str.data[j]) {
