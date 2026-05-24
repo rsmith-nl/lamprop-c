@@ -4,11 +4,12 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:36 +0200
-// Last modified: 2026-02-19T00:14:55+0100
+// Last modified: 2026-05-25T01:21:47+0200
 
 #pragma once
 
 #include <stdbool.h>
+#include <stdio.h>
 
 enum Output {
   TEXT = 0,
@@ -18,6 +19,8 @@ enum Output {
 
 typedef struct {
   enum Output output;
+  char *output_filename;
+  FILE *outfile;
   bool eng, matrix, fea, info;
   int argc;
   char **argv;

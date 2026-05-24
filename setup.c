@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:37 +0200
-// Last modified: 2026-04-10T16:38:52+0200
+// Last modified: 2026-05-25T01:22:30+0200
 
 #include "setup.h"
 #include "logging.h"
@@ -42,7 +42,7 @@ const char license[] =
 
 const char help[] =
   "usage: lamprop [-h] [-l | -H] [-e] [-m] [-f] [-L | -v] [--log=(debug|info|warn|error|crit)]\n"
-  "               [file ...]\n"
+  "               [-o outfile] [file]\n"
   "\n"
   "Calculate the elastic properties of a fibrous composite laminate. See the manual (lamprop-manual.pdf)\n"
   "for more in-depth information.\n"
@@ -59,6 +59,7 @@ const char help[] =
   "  -f, --fea             output only material data for FEA\n"
   "  -L, --license         print the license\n"
   "  -v, --version         show program's version number and exit\n"
+  "  -o outfile            write the programs output to outfile.\n"
   "  --log                 logging level debug,info,(default) warn,error,crit\n";
 
 Options setup(int argc, char *argv[])
@@ -87,7 +88,7 @@ Options setup(int argc, char *argv[])
   logging_configure("lamprop-c", LOG_WARNING);
   while (1) {
     int32_t option_index = 0;
-    choice = getopt_long(argc, argv, "hilHemfLv", long_options, &option_index);
+    choice = getopt_long(argc, argv, "hilHemfLvo:", long_options, &option_index);
     if (choice == -1) {
       break;
     }
@@ -128,6 +129,8 @@ Options setup(int argc, char *argv[])
         puts(LONG_VERSION);
         exit(0);
         break;
+      case 'o':
+        rv.output_filename = optarg;
       case 1000:
         if (strcasecmp(optarg, "debug") == 0) {
           logging_configure(0, LOG_DEBUG);
