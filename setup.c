@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:37 +0200
-// Last modified: 2026-05-25T01:22:30+0200
+// Last modified: 2026-05-26T14:54:48+0200
 
 #include "setup.h"
 #include "logging.h"
@@ -48,7 +48,7 @@ const char help[] =
   "for more in-depth information.\n"
   "\n"
   "positional arguments:\n"
-  "  file                  one or more files to process\n"
+  "  file                  path of the file to process\n"
   "\n"
   "options:\n"
   "  -h, --help            show this help message and exit\n"
