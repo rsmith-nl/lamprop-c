@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2026-05-25T02:28:20+0200
+// Last modified: 2026-06-02T16:44:35+0200
 
 #include "core.h"
 #include "version.h"
@@ -36,7 +36,7 @@ void text_out(Laminate *pl, Options opts)
       fwrite(la->comment.data, 1, la->comment.len, opts.outfile);
       putc('\n', opts.outfile);
     } else if (la->symm) {
-      fputs("----- symmetry line -----", opts.outfile);
+      fputs("----- symmetry line -----\n", opts.outfile);
     }
     fprintf(opts.outfile, "%3d %6g %5g %4.3g ", k + 1, la->fiber_weight, 180 * la->angle / M_PI, 100 * la->vf);
     fprintf(opts.outfile, "%s\n", sv8cstring(la->f.name));
