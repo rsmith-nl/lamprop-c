@@ -45,7 +45,7 @@ $(BASENAME)-debug: $(SRCS) version.h
 
 .PHONY: clean
 clean:  ## Remove all generated files.
-	rm -f $(BASENAME) $(BASENAME)-debug *~ version.h core gmon.out $(TARFILE) backup-*
+	rm -f $(BASENAME) $(BASENAME)-debug *~ core gmon.out $(TARFILE) backup-*
 
 install: $(BASENAME)  ## Install the program.
 	install -d $(BINDIR)
