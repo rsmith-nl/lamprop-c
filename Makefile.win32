@@ -1,8 +1,5 @@
-# Package name and version: BASENAME-VMAJOR.VMINOR.VPATCH.tar.gz
+# Package name
 BASENAME = lamprop
-VMAJOR   = 2026
-VMINOR   = 05
-VPATCH   = 07
 
 # w64devkit uses gcc as cc.
 
@@ -15,7 +12,6 @@ DLFLAGS = -pipe
 # The next lines are for release builds.
 CFLAGS = -Os -pipe -std=c11 -ffast-math -march=native
 CFLAGS += -D_POSIX_SOURCE
-CFLAGS += -DNDEBUG=1
 LFLAGS = -pipe
 
 # Other libraries to link against
@@ -37,13 +33,6 @@ $(BASENAME).exe: $(SRCS) version.h
 
 $(BASENAME)-debug.exe: $(SRCS) version.h
 	$(CC) $(DCFLAGS) $(DLFLAGS) $(LDIRS) -o $(BASENAME)-debug $(SRCS) $(LIBS)
-
-version.h: Makefile.win32
-	echo '#define VERSION "'${VMAJOR}"."${VMINOR}"."${VPATCH}'"' >version.h
-
-.PHONY: test
-test: $(BASENAME).exe  ## Run a test
-	./lamprop test/hyer.lam
 
 .PHONY: clean
 clean:  ## Remove all generated files.

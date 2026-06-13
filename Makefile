@@ -1,8 +1,6 @@
 # Package name and version: BASENAME-VMAJOR.VMINOR.VPATCH.tar.gz
 BASENAME = lamprop
-VMAJOR   = 2026
-VMINOR   = 05
-VPATCH   = 07
+RELDATE=2026.06.13
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
@@ -15,7 +13,6 @@ DLFLAGS = -pipe -fsanitize=address,undefined
 
 # For release builds.
 CFLAGS = -Os -pipe -std=c11 -ffast-math -march=native
-CFLAGS += -DNDEBUG=1
 LFLAGS = -pipe -flto
 
 # Other libraries to link against
@@ -60,9 +57,6 @@ install: $(BASENAME)  ## Install the program.
 uninstall:  ## Uninstall the program.
 	rm -f $(BINDIR)/$(BASENAME)
 
-version.h: mkver.sh
-	./mkver.sh >version.h
-
 .PHONY: style
 style:  ## Reformat source code using astyle.
 	astyle -n --style=1tbs -s2 -p -o -O --indent-switches --delete-empty-lines --add-braces *.c *.h
@@ -83,7 +77,6 @@ test: $(BASENAME)  ## Run a test
 	./lamprop test/hyer.lam
 
 .PHONY: release
-RELDATE:=$(VMAJOR).$(VMINOR).$(VPATCH)
 release: $(BASENAME).exe
 	mkdir releases/$(BASENAME)-c-w64-$(RELDATE)
 	cp $(BASENAME).exe README.rst doc/lamprop-manual.pdf releases/$(BASENAME)-c-w64-$(RELDATE)/

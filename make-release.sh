@@ -5,28 +5,27 @@
 BASENAME=lamprop-c
 # Get the latest tag from git.
 RELEASE=`git tag -l |tail -n 1 | tr -d '\n'`
-# Get the date of the latest commit
-CDATE=`git log -n 1 --pretty='%as'|tr '-' '.'`
+# Get the current date.
+DATE=` date +%Y.%m.%d`
 # Get the abbreviated commit hash of the latest commit.
 COMMIT=`git log -n 1 --pretty='%h'|tr -d '\n'`
 
-# Tag release if nesessary.
-if test ${CDATE} != ${RELEASE}; then
-    echo "Tagging latest commit with date-derived version."
-    git tag ${CDATE}
-    RELEASE=${CDATE}
-else
-    echo "Latest commit is tagged: OK."
-fi
-
+# Remove duplicate tag, if any
+git tag -d ${DATE}
 
 echo "Updating version.h"
-echo "#define VERSION \""${RELEASE}"\"" >version.h
-echo "#define LONG_VERSION \""${BASENAME}" version "${RELEASE}" (commit "${COMMIT}")\"" >>version.h
-#echo "#define RELEASE_NAME \""${BASENAME}"-w64-"${RELEASE}"\"" >>version.h
+echo "#define VERSION \""${DATE}"\"" >version.h
+echo "#define LONG_VERSION \""${BASENAME}" version "${DATE}" (commit "${COMMIT}")\"" >>version.h
+
+echo "Updating Makefile"
+sed -i '' -e "s/^RELDATE.*/RELDATE=${DATE}/" Makefile
 
 if git status -s -- version.h | grep 'M' >/dev/null; then
     echo "version.h modified; committing it."
-    git add version.h
+    git add version.h Makefile
     git commit -m "Updated version.h"
 fi
+
+# Tag release.
+echo "Tagging latest commit with date-derived version."
+git tag ${DATE}
