@@ -1,5 +1,4 @@
 *.o
-version.h
 lamprop
 lamprop-debug
 lamprop.exe
