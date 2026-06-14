@@ -1,4 +1,6 @@
-# Package name and version: BASENAME-VMAJOR.VMINOR.VPATCH.tar.gz
+# vim:fileencoding=utf-8:ft=make
+
+# Package name and version
 BASENAME = lamprop
 RELDATE=2026.06.13
 
@@ -18,6 +20,13 @@ LFLAGS = -pipe -flto
 # Other libraries to link against
 LIBS += -lm
 
+# Installation location for the current user
+UPREFIX = ${HOME}/.local
+UBINDIR = $(UPREFIX)/bin
+UMANDIR = $(UPREFIX)/man/man1
+UDOCSDIR= $(UPREFIX)/share/doc/$(BASENAME)
+
+# System-wide installation location.
 PREFIX = /usr/local
 BINDIR = $(PREFIX)/bin
 MANDIR = $(PREFIX)/man/man1
@@ -47,15 +56,25 @@ $(BASENAME)-debug: $(SRCS) version.h
 clean:  ## Remove all generated files.
 	rm -f $(BASENAME) $(BASENAME)-debug *~ core gmon.out $(TARFILE) backup-*
 
-install: $(BASENAME)  ## Install the program.
+install: $(BASENAME)  ## Install the program system-wide.
 	install -d $(BINDIR)
 	install -m 755 -s $(BASENAME) $(BINDIR)
 #	install -m 644 $(BASENAME).1 $(MANDIR)
 #	gzip -f -q $(MANDIR)/$(BASENAME).1
 
+install-user: $(BASENAME)  ## Install the program for the current user.
+	install -d $(UBINDIR)
+	install -m 755 -s $(BASENAME) $(UBINDIR)
+#	install -m 644 $(BASENAME).1 $(UMANDIR)
+#	gzip -f -q $(UMANDIR)/$(BASENAME).1
+
 .PHONY: uninstall
 uninstall:  ## Uninstall the program.
 	rm -f $(BINDIR)/$(BASENAME)
+
+.PHONY: uninstall-user
+uninstall-user:  ## Uninstall the program for the current user.
+	rm -f $(UBINDIR)/$(BASENAME)
 
 .PHONY: style
 style:  ## Reformat source code using astyle.
@@ -90,8 +109,8 @@ help:  ## List available commands
 	@sed -n -e '/##/s/:.*\#\#/\t/p' Makefile
 
 # Predefined directory/file names
-PKGDIR  = $(BASENAME)-$(VMAJOR).$(VMINOR).$(VPATCH)
-TARFILE = $(BASENAME)-$(VMAJOR).$(VMINOR).$(VPATCH).tar.gz
+PKGDIR  = $(BASENAME)-$(RELDATE)
+TARFILE = $(BASENAME)-$(RELDATE).tar.gz
 
 dist: clean  # Build a tar distribution file
 	rm -rf $(PKGDIR)
