@@ -95,8 +95,8 @@ tags: $(SRCS) *.h  ## Update tags file
 test: $(BASENAME)  ## Run a test
 	./lamprop test/hyer.lam
 
-.PHONY: release
-release: $(BASENAME).exe
+.PHONY: rel
+rel: $(BASENAME).exe  ## Build a binary release for windows platform
 	mkdir releases/$(BASENAME)-c-w64-$(RELDATE)
 	cp $(BASENAME).exe README.rst doc/lamprop-manual.pdf releases/$(BASENAME)-c-w64-$(RELDATE)/
 	rm -f releases/*.zip
@@ -112,7 +112,7 @@ help:  ## List available commands
 PKGDIR  = $(BASENAME)-$(RELDATE)
 TARFILE = $(BASENAME)-$(RELDATE).tar.gz
 
-dist: clean  # Build a tar distribution file
+dist: clean  ## Build a source distribution tar file
 	rm -rf $(PKGDIR)
 	mkdir -p $(PKGDIR)
 	cp $(DISTFILES) $(XTRA_DIST) *.c *.h $(PKGDIR)
