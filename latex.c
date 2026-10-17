@@ -52,7 +52,7 @@ void latex_out(Laminate *pl, Options opts)
       fputs("      \\multicolumn{5}{l}{\\rule[0.5ex]{10mm}{1pt}symmetry line\\rule[0.5ex]{10mm}{1pt}}\\\\\n", opts.outfile);
     }
     fprintf(opts.outfile, "      %3d & %6g & %5g & %4.3g & ", k + 1, la->fiber_weight,
-           180 * la->angle / M_PI, 100 * la->vf);
+            180 * la->angle / M_PI, 100 * la->vf);
     fprintf(opts.outfile, "%s\\\\\n", fname);
   }
   fputs("      \\bottomrule\n", opts.outfile);
@@ -97,11 +97,11 @@ void engprop(Laminate *pl, FILE *outfile)
   fputs("      \\multicolumn{3}{c}{\\small\\textbf{In-plane}} & \n", outfile);
   fputs("      \\multicolumn{3}{c}{\\small\\textbf{3D stiffness tensor}}\\\\[0.1em]\n", outfile);
   fprintf(outfile, "      $\\mathrm{E_x}$ & %.0f & MPa & $\\mathrm{E_x}$ & %.0f & MPa\\\\\n",
-         pl->Ex, pl->tEx);
+          pl->Ex, pl->tEx);
   fprintf(outfile, "      $\\mathrm{E_y}$ & %.0f & MPa & $\\mathrm{E_y}$ & %.0f & MPa\\\\\n",
-         pl->Ey, pl->tEy);
+          pl->Ey, pl->tEy);
   fprintf(outfile, "      $\\mathrm{E_z}$ & %.0f & MPa & $\\mathrm{E_z}$ & %.0f & MPa\\\\\n",
-         pl->Ez, pl->tEz);
+          pl->Ez, pl->tEz);
   fprintf(outfile, "      $\\mathrm{G_{xy}}$ & %.0f & MPa & ", pl->Gxy);
   fprintf(outfile, "$\\mathrm{G_{xy}}$ & %.0f & MPa\\\\\n", pl->tGxy);
   fprintf(outfile, "      $\\mathrm{G_{xz}}$ & %.0f & MPa & ", pl->Gxz);
@@ -170,19 +170,19 @@ void matrices(Laminate *pl, FILE *outfile)
   fputs("          \\end{array}\\right\\}\\]\n", outfile);
   fputs("    }\n", outfile);
   fputs("    \\vbox{\\small\\textbf{3D stiffness tensor (C), contracted "
-       "notation}\\\\[-3mm]\n", outfile);
+        "notation}\\\\[-3mm]\n", outfile);
   fputs("      \\tiny\\[\\left\\{\\begin{array}{c}\n", outfile);
   fputs("          \\sigma_{11}\\\\ \\sigma_{22}\\\\ \\sigma_{33}\\\\"
-       " \\sigma_{23}\\\\ \\sigma_{13}\\\\ \\sigma_{12}\n", outfile);
+        " \\sigma_{23}\\\\ \\sigma_{13}\\\\ \\sigma_{12}\n", outfile);
   fputs("        \\end{array}\\right\\} = \n", outfile);
   fputs("      \\left|\\begin{array}{cccccc}\n", outfile);
   pm(6, pl->C, outfile);
   fputs("          \\end{array}\\right| \\times\n", outfile);
   fputs("        \\left\\{\\begin{array}{c}\n", outfile);
   fputs("            \\epsilon_{11}\\\\[2pt] \\epsilon_{22}\\\\[2pt]"
-       " \\epsilon_{33}\\\\[2pt]\n", outfile);
+        " \\epsilon_{33}\\\\[2pt]\n", outfile);
   fputs("            2\\cdot\\epsilon_{23}\\\\[2pt] 2\\cdot\\epsilon_{13}\\\\"
-       "[2pt] 2\\cdot\\epsilon_{12}\n", outfile);
+        "[2pt] 2\\cdot\\epsilon_{12}\n", outfile);
   fputs("          \\end{array}\\right\\}\\]\n", outfile);
   fputs("    }\n", outfile);
   fputs("  }\n", outfile);
@@ -215,19 +215,19 @@ void cmatrices(Laminate *pl, FILE *outfile)
   fputs("          \\end{array}\\right\\}\\]\n", outfile);
   fputs("    }\n", outfile);
   fputs("    \\vbox{\\small\\textbf{3D compliance tensor (S), contracted "
-       "notation}\\\\[-3mm]\n", outfile);
+        "notation}\\\\[-3mm]\n", outfile);
   fputs("      \\tiny\\[\\left\\{\\begin{array}{c}\n", outfile);
   fputs("            \\epsilon_{11}\\\\[2pt] \\epsilon_{22}\\\\[2pt]"
-       " \\epsilon_{33}\\\\[2pt]\n", outfile);
+        " \\epsilon_{33}\\\\[2pt]\n", outfile);
   fputs("            2\\cdot\\epsilon_{23}\\\\[2pt] 2\\cdot\\epsilon_{13}\\\\"
-       "[2pt] 2\\cdot\\epsilon_{12}\n", outfile);
+        "[2pt] 2\\cdot\\epsilon_{12}\n", outfile);
   fputs("        \\end{array}\\right\\} = \n", outfile);
   fputs("      \\left|\\begin{array}{cccccc}\n", outfile);
   pm(6, pl->S, outfile);
   fputs("          \\end{array}\\right| \\times\n", outfile);
   fputs("        \\left\\{\\begin{array}{c}\n", outfile);
   fputs("          \\sigma_{11}\\\\ \\sigma_{22}\\\\ \\sigma_{33}\\\\"
-       " \\sigma_{23}\\\\ \\sigma_{13}\\\\ \\sigma_{12}\n", outfile);
+        " \\sigma_{23}\\\\ \\sigma_{13}\\\\ \\sigma_{12}\n", outfile);
   fputs("          \\end{array}\\right\\}\\]\n", outfile);
   fputs("    }\n", outfile);
   fputs("  }\n", outfile);

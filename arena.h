@@ -36,7 +36,7 @@ extern Arena arena_create(ptrdiff_t length);
 extern ptrdiff_t arena_remaining(Arena *arena);
 // Allocate from the arena. Best to use arena_new instead.
 extern void *arena_alloc(Arena *arena, ptrdiff_t size, ptrdiff_t count,
-                         ptrdiff_t align);
+ptrdiff_t align);
 // Allocate “n” objects of type “t” from arena “a”.
 #define arena_new(a, t, n) (t *)arena_alloc(a, sizeof(t), n, alignof(t))
 // Destroy the arena and make it invalid.
