@@ -3,7 +3,7 @@
 %
 % Copyright © 2026 R.F. Smith <rsmith@xs4all.nl>. All rights reserved.
 % Created: 2026-02-01T19:52:00+01:00
-% Last modified: 2026-05-07T20:41:38+0200
+% Last modified: 2026-10-17T14:06:22+0200
 
 \newcommand{\twodigits}[1]{\ifnum#1<10 0\number#1\else\number#1\fi}
 \newcommand{\TheDate}{\number\year-\twodigits\month-\twodigits\day}
@@ -330,9 +330,8 @@ The command \texttt{lamrop -h} produces the following overview of the options.
 
 Running \texttt{lamprop} from the command line produces text output by
 default. Output in \LaTeX{} or \textsc{html} format can be requested with the
-appropriate arguments. \textsc{rtf} output (for inclusion in word
-processor documents) has been removed. Since most word processors can read
-\textsc{html}, use that instead.
+appropriate arguments. To include the output in e.g.\ ms-word, use the
+\textsc{html} output.
 
 By default, it produces all possible output, in text format.
 Often we are only interested in the engineering properties.
@@ -395,8 +394,8 @@ resin line must contain the following values, separated by white space.
         whitespace.
 \end{description}
 
-An example of a generic thermoset resin is shown below.\\
-\texttt{3800 0.36 40e-6 1.165 generic}
+An example of generic epoxy resin is shown below.\\
+\texttt{3800 0.36 40e-6 1.165 generic-epoxy}
 
 The \textbf{t:} line starts a new laminate. It only contains the name which
 identifies the laminate. This name must be unique within the current input
@@ -604,6 +603,53 @@ The ABD and H matrix equations in \tref{tab:quasi-isotropic-mat-2} basically sho
 behavior of a square piece of laminate small enough that the stress and strain
 resultants can be considered constant over its dimensions.
 
+The inverse of these matrices are the called the \emph{compliance} matrices.
+For example.
+
+\[
+  \left\{\begin{array}{c}
+      \epsilon_x\\[2pt] \epsilon_y\\[2pt] \gamma_{xy}\\[2pt]
+      \kappa_x\\[2pt] \kappa_y\\[2pt] \kappa_{xy}
+    \end{array}\right\} = 
+    \left|\begin{array}{cccccc}
+        a_{11} & a_{12} & a_{16} & b_{11} & b_{12} & b_{16}\\
+        a_{12} & a_{22} & a_{26} & b_{12} & b_{22} & b_{26}\\
+        a_{16} & a_{26} & a_{66} & b_{16} & b_{26} & b_{66}\\
+        b_{11} & b_{12} & b_{16} & d_{11} & d_{12} & d_{16}\\
+        b_{12} & b_{22} & b_{26} & d_{12} & d_{22} & d_{26}\\
+        b_{16} & b_{26} & b_{66} & d_{16} & d_{26} & d_{66}\\
+    \end{array}\right|
+    \times
+      \left\{\begin{array}{c}
+              N_x\\ N_y\\ N_{xy}\\ M_x\\ M_y\\ M_{xy}
+            \end{array}\right\}
+\]
+
+The compliance matrices allow us to see the effects of a particular load.
+For example, assume that in the example above, all forces except $N_y$ are
+zero.
+
+Then the matrix equation would be reduced to:
+
+\[
+  \left\{\begin{array}{c}
+      \epsilon_x\\[2pt] \epsilon_y\\[2pt] \gamma_{xy}\\[2pt]
+      \kappa_x\\[2pt] \kappa_y\\[2pt] \kappa_{xy}
+    \end{array}\right\} = 
+     \left\{\begin{array}{c}
+              a_{12}\cdot N_y \\
+              a_{22}\cdot N_y \\
+              a_{26}\cdot N_y \\
+              b_{12}\cdot N_y \\
+              b_{22}\cdot N_y \\
+              b_{26}\cdot N_y \\
+            \end{array}\right\}
+\]
+
+So if any of the used $b$ components are non-zero, the force $N_y$ will also
+cause twisting.
+Such coupling is generally unwanted.
+
 If we ignore thermal effects, the most general form of linear elasticity is:
 \[
     \sigma_{ij} = C_{ijkl}\epsilon_{kl}
@@ -639,6 +685,30 @@ The two indices in the stress and strain vectors indicate respectively the
 plane whereupon the stress/strain operates and the direction in which said
 stress/strain points.
 In this case, 1 is x, 2 is y and 3 is z.
+
+The inverse of the stiffness tensor is called the compliance tensor
+$S_{ijkl}$.
+In contracted notation:
+\[
+  \left\{\begin{array}{c}
+            \epsilon_{11}\\[2pt] \epsilon_{22}\\[2pt] \epsilon_{33}\\[2pt]
+            2\cdot\epsilon_{23}\\[2pt] 2\cdot\epsilon_{13}\\[2pt] 2\cdot\epsilon_{12}
+        \end{array}\right\} =
+     \left|\begin{array}{cccccc}
+        s_{11} & s_{12} & s_{13} & s_{14} & s_{15} & s_{16}\\
+               & s_{22} & s_{23} & s_{24} & s_{25} & s_{26}\\
+               &        & s_{33} & s_{34} & s_{35} & s_{36}\\
+               &        &        & s_{44} & s_{45} & s_{46}\\
+               &  \mathrm{sym.}  &        &        & s_{55} & s_{56}\\
+               &        &        &        &        & s_{66}\\
+    \end{array}\right|
+    \times
+        \left\{\begin{array}{c}
+          \sigma_{11}\\ \sigma_{22}\\ \sigma_{33}\\ \sigma_{23}\\ \sigma_{13}\\ \sigma_{12}
+          \end{array}\right\}
+\]
+
+This is also useful in showing what deformations result from a stress.
 
 \begin{table}[!htbp]
   \caption{\label{tab:quasi-isotropic-mat}properties of quasi isotropic laminate}
