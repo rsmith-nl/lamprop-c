@@ -5,7 +5,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-05-25T02:26:02+0200
+// Last modified: 2026-10-17T12:26:32+0200
 
 #include "core.h"
 #include "stringview.h"
@@ -21,6 +21,7 @@
 
 static void engprop(Laminate *pl, FILE *outfile);
 static void matrices(Laminate *pl, FILE *outfile);
+static void cmatrices(Laminate *pl, FILE *outfile);
 extern void text_fea(Laminate *pl, FILE *outfile);
 static void ltxclean(Sv8 str, char replace, char *outbuf, ptrdiff_t outlen);
 
@@ -72,7 +73,9 @@ void latex_out(Laminate *pl, Options opts)
   }
   fputs("      \\bottomrule\n", opts.outfile);
   fputs("    \\end{tabular}\n", opts.outfile);
-  if (opts.matrix) {
+  if (opts.cmatrix) {
+    cmatrices(pl, opts.outfile);
+  } else if (opts.matrix) {
     matrices(pl, opts.outfile);
   }
   if (opts.fea) {
@@ -148,7 +151,6 @@ void matrices(Laminate *pl, FILE *outfile)
   fputs("          N_x\\\\ N_y\\\\ N_{xy}\\\\ M_x\\\\ M_y\\\\ M_{xy}\n", outfile);
   fputs("        \\end{array}\\right\\} = \n", outfile);
   fputs("      \\left|\\begin{array}{cccccc}\n", outfile);
-  //}
   pm(6, pl->ABD, outfile);
   fputs("          \\end{array}\\right| \\times\n", outfile);
   fputs("        \\left\\{\\begin{array}{c}\n", outfile);
@@ -181,6 +183,51 @@ void matrices(Laminate *pl, FILE *outfile)
        " \\epsilon_{33}\\\\[2pt]\n", outfile);
   fputs("            2\\cdot\\epsilon_{23}\\\\[2pt] 2\\cdot\\epsilon_{13}\\\\"
        "[2pt] 2\\cdot\\epsilon_{12}\n", outfile);
+  fputs("          \\end{array}\\right\\}\\]\n", outfile);
+  fputs("    }\n", outfile);
+  fputs("  }\n", outfile);
+}
+
+void cmatrices(Laminate *pl, FILE *outfile)
+{
+  fputs("  \\vbox{\n", outfile);
+  fputs("    \\vbox{\\small\\textbf{In-plane compliance (abd) matrix}\\\\[-3mm]\n", outfile);
+  fputs("      \\tiny\\[\\left\\{\\begin{array}{c}\n", outfile);
+  fputs("            \\epsilon_x\\\\[2pt] \\epsilon_y\\\\[2pt] \\gamma_{xy}\\\\[2pt]\n", outfile);
+  fputs("            \\kappa_x\\\\[2pt] \\kappa_y\\\\[2pt] \\kappa_{xy}\n", outfile);
+  fputs("        \\end{array}\\right\\} = \n", outfile);
+  fputs("      \\left|\\begin{array}{cccccc}\n", outfile);
+  pm(6, pl->abd, outfile);
+  fputs("          \\end{array}\\right| \\times\n", outfile);
+  fputs("        \\left\\{\\begin{array}{c}\n", outfile);
+  fputs("          N_x\\\\ N_y\\\\ N_{xy}\\\\ M_x\\\\ M_y\\\\ M_{xy}\n", outfile);
+  fputs("          \\end{array}\\right\\}\\]\n", outfile);
+  fputs("    }\n", outfile);
+  fputs("    \\vbox{\\small\\textbf{Transverse compliance (h) matrix}\\\\[-2mm]\n", outfile);
+  fputs("      \\tiny\\[\\left\\{\\begin{array}{c}\n", outfile);
+  fputs("            \\gamma_{yz}\\\\[2pt] \\gamma_{xz}\n", outfile);
+  fputs("        \\end{array}\\right\\} = \n", outfile);
+  fputs("      \\left|\\begin{array}{cc}\n", outfile);
+  pm(2, pl->h, outfile);
+  fputs("          \\end{array}\\right| \\times\n", outfile);
+  fputs("        \\left\\{\\begin{array}{c}\n", outfile);
+  fputs("          V_y\\\\ V_x\n", outfile);
+  fputs("          \\end{array}\\right\\}\\]\n", outfile);
+  fputs("    }\n", outfile);
+  fputs("    \\vbox{\\small\\textbf{3D compliance tensor (S), contracted "
+       "notation}\\\\[-3mm]\n", outfile);
+  fputs("      \\tiny\\[\\left\\{\\begin{array}{c}\n", outfile);
+  fputs("            \\epsilon_{11}\\\\[2pt] \\epsilon_{22}\\\\[2pt]"
+       " \\epsilon_{33}\\\\[2pt]\n", outfile);
+  fputs("            2\\cdot\\epsilon_{23}\\\\[2pt] 2\\cdot\\epsilon_{13}\\\\"
+       "[2pt] 2\\cdot\\epsilon_{12}\n", outfile);
+  fputs("        \\end{array}\\right\\} = \n", outfile);
+  fputs("      \\left|\\begin{array}{cccccc}\n", outfile);
+  pm(6, pl->S, outfile);
+  fputs("          \\end{array}\\right| \\times\n", outfile);
+  fputs("        \\left\\{\\begin{array}{c}\n", outfile);
+  fputs("          \\sigma_{11}\\\\ \\sigma_{22}\\\\ \\sigma_{33}\\\\"
+       " \\sigma_{23}\\\\ \\sigma_{13}\\\\ \\sigma_{12}\n", outfile);
   fputs("          \\end{array}\\right\\}\\]\n", outfile);
   fputs("    }\n", outfile);
   fputs("  }\n", outfile);
