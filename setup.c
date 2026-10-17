@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-08 04:00:37 +0200
-// Last modified: 2026-05-26T14:54:48+0200
+// Last modified: 2026-10-17T11:14:13+0200
 
 #include "setup.h"
 #include "logging.h"
@@ -41,7 +41,7 @@ const char license[] =
   "SUCH DAMAGE.\n";
 
 const char help[] =
-  "usage: lamprop [-h] [-l | -H] [-e] [-m] [-f] [-L | -v] [--log=(debug|info|warn|error|crit)]\n"
+  "usage: lamprop [-h] [-l | -H] [-e] [-m|-c] [-f] [-L | -v] [--log=(debug|info|warn|error|crit)]\n"
   "               [-o outfile] [file]\n"
   "\n"
   "Calculate the elastic properties of a fibrous composite laminate. See the manual (lamprop-manual.pdf)\n"
@@ -56,6 +56,7 @@ const char help[] =
   "  -H, --html            generate HTML output\n"
   "  -e, --eng             output only the engineering properties\n"
   "  -m, --mat             output only the ABD matrix and stiffness tensor\n"
+  "  -c, --cmat            output only the abd matrix and compliance tensor\n"
   "  -f, --fea             output only material data for FEA\n"
   "  -L, --license         print the license\n"
   "  -v, --version         show program's version number and exit\n"
@@ -79,6 +80,7 @@ Options setup(int argc, char *argv[])
     {"html", no_argument, 0, 'H'},
     {"eng", no_argument, 0, 'e'},
     {"mat", no_argument, 0, 'm'},
+    {"cmat", no_argument, 0, 'c'},
     {"fea", no_argument, 0, 'f'},
     {"license", no_argument, 0, 'L'},
     {"version", no_argument, 0, 'v'},
@@ -88,7 +90,7 @@ Options setup(int argc, char *argv[])
   logging_configure("lamprop-c", LOG_WARNING);
   while (1) {
     int32_t option_index = 0;
-    choice = getopt_long(argc, argv, "hilHemfLvo:", long_options, &option_index);
+    choice = getopt_long(argc, argv, "hilHemcfLvo:", long_options, &option_index);
     if (choice == -1) {
       break;
     }
@@ -116,6 +118,9 @@ Options setup(int argc, char *argv[])
         break;
       case 'm':
         rv.matrix = true;
+        break;
+      case 'c':
+        rv.cmatrix = true;
         break;
       case 'f':
         rv.fea = true;
@@ -148,7 +153,7 @@ Options setup(int argc, char *argv[])
   rv.argc = argc - optind;
   rv.argv = argv + optind;
   // If none of the output options are given, set all of them
-  if (rv.eng == false && rv.matrix == false && rv.fea == false) {
+  if (rv.eng == false && rv.matrix == false && rv.cmatrix == false && rv.fea == false) {
     rv.eng = true;
     rv.matrix = true;
     rv.fea = true;
