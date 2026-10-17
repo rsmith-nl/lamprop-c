@@ -4,7 +4,7 @@
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: MIT
 // Created: 2025-08-09 22:26:21 +0200
-// Last modified: 2026-06-02T16:44:35+0200
+// Last modified: 2026-10-17T11:12:35+0200
 
 #include "core.h"
 #include "version.h"
@@ -15,6 +15,7 @@
 
 static void engprop(Laminate *pl, FILE *outfile);
 static void matrices(Laminate *pl, FILE *outfile);
+static void cmatrices(Laminate *pl, FILE *outfile);
 void text_fea(Laminate *pl, FILE *outfile);
 
 void text_out(Laminate *pl, Options opts)
@@ -44,7 +45,9 @@ void text_out(Laminate *pl, Options opts)
   if (opts.eng) {
     engprop(pl, opts.outfile);
   }
-  if (opts.matrix) {
+  if (opts.cmatrix) {
+    cmatrices(pl, opts.outfile);
+  } else if (opts.matrix) {
     matrices(pl, opts.outfile);
   }
   if (opts.fea) {
@@ -88,6 +91,26 @@ void matrices(Laminate *pl, FILE *outfile)
     fprintf(outfile, "|% -10.4g % -10.4g % -10.4g % -10.4g % -10.4g % -10.4g |\n",
             pl->C[r][0], pl->C[r][1], pl->C[r][2],
             pl->C[r][3], pl->C[r][4], pl->C[r][5]);
+  }
+}
+
+void cmatrices(Laminate *pl, FILE *outfile)
+{
+  fputs("In-plane compliance (abd) matrix:\n", outfile);
+  for (int32_t r = 0; r < 6; r++) {
+    fprintf(outfile, "|% -10.4g % -10.4g % -10.4g % -10.4g % -10.4g % -10.4g |\n",
+            pl->abd[r][0], pl->abd[r][1], pl->abd[r][2],
+            pl->abd[r][3], pl->abd[r][4], pl->abd[r][5]);
+  }
+  fputs("Transverse (h) compliance matrix:\n", outfile);
+  fprintf(outfile, "|% -10.4g % -10.4g |\n", pl->H[0][0], pl->H[0][1]);
+  fprintf(outfile, "|% -10.4g % -10.4g |\n", pl->H[1][0], pl->H[1][1]);
+  fputs("3D compliance tensor [S], contracted notation:\n", outfile);
+  fputs("(indices for stress/strain are in the order 11, 22, 33, 23, 13, 12)\n", outfile);
+  for (int32_t r = 0; r < 6; r++) {
+    fprintf(outfile, "|% -10.4g % -10.4g % -10.4g % -10.4g % -10.4g % -10.4g |\n",
+            pl->S[r][0], pl->S[r][1], pl->S[r][2],
+            pl->S[r][3], pl->S[r][4], pl->S[r][5]);
   }
 }
 
