@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-08-28 23:49:02 +0200
-// Last modified: 2026-10-17T11:28:40+0200
+// Last modified: 2026-10-17T15:03:29+0200
 
 #include "sbuf.h"
 #include <assert.h>
@@ -130,7 +130,7 @@ extern void sbuf_appendd(Sbuf *buf, double f)
       intbuf[index--] = ORD0 + result.rem;
       value = result.quot;
     } while (value > 0 && index > 0);
-    strlcpy(tbuf+bufused, intbuf+index+1, BUFLEND-bufused-1);
+    strncpy(tbuf+bufused, intbuf+index+1, BUFLEND-bufused-1);
     bufused += strlen(intbuf+index+1);
     if (frac == 0) {
       sbuf_appends(buf, tbuf);
@@ -153,7 +153,7 @@ extern void sbuf_appendd(Sbuf *buf, double f)
     while (fracbuf[ridx] == '0') {
       fracbuf[ridx--] = 0;
     }
-    strlcpy(tbuf+bufused, fracbuf+index+1, BUFLEND-bufused-1);
+    strncpy(tbuf+bufused, fracbuf+index+1, BUFLEND-bufused-1);
     sbuf_appends(buf, tbuf);
     return;
   }
