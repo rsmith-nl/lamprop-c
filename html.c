@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // Copyright © 2025 R.F. Smith <rsmith@xs4all.nl>
 // Created: 2025-08-11 20:20:22 +0200
-// Last modified: 2026-05-25T02:25:43+0200
+// Last modified: 2026-10-17T12:10:12+0200
 
 #include "core.h"
 #include "version.h"
@@ -20,6 +20,7 @@
 
 static void engprop(Laminate *pl, FILE *outfile);
 static void matrices(Laminate *pl, FILE *outfile);
+static void cmatrices(Laminate *pl, FILE *outfile);
 extern void text_fea(Laminate *pl, FILE *outfile);
 
 void html_out(Laminate *pl, Options opt)
@@ -96,7 +97,9 @@ void html_out(Laminate *pl, Options opt)
   fputs("</table>\n", opt.outfile);
   fputs("</td>\n", opt.outfile);
   fputs("</tr>\n", opt.outfile);
-  if (opt.matrix) {
+  if (opt.cmatrix) {
+    cmatrices(pl, opt.outfile);
+  } else if (opt.matrix) {
     matrices(pl, opt.outfile);
   }
   if (opt.fea) {
@@ -302,6 +305,127 @@ void matrices(Laminate *pl, FILE *outfile)
     fputs("<tr>\n", outfile);
     fputs(fstr2[r], outfile);
     pr(6, pl->C, r, outfile);
+    fputs(dstr2[r], outfile);
+    fputs("</tr>\n", outfile);
+  }
+  fputs("</tbody>\n", outfile);
+  fputs("</table>\n", outfile);
+  fputs("</td>\n", outfile);
+  fputs("</tr>\n", outfile);
+}
+
+void cmatrices(Laminate *pl, FILE *outfile)
+{
+  char *dstr[6] = {
+    "<td>N<sub>x</sub></td>",
+    "<td>N<sub>y</sub></td>",
+    "<td>N<sub>xy</sub></td>",
+    "<td>M<sub>x</sub></td>",
+    "<td>M<sub>y</sub></td>",
+    "<td>M<sub>xy</sub></td>"
+  };
+  char *fstr[6] = {
+    "<td>&epsilon;<sub>x</sub></td>",
+    "<td>&epsilon;<sub>y</sub></td>",
+    "<td>&gamma;<sub>xy</sub></td>",
+    "<td>&kappa;<sub>x</sub></td>",
+    "<td>&kappa;<sub>y</sub></td>",
+    "<td>&kappa;<sub>xy</sub></td>",
+  };
+  fputs("<tr>\n", outfile);
+  fputs("<!-- second row, compliance or abd matrix -->\n", outfile);
+  fputs("<td colspan=\"2\">\n", outfile);
+  fputs("<table border=\"1\" frame=\"vsides\" rules=\"groups\" cellpadding=\"5%\">\n", outfile);
+  fputs("<caption><strong>In-plane compliance (abd) matrix</strong></caption>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"6\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<tbody align=\"center\">\n", outfile);
+  fputs("<tr>\n", outfile);
+  fputs(fstr[0], outfile);
+  fputs("<td rowspan=\"6\">=</td>\n", outfile);
+  pr(6, pl->abd, 0, outfile);
+  fputs("<td rowspan=\"6\">&times;</td>\n", outfile);
+  fputs(dstr[0], outfile);
+  fputs("</tr>\n", outfile);
+  for (int32_t r = 1; r < 6; r++) {
+    fputs("<tr>\n", outfile);
+    fputs(fstr[r], outfile);
+    pr(6, pl->abd, r, outfile);
+    fputs(dstr[r], outfile);
+    fputs("</tr>\n", outfile);
+  }
+  fputs("</tbody>\n", outfile);
+  fputs("</table>\n", outfile);
+  fputs("</td>\n", outfile);
+  fputs("</tr>\n", outfile);
+  fputs("<tr>\n", outfile);
+  fputs("<!-- third row, transverse compliance or h matrix -->\n", outfile);
+  fputs("<td colspan=\"2\">\n", outfile);
+  fputs("<table border=\"1\" frame=\"vsides\" rules=\"groups\" cellpadding=\"5%\">\n", outfile);
+  fputs("<caption><strong>Transverse compliance (h) matrix</strong></caption>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"2\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<tbody align=\"center\">\n", outfile);
+  fputs("<tr>\n", outfile);
+  fputs("<td>&gamma;<sub>yz</sub></td>\n", outfile);
+  fputs("<td rowspan=\"2\">=</td>\n", outfile);
+  pr(2, pl->h, 0, outfile);
+  fputs("<td rowspan=\"2\">&times;</td>\n", outfile);
+  fputs("<td>V<sub>y</sub></td>\n", outfile);
+  fputs("</tr>\n", outfile);
+  fputs("<tr>\n", outfile);
+  fputs("<td>&gamma;<sub>xz</sub></td>\n", outfile);
+  pr(2, pl->h, 1, outfile);
+  fputs("<td>V<sub>x</sub></td>\n", outfile);
+  fputs("</tr>\n", outfile);
+  fputs("</tbody>\n", outfile);
+  fputs("</table>\n", outfile);
+  fputs("</td>\n", outfile);
+  fputs("</tr>\n", outfile);
+  char *dstr2[6] = {
+    "<td>&sigma;<sub>11</sub></td>",
+    "<td>&sigma;<sub>22</sub></td>",
+    "<td>&sigma;<sub>33</sub></td>",
+    "<td>&sigma;<sub>23</sub></td>",
+    "<td>&sigma;<sub>13</sub></td>",
+    "<td>&sigma;<sub>12</sub></td>",
+  };
+  char *fstr2[6] = {
+    "<td>&epsilon;<sub>11</sub></td>",
+    "<td>&epsilon;<sub>22</sub></td>",
+    "<td>&epsilon;<sub>33</sub></td>",
+    "<td>2&epsilon;<sub>23</sub></td>",
+    "<td>2&epsilon;<sub>13</sub></td>",
+    "<td>2&epsilon;<sub>12</sub></td>",
+  };
+  fputs("<tr>\n", outfile);
+  fputs("<!-- next row, compliance tensor -->\n", outfile);
+  fputs("<td colspan=\"2\">\n", outfile);
+  fputs("<table border=\"1\" frame=\"vsides\" rules=\"groups\" cellpadding=\"5%\">\n", outfile);
+  fputs("<caption><strong>3D compliance (S) tensor, contracted notation</strong></caption>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"6\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<colgroup span=\"1\"></colgroup>\n", outfile);
+  fputs("<tbody align=\"center\">\n", outfile);
+  fputs("<tr>\n", outfile);
+  fputs(fstr2[0], outfile);
+  fputs("<td rowspan=\"6\">=</td>\n", outfile);
+  pr(6, pl->S, 0, outfile),
+  fputs("<td rowspan=\"6\">&times;</td>\n", outfile);
+  fputs(dstr2[0], outfile);
+  fputs("</tr>\n", outfile);
+  for (int32_t r = 1; r < 6; r++) {
+    fputs("<tr>\n", outfile);
+    fputs(fstr2[r], outfile);
+    pr(6, pl->S, r, outfile);
     fputs(dstr2[r], outfile);
     fputs("</tr>\n", outfile);
   }
