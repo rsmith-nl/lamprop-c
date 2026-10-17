@@ -40,7 +40,7 @@ Requirements
 
 To build this program you will need a C compiler that supports the C11
 standard.
-The build has been tested with clang 19 and gcc 15.
+The build has been tested with clang 19 and gcc 16.
 
 POSIX
 -----
