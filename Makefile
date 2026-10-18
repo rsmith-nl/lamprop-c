@@ -2,7 +2,7 @@
 
 # Package name and version
 BASENAME = lamprop
-RELDATE=2026.08.25
+RELDATE=2026.10.18
 
 # Define the C compiler to be used, if not cc.
 #CC = gcc
