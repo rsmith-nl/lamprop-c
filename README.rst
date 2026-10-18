@@ -52,7 +52,7 @@ ms-windows
 
 The only tested build method on ms-windows is using w64devkit_.
 Open ``w64devkit``, change to the directory where you have stored the source,
-and issue the command ``make -f Makefile.win32``.
+and issue the command ``make -f Makefile.w64devkit``.
 
 .. _w64devkit: https://github.com/skeeto/w64devkit
 
