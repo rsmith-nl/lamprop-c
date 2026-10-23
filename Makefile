@@ -8,7 +8,7 @@ RELDATE=2026.10.18
 #CC = gcc
 
 # For debugging builds.
-DCFLAGS = -pipe -std=c11 -g3 -Wall -Wextra -Wstrict-prototypes -Wpedantic \
+DCFLAGS = -pipe -std=c11 -g -Wall -Wextra -Wstrict-prototypes -Wpedantic \
                 -Wshadow-all -Wmissing-field-initializers -Wpointer-arith \
                 -fsanitize=address,undefined
 DLFLAGS = -pipe -fsanitize=address,undefined
