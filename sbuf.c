@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-08-28 23:49:02 +0200
-// Last modified: 2026-10-17T15:03:29+0200
+// Last modified: 2026-10-24T13:52:06+0200
 
 #include "sbuf.h"
 #include <assert.h>
@@ -20,15 +20,18 @@ void sbuf_append(Sbuf *buf, char *str, ptrdiff_t len)
 {
   assert(buf != 0);
   assert(str != 0);
+  assert(len >= 0);
   if (buf->error == true) {
     return;
   }
   ptrdiff_t alen = strnlen(str, len);
-  ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
+  ptrdiff_t remaining = SBUF_MAX - buf->used;
   if (len < remaining) {
     memcpy(buf->data + buf->used, str, alen);
     buf->used += alen;
     buf->error = false;
+    buf->data[buf->used] = 0;
+    buf->data[SBUF_MAX] = 0;
   } else {
     buf->error = true;
   }
@@ -40,10 +43,12 @@ void sbuf_appendc(Sbuf *buf, char c)
   if (buf->error == true) {
     return;
   }
-  ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
+  ptrdiff_t remaining = SBUF_MAX - buf->used;
   if (remaining >= 1) {
     buf->data[buf->used++] = c;
     buf->error = false;
+    buf->data[buf->used] = 0;
+    buf->data[SBUF_MAX] = 0;
   } else {
     buf->error = true;
   }
@@ -51,7 +56,7 @@ void sbuf_appendc(Sbuf *buf, char c)
 
 inline void sbuf_appends(Sbuf *buf, char *str)
 {
-  sbuf_append(buf, str, strlen(str));
+  sbuf_append(buf, str, strnlen(str, SBUF_MAX));
 }
 
 extern void sbuf_appendi(Sbuf *buf, int64_t i)
@@ -60,7 +65,7 @@ extern void sbuf_appendi(Sbuf *buf, int64_t i)
   if (buf->error == true) {
     return;
   }
-#define BUFLENI 21
+#define BUFLENI 32
 #define ORD0 48
   int64_t work = 0;
   bool negative = false;
@@ -81,7 +86,8 @@ extern void sbuf_appendi(Sbuf *buf, int64_t i)
     assert(index > 0);
     tmpbuf[index--] = '-';
   }
-  sbuf_appends(buf, tmpbuf + index + 1);
+  index++;
+  sbuf_append(buf, tmpbuf + index, strnlen(tmpbuf + index, BUFLENI - index));
 }
 
 static double frexp10(double arg, int *exp)
@@ -108,14 +114,14 @@ extern void sbuf_appendd(Sbuf *buf, double f)
   }
   if (isinf(f)) {
     char inf[4] = {0xE2, 0x88, 0x9E, 0}; // UTF-8 for infinity symbol.
-    sbuf_appends(buf, inf);
+    sbuf_append(buf, inf, 4);
     return;
   } else if (mantissa == 0 && exp == 0) {
     tbuf[bufused++] = '0';
-    sbuf_appends(buf, tbuf);
+    sbuf_append(buf, tbuf, BUFLEND);
     return;
   } else if (isnan(f)) {
-    sbuf_appends(buf, "NaN");
+    sbuf_append(buf, "NaN", 3);
     return;
   }
   if (exp > 0 && exp < 10) {
@@ -133,7 +139,7 @@ extern void sbuf_appendd(Sbuf *buf, double f)
     strncpy(tbuf + bufused, intbuf + index + 1, BUFLEND - bufused - 1);
     bufused += strlen(intbuf + index + 1);
     if (frac == 0) {
-      sbuf_appends(buf, tbuf);
+      sbuf_append(buf, tbuf, BUFLEND);
       return;
     }
     if (buf->decsep == 0) {
@@ -154,7 +160,7 @@ extern void sbuf_appendd(Sbuf *buf, double f)
       fracbuf[ridx--] = 0;
     }
     strncpy(tbuf + bufused, fracbuf + index + 1, BUFLEND - bufused - 1);
-    sbuf_appends(buf, tbuf);
+    sbuf_append(buf, tbuf, BUFLEND);
     return;
   }
   int decimal = (int)floor(am);
@@ -191,7 +197,7 @@ extern void sbuf_appendd(Sbuf *buf, double f)
     exp -= 10;
   }
   tbuf[bufused++] = ORD0 + exp;
-  sbuf_appends(buf, tbuf);
+  sbuf_append(buf, tbuf, BUFLEND);
 }
 
 void sbuf_printf(Sbuf *buf, char *fmt, ...)
@@ -212,13 +218,15 @@ void sbuf_printf(Sbuf *buf, char *fmt, ...)
   } else {
     buf->error = false;
     buf->used += used;
+    buf->data[buf->used] = 0;
+    buf->data[SBUF_MAX] = 0;
   }
 }
 
 ptrdiff_t sbuf_remaining(Sbuf *buf)
 {
   assert(buf != 0);
-  ptrdiff_t remaining = SBUF_SIZE - buf->used - 1;
+  ptrdiff_t remaining = SBUF_MAX - buf->used;
   return remaining;
 }
 
@@ -236,4 +244,96 @@ void sbuf_reset(Sbuf *buf)
   memset(buf->data, 0, SBUF_SIZE);
   buf->used = 0;
   buf->error = false;
+}
+
+ptrdiff_t sbuf_find(Sbuf *buf, char *f)
+{
+  assert(buf != 0);
+  if (buf->error == true) {
+    return -1;
+  }
+  ptrdiff_t fl = strnlen(f, SBUF_MAX);
+  if (buf->used == 0 || fl == 0 || fl > buf->used) {
+    return -1;
+  }
+  for (ptrdiff_t j = 0; j < buf->used - fl; j++) {
+    if (memcmp(buf->data + j, f, fl) == 0) {
+      return j;
+    }
+  }
+  return -1;
+}
+
+void sbuf_replace_char(Sbuf *buf, char from, char to)
+{
+  assert(buf != 0);
+  if (buf->error == true) {
+    return;
+  }
+  for (ptrdiff_t j = 0; j < buf->used; j++) {
+    if (buf->data[j] == from) {
+      buf->data[j] = to;
+    }
+  }
+  buf->data[buf->used] = 0;
+  buf->data[SBUF_MAX] = 0;
+}
+
+void sbuf_replace_string(Sbuf *buf, char *from, char *to)
+{
+  assert(buf != 0);
+  if (buf->error == true) {
+    return;
+  }
+  ptrdiff_t fromlen = strnlen(from, SBUF_MAX);
+  ptrdiff_t tolen = strnlen(to, SBUF_MAX);
+  ptrdiff_t offset = tolen - fromlen;
+  if (fromlen > buf->used) {
+    return;
+  }
+  for (ptrdiff_t j = 0; j <= buf->used - fromlen; j++) {
+    if (buf->data[j] == from[0] && strncmp(buf->data + j, from, fromlen) == 0) {
+      // Found “from”.
+      // Make space if “to” is longer than “from”.
+      if (tolen > fromlen) {
+        // Return if not enough room is available.
+        if (sbuf_remaining(buf) < (tolen - fromlen)) {
+          buf->error = true;
+          return;
+        }
+        for (ptrdiff_t k = buf->used + offset; k > j + fromlen; k--) {
+          buf->data[k] = buf->data[k - 1];
+        }
+        buf->used += offset;
+      }
+      // Replace
+      strncpy(buf->data + j, to, tolen);
+      // Move remainder if “to” is shorter than “from”.
+      if (fromlen > tolen) {
+        for (ptrdiff_t k = j + tolen; k < buf->used; k++) {
+          buf->data[k] = buf->data[k - offset];
+        };
+      }
+      // Move to past replacement.
+      j += tolen;
+    }
+  }
+  buf->data[buf->used] = 0;
+  buf->data[SBUF_MAX] = 0;
+}
+
+
+void sbuf_ascii_lower(Sbuf *buf)
+{
+  assert(buf != 0);
+  if (buf->error == true) {
+    return;
+  }
+  for (ptrdiff_t j = 0; j < buf->used; j++) {
+    if (buf->data[j] > 64 && buf->data[j] < 91) {
+      buf->data[j] += 32;
+    }
+  }
+  buf->data[buf->used] = 0;
+  buf->data[SBUF_MAX] = 0;
 }

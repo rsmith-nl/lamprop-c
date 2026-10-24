@@ -5,7 +5,7 @@
 // Author: R.F. Smith <rsmith@xs4all.nl>
 // SPDX-License-Identifier: Unlicense
 // Created: 2025-08-28 23:49:02 +0200
-// Last modified: 2026-04-11T14:18:24+0200
+// Last modified: 2026-10-23T14:51:17+0200
 
 // Simple string buffer.
 // Mostly conceived for assembling strings.
@@ -21,6 +21,7 @@
 #include <limits.h>  // for PATH_MAX
 
 #define SBUF_SIZE PATH_MAX
+#define SBUF_MAX (SBUF_SIZE-1)
 
 typedef struct {
   ptrdiff_t used;
@@ -42,10 +43,10 @@ extern void sbuf_append(Sbuf *buf, char *str, ptrdiff_t len);
 // Appends a character.
 extern void sbuf_appendc(Sbuf *buf, char c);
 
-// Appends null-terminated strings “str” to “buf”.
+// Appends null-terminated strings “str” to the buffer.
 extern void sbuf_appends(Sbuf *buf, char *str);
 
-// Format and append an integer number to buf.
+// Format and append an integer number to “buf”.
 extern void sbuf_appendi(Sbuf *buf, int64_t i);
 
 // Format and append a double to buf.
@@ -62,6 +63,20 @@ extern void sbuf_fputs(Sbuf *buf, FILE* stream);
 
 // Empty the buffer.
 extern void sbuf_reset(Sbuf *buf);
+
+// Returns the offset of the first occurence of “str” in “buf”.
+// In case of error, returns -1.
+ptrdiff_t sbuf_find(Sbuf *buf, char *f);
+
+// Replace a character in the whole buffer.
+void sbuf_replace_char(Sbuf *buf, char from, char to);
+
+// Replace a string in the whole buffer.
+void sbuf_replace_string(Sbuf *buf, char *from, char *to);
+
+// Switch ascii characters to lowercase
+void sbuf_ascii_lower(Sbuf *buf);
+
 
 #ifdef __cplusplus
 }
